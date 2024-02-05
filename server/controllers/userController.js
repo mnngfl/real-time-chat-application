@@ -15,19 +15,21 @@ const createToken = (_id) => {
 };
 
 const registerUser = async (req, res) => {
+  const { userName, password } = req.body;
   try {
-    const { userName, password } = req.body;
-
     let user = await userModel.findOne({ userName });
 
-    if (user)
+    if (user) {
       return res
         .status(400)
         .json("User with the given userName already exist...");
-    if (!userName || !password)
+    }
+    if (!userName || !password) {
       return res.status(400).json("All fields are required...");
-    if (!validator.isStrongPassword(password))
+    }
+    if (!validator.isStrongPassword(password)) {
       return res.status(400).json("Password must be a strong passwords...");
+    }
 
     user = new userModel({ userName, password });
 
@@ -45,4 +47,49 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser };
+const loginUser = async (req, res) => {
+  const { userName, password } = req.body;
+
+  try {
+    let user = await userModel.findOne({ userName });
+    if (!user) {
+      return res.status(400).json("Invalid email or password...");
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(400).json("Invalid email or password...");
+    }
+
+    const token = createToken(user._id);
+
+    res.status(200).json({ _id: user._id, userName, token });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+const findUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await userModel.findById(userId);
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await userModel.find();
+    res.status(200).json(users);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+module.exports = { registerUser, loginUser, findUser, getUsers };
