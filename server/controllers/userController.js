@@ -20,17 +20,17 @@ const registerUser = async (req, res) => {
     let user = await userModel.findOne({ userName });
 
     if (user) {
-      res.apiError("User with the given userName already exist...", 400);
+      return res.apiError("User with the given userName already exist...", 400);
     }
     if (!userName || !password) {
-      res.apiError("All fields are required...", 400);
+      return res.apiError("All fields are required...", 400);
     }
     if (
       !validator.isStrongPassword(password, {
         minUppercase: 0,
       })
     ) {
-      res.apiError("Password must be a strong passwords...", 400);
+      return res.apiError("Password must be a strong passwords...", 400);
     }
 
     user = new userModel({ userName, password });
@@ -42,10 +42,10 @@ const registerUser = async (req, res) => {
 
     const token = createToken(user._id);
 
-    res.apiSuccess({ _id: user._id, userName, token });
+    return res.apiSuccess({ _id: user._id, userName, token });
   } catch (error) {
     console.error(error);
-    res.apiError(error);
+    return res.apiError(error);
   }
 };
 
@@ -55,20 +55,20 @@ const loginUser = async (req, res) => {
   try {
     let user = await userModel.findOne({ userName });
     if (!user) {
-      res.apiError("Invalid email or password...", 400);
+      return res.apiError("Invalid email or password...", 400);
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      res.apiError("Invalid email or password...", 400);
+      return res.apiError("Invalid email or password...", 400);
     }
 
     const token = createToken(user._id);
 
-    res.apiSuccess({ _id: user._id, userName, token });
+    return res.apiSuccess({ _id: user._id, userName, token });
   } catch (error) {
     console.error(error);
-    res.apiError(error);
+    return res.apiError(error);
   }
 };
 
@@ -77,20 +77,20 @@ const findUser = async (req, res) => {
 
   try {
     const user = await userModel.findById(userId);
-    res.apiSuccess(user);
+    return res.apiSuccess(user);
   } catch (error) {
     console.error(error);
-    res.apiError(error);
+    return res.apiError(error);
   }
 };
 
 const getUsers = async (req, res) => {
   try {
     const users = await userModel.find();
-    res.apiSuccess(users);
+    return res.apiSuccess(users);
   } catch (error) {
     console.error(error);
-    res.apiError(error);
+    return res.apiError(error);
   }
 };
 
