@@ -20,15 +20,17 @@ const registerUser = async (req, res) => {
     let user = await userModel.findOne({ userName });
 
     if (user) {
-      return res
-        .status(400)
-        .json("User with the given userName already exist...");
+      res.apiError("User with the given userName already exist...", 400);
     }
     if (!userName || !password) {
-      return res.status(400).json("All fields are required...");
+      res.apiError("All fields are required...", 400);
     }
-    if (!validator.isStrongPassword(password)) {
-      return res.status(400).json("Password must be a strong passwords...");
+    if (
+      !validator.isStrongPassword(password, {
+        minUppercase: 0,
+      })
+    ) {
+      res.apiError("Password must be a strong passwords...", 400);
     }
 
     user = new userModel({ userName, password });
@@ -40,10 +42,10 @@ const registerUser = async (req, res) => {
 
     const token = createToken(user._id);
 
-    res.status(200).json({ _id: user._id, userName, token });
+    res.apiSuccess({ _id: user._id, userName, token });
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    console.error(error);
+    res.apiError(error);
   }
 };
 
@@ -53,20 +55,20 @@ const loginUser = async (req, res) => {
   try {
     let user = await userModel.findOne({ userName });
     if (!user) {
-      return res.status(400).json("Invalid email or password...");
+      res.apiError("Invalid email or password...", 400);
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return res.status(400).json("Invalid email or password...");
+      res.apiError("Invalid email or password...", 400);
     }
 
     const token = createToken(user._id);
 
-    res.status(200).json({ _id: user._id, userName, token });
+    res.apiSuccess({ _id: user._id, userName, token });
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    console.error(error);
+    res.apiError(error);
   }
 };
 
@@ -75,20 +77,20 @@ const findUser = async (req, res) => {
 
   try {
     const user = await userModel.findById(userId);
-    res.status(200).json(user);
+    res.apiSuccess(user);
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    console.error(error);
+    res.apiError(error);
   }
 };
 
 const getUsers = async (req, res) => {
   try {
     const users = await userModel.find();
-    res.status(200).json(users);
+    res.apiSuccess(users);
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    console.error(error);
+    res.apiError(error);
   }
 };
 
