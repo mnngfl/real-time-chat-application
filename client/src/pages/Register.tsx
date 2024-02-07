@@ -4,37 +4,163 @@ import {
   Container,
   Flex,
   FormControl,
+  FormErrorMessage,
+  FormLabel,
   Input,
   Link,
   Text,
 } from "@chakra-ui/react";
+import { useState } from "react";
+import validator from "validator";
+import { RegisterUserRequest, RegisterUserResponse } from "../types/users";
+import { registerUser } from "../services/users";
+import { useAlertDialog } from "../context/AlertDialogProvider";
 
 const Register = () => {
+  const { openAlert } = useAlertDialog();
+
+  const [formData, setFormData] = useState<RegisterUserRequest>({
+    userName: "",
+    password: "",
+    passwordConfirm: "",
+  });
+  const [errors, setErrors] = useState<Partial<RegisterUserRequest>>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    if (isSubmitted) {
+      let newErrors = { ...errors };
+      newErrors = validateField(newErrors, name, value);
+      setErrors(newErrors);
+    }
+  };
+
+  const validateField = (
+    prevErrors: Partial<RegisterUserRequest>,
+    fieldName: string,
+    value: string
+  ) => {
+    const newErrors = { ...prevErrors };
+    switch (fieldName) {
+      case "userName":
+        if (!validator.matches(value, "([a-z0-9]){4,30}")) {
+          newErrors.userName = "Enter 4 to 30 lowercase letters and numbers.";
+        } else {
+          delete newErrors.userName;
+        }
+        break;
+      case "password":
+        if (!validator.isStrongPassword(value, { minUppercase: 0 })) {
+          newErrors.password =
+            "At least 8 characters with 1 lowercase, 1 number, and 1 special character.";
+        } else {
+          delete newErrors.password;
+        }
+        break;
+      case "passwordConfirm":
+        if (value.length === 0) {
+          newErrors.passwordConfirm = "Enter a password confirm.";
+        } else if (!validator.equals(formData.password, value)) {
+          newErrors.passwordConfirm = "Passwords do not match.";
+        } else {
+          delete newErrors.passwordConfirm;
+        }
+        break;
+      default:
+        break;
+    }
+    return newErrors;
+  };
+
+  const validateForm = () => {
+    let newErrors = { ...errors };
+    newErrors = validateField(newErrors, "userName", formData.userName);
+    newErrors = validateField(newErrors, "password", formData.password);
+    newErrors = validateField(
+      newErrors,
+      "passwordConfirm",
+      formData.passwordConfirm
+    );
+    return newErrors;
+  };
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsSubmitted(true);
+
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
+    try {
+      const res: RegisterUserResponse = await registerUser(formData);
+      openAlert("Register Succeed", `Hello, ${res.userName}`);
+    } catch (error) {
+      openAlert("Register Failed", error as string);
+    }
+  };
+
   return (
     <Container maxW={"container.sm"}>
       <Flex justifyContent={"center"} alignItems={"center"} h={"100%"}>
-        <Box width={"30rem"} p={"4rem"} bg="gray.300" borderRadius={8}>
+        <Box width={"32rem"} p={"4rem"} bg="gray.300" borderRadius={8}>
           <Text fontSize={"3xl"} fontWeight={500}>
             Register
           </Text>
-          <FormControl isRequired my={4}>
-            <Input placeholder="Enter your username" />
+          <FormControl my={4} isInvalid={!!errors?.userName}>
+            <FormLabel>User name</FormLabel>
+            <Input
+              placeholder="Enter 4 to 30 lowercase letters and numbers"
+              name="userName"
+              value={formData.userName}
+              onChange={handleChange}
+            />
+            {errors?.userName && (
+              <FormErrorMessage>{errors.userName}</FormErrorMessage>
+            )}
           </FormControl>
 
-          <FormControl isRequired mb={4}>
-            <Input type="password" placeholder="Enter your password" />
+          <FormControl mb={4} isInvalid={!!errors?.password}>
+            <FormLabel>Password</FormLabel>
+            <Input
+              type="password"
+              placeholder="Please enter a secure password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            {errors?.password && (
+              <FormErrorMessage>{errors.password}</FormErrorMessage>
+            )}
           </FormControl>
 
-          <FormControl isRequired mb={4}>
-            <Input type="password" placeholder="Confirm your password" />
+          <FormControl mb={4} isInvalid={!!errors?.passwordConfirm}>
+            <FormLabel>Password Confirm</FormLabel>
+            <Input
+              type="password"
+              name="passwordConfirm"
+              value={formData.passwordConfirm}
+              onChange={handleChange}
+            />
+            {errors?.passwordConfirm && (
+              <FormErrorMessage>{errors.passwordConfirm}</FormErrorMessage>
+            )}
           </FormControl>
 
           <Button
-            type="submit"
             colorScheme="teal"
             size={"lg"}
             my={4}
             w={"100%"}
+            onClick={(e) => handleSubmit(e)}
           >
             Sign Up
           </Button>

@@ -13,7 +13,7 @@ const Login = () => {
   return (
     <Container maxW={"container.sm"}>
       <Flex justifyContent={"center"} alignItems={"center"} h={"100%"}>
-        <Box width={"30rem"} p={"4rem"} bg="gray.300" borderRadius={8}>
+        <Box width={"32rem"} p={"4rem"} bg="gray.300" borderRadius={8}>
           <Text fontSize={"3xl"} fontWeight={500}>
             Login
           </Text>

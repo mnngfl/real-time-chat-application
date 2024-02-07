@@ -9,7 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
-import CurrentChat from "../components/chat/CurrentChat";
+import ChatRoom from "../components/chat/ChatRoom";
 
 const Chat = () => {
   return (
@@ -30,7 +30,7 @@ const Chat = () => {
         <ChatList />
       </Box>
       <Box w="65%" bg="gray.900" p={12} color={"white"}>
-        <CurrentChat />
+        <ChatRoom />
       </Box>
     </Flex>
   );
