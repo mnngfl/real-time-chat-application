@@ -22,6 +22,12 @@ const registerUser = async (req, res) => {
     if (user) {
       return res.apiError("User with the given userName already exist...", 400);
     }
+    if (!validator.matches(userName, "([a-z0-9]){4,30}")) {
+      return res.apiError(
+        "UserName must be 4 to 30 lowercase letters and numbers...",
+        400
+      );
+    }
     if (!userName || !password) {
       return res.apiError("All fields are required...", 400);
     }
