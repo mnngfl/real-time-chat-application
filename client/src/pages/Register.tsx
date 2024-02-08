@@ -15,8 +15,10 @@ import validator from "validator";
 import { RegisterUserRequest, RegisterUserResponse } from "../types/users";
 import { registerUser } from "../services/users";
 import { useAlertDialog } from "../context/AlertDialogProvider";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
   const { openAlert } = useAlertDialog();
 
   const [formData, setFormData] = useState<RegisterUserRequest>({
@@ -26,6 +28,7 @@ const Register = () => {
   });
   const [errors, setErrors] = useState<Partial<RegisterUserRequest>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitLoading, setIsSubmitLoding] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,6 +41,28 @@ const Register = () => {
       let newErrors = { ...errors };
       newErrors = validateField(newErrors, name, value);
       setErrors(newErrors);
+    }
+  };
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsSubmitted(true);
+
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
+    try {
+      setIsSubmitLoding(true);
+      const res: RegisterUserResponse = await registerUser(formData);
+      localStorage.setItem("user", JSON.stringify(res));
+      navigate("/");
+    } catch (error) {
+      openAlert("Register Failed", error as string);
+    } finally {
+      setIsSubmitLoding(false);
     }
   };
 
@@ -88,24 +113,6 @@ const Register = () => {
       formData.passwordConfirm
     );
     return newErrors;
-  };
-
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setIsSubmitted(true);
-
-    const validationErrors = validateForm();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) {
-      return;
-    }
-
-    try {
-      const res: RegisterUserResponse = await registerUser(formData);
-      openAlert("Register Succeed", `Hello, ${res.userName}`);
-    } catch (error) {
-      openAlert("Register Failed", error as string);
-    }
   };
 
   return (
@@ -160,6 +167,7 @@ const Register = () => {
             size={"lg"}
             my={4}
             w={"100%"}
+            isLoading={isSubmitLoading}
             onClick={(e) => handleSubmit(e)}
           >
             Sign Up

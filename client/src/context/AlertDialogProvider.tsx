@@ -1,8 +1,17 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import AlertOverlay from "../components/common/AlertOverlay";
 
+interface AlertDialogActionProps {
+  content: string;
+  handler: () => void;
+}
+
 interface AlertDialogContextProps {
-  openAlert: (title: string, description: string) => void;
+  openAlert: (
+    title: string,
+    description: string,
+    action?: AlertDialogActionProps
+  ) => void;
   closeAlert: () => void;
 }
 
@@ -30,11 +39,19 @@ export const AlertDialogProvider: React.FC<AlertDialogProviderProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [action, setAction] = useState<Partial<AlertDialogActionProps>>({});
 
-  const openAlert = (title: string, description: string) => {
+  const openAlert = (
+    title: string,
+    description: string,
+    action?: AlertDialogActionProps
+  ) => {
     setTitle(title);
     setDescription(description);
     setIsOpen(true);
+    if (action?.content && typeof action?.handler === "function") {
+      setAction(action);
+    }
   };
 
   const closeAlert = () => {
@@ -49,6 +66,7 @@ export const AlertDialogProvider: React.FC<AlertDialogProviderProps> = ({
         onClose={closeAlert}
         title={title}
         description={description}
+        action={action}
       />
     </AlertDialogContext.Provider>
   );

@@ -9,11 +9,17 @@ import {
 } from "@chakra-ui/react";
 import React, { useRef } from "react";
 
+interface AlertOverlayActionProps {
+  content: string;
+  handler: () => void;
+}
+
 interface AlertOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   description: string;
+  action: Partial<AlertOverlayActionProps>;
 }
 
 const AlertOverlay: React.FC<AlertOverlayProps> = ({
@@ -21,6 +27,7 @@ const AlertOverlay: React.FC<AlertOverlayProps> = ({
   onClose,
   title,
   description,
+  action,
 }) => {
   const cancelRef = useRef(null);
 
@@ -39,12 +46,17 @@ const AlertOverlay: React.FC<AlertOverlayProps> = ({
           <AlertDialogBody>{description}</AlertDialogBody>
           <AlertDialogFooter>
             <Button
-              colorScheme="blue"
+              colorScheme="gray"
               onClick={onClose}
               ref={cancelRef.current}
             >
               Close
             </Button>
+            {action?.content && typeof action?.handler === "function" && (
+              <Button colorScheme="teal" ml={3} onClick={action.handler}>
+                {action.content}
+              </Button>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialogOverlay>
