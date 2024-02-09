@@ -1,27 +1,40 @@
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Chat from "./pages/Chat";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import { Flex } from "@chakra-ui/react";
 import NavBar from "./components/common/NavBar";
+import { useRecoilValue } from "recoil";
+import { isLoggedInSelector } from "./state";
+import useRecoilInitialize from "./state/useRecoilInitialize";
+import RequireAuth from "./components/auth/RequireAuth";
 
 function App() {
-  const navigate = useNavigate();
+  useRecoilInitialize();
+  const isLoggedIn = useRecoilValue(isLoggedInSelector);
 
-  const isLoggedIn = true; // 로그인 상태 확인 로직 추가
+  const LoginRedirect = () => {
+    return isLoggedIn ? <Navigate to="/" /> : <Login />;
+  };
 
-  const handleLogout = () => {
-    // 로그아웃 로직 추가
-    navigate("/login");
+  const RegisterRedirect = () => {
+    return isLoggedIn ? <Navigate to="/" /> : <Register />;
   };
 
   return (
     <Flex height={"100vh"}>
       {isLoggedIn ? <NavBar /> : <></>}
       <Routes>
-        <Route path="/" element={<Chat />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<RegisterRedirect />} />
+        <Route path="/login" element={<LoginRedirect />} />
+        <Route
+          path="/"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <Chat />
+            </RequireAuth>
+          }
+        />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Flex>
