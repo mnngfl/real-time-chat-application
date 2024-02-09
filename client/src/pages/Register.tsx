@@ -9,6 +9,7 @@ import {
   Input,
   Link,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import validator from "validator";
@@ -19,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const { openAlert } = useAlertDialog();
 
   const [formData, setFormData] = useState<RegisterUserRequest>({
@@ -57,13 +59,31 @@ const Register = () => {
     try {
       setIsSubmitLoding(true);
       const res: RegisterUserResponse = await registerUser(formData);
-      localStorage.setItem("user", JSON.stringify(res));
-      navigate("/");
+      toast({
+        title: "Register Succeed",
+        description: `Hello, ${res.userName}`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      navigate("/login");
     } catch (error) {
       openAlert("Register Failed", error as string);
     } finally {
       setIsSubmitLoding(false);
     }
+  };
+
+  const validateForm = () => {
+    let newErrors = { ...errors };
+    newErrors = validateField(newErrors, "userName", formData.userName);
+    newErrors = validateField(newErrors, "password", formData.password);
+    newErrors = validateField(
+      newErrors,
+      "passwordConfirm",
+      formData.passwordConfirm
+    );
+    return newErrors;
   };
 
   const validateField = (
@@ -100,18 +120,6 @@ const Register = () => {
       default:
         break;
     }
-    return newErrors;
-  };
-
-  const validateForm = () => {
-    let newErrors = { ...errors };
-    newErrors = validateField(newErrors, "userName", formData.userName);
-    newErrors = validateField(newErrors, "password", formData.password);
-    newErrors = validateField(
-      newErrors,
-      "passwordConfirm",
-      formData.passwordConfirm
-    );
     return newErrors;
   };
 

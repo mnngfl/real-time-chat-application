@@ -1,16 +1,19 @@
 const cors = require("cors");
 const express = require("express");
 const db = require("../db");
+const jwtUtils = require("../utils/jwtUtils");
 const responseFormatter = require("../utils/responseFormatter");
 
-const userRoute = require("../routes/userRoute");
+const { authRoute, userRoute, chatRoute } = require("../routes");
 
 const app = express();
 db.connect(app);
 app.use(cors());
 app.use(responseFormatter);
 app.use(express.json());
+app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
+app.use("/api/chats", jwtUtils.authenticateToken, chatRoute);
 
 const port = process.env.PORT || 3000;
 app.on("ready", () =>
