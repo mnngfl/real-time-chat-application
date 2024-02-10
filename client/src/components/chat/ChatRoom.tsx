@@ -11,8 +11,26 @@ import {
   InputRightElement,
   Text,
 } from "@chakra-ui/react";
+import ChatBubble from "./ChatBubble";
+import DividerWithDate from "./DividerWithDate";
 
 const ChatRoom = () => {
+  // const renderDivider = (currDate, prevDate) => {
+  //   if (!prevDate) return null;
+
+  //   const currDateStr = currDate.toLocaleDateString();
+  //   const prevDateStr = prevDate.toLocaleDateString();
+
+  //   if (currDateStr !== prevDateStr) {
+  //     return (
+  //       <DividerWithDate
+  //         date={currDateStr}
+  //         bgColor={"gray.700"}
+  //       ></DividerWithDate>
+  //     );
+  //   }
+  // };
+
   return (
     <>
       <Flex mb={4}>
@@ -22,11 +40,10 @@ const ChatRoom = () => {
         </Center>
       </Flex>
       <Divider />
-      <Box h={"85%"} overflowY={"auto"} paddingY={4}>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec
-          odio. Praesent libero. Sed cursus ante dapibus diam.
-        </p>
+      <Box h={"85%"} overflowY={"auto"} paddingY={4} bgColor={"gray.700"}>
+        <ChatBubble />
+        <DividerWithDate date={"Today"} bgColor={"gray.700"} />
+        <ChatBubble />
       </Box>
       <Divider />
       <Flex paddingY={4}>
