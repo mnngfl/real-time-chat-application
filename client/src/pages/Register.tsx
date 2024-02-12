@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import validator from "validator";
-import { RegisterUserRequest, RegisterUserResponse } from "../types/users";
+import { RegisterUserReq, RegisterUserRes } from "../types/users";
 import { registerUser } from "../services/users";
 import { useAlertDialog } from "../context/AlertDialogProvider";
 import { useNavigate } from "react-router-dom";
@@ -23,12 +23,12 @@ const Register = () => {
   const toast = useToast();
   const { openAlert } = useAlertDialog();
 
-  const [formData, setFormData] = useState<RegisterUserRequest>({
+  const [formData, setFormData] = useState<RegisterUserReq>({
     userName: "",
     password: "",
     passwordConfirm: "",
   });
-  const [errors, setErrors] = useState<Partial<RegisterUserRequest>>({});
+  const [errors, setErrors] = useState<Partial<RegisterUserReq>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitLoading, setIsSubmitLoding] = useState(false);
 
@@ -58,7 +58,7 @@ const Register = () => {
 
     try {
       setIsSubmitLoding(true);
-      const res: RegisterUserResponse = await registerUser(formData);
+      const res: RegisterUserRes = await registerUser(formData);
       toast({
         title: "Register Succeed",
         description: `Hello, ${res.userName}`,
@@ -87,7 +87,7 @@ const Register = () => {
   };
 
   const validateField = (
-    prevErrors: Partial<RegisterUserRequest>,
+    prevErrors: Partial<RegisterUserReq>,
     fieldName: string,
     value: string
   ) => {

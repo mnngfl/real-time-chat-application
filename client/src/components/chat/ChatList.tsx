@@ -1,10 +1,12 @@
+import { BaseChat } from "../../types/chats";
 import ChatPreview from "./ChatPreview";
 
-const ChatList = () => {
+const ChatList = ({ chats }: { chats: Array<BaseChat> }) => {
   return (
     <>
-      <ChatPreview />
-      <ChatPreview />
+      {chats.map((chat) => {
+        return <ChatPreview key={chat.chatId} chat={chat} />;
+      })}
     </>
   );
 };

@@ -12,7 +12,7 @@ app.use(cors());
 app.use(responseFormatter);
 app.use(express.json());
 app.use("/api/auth", authRoute);
-app.use("/api/users", userRoute);
+app.use("/api/users", jwtUtils.authenticateToken, userRoute);
 app.use("/api/chats", jwtUtils.authenticateToken, chatRoute);
 app.use("/api/messages", jwtUtils.authenticateToken, messageRoute);
 

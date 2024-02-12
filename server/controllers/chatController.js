@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const chatModel = require("../models/chatModel");
 
 const createChat = async (req, res) => {
@@ -23,12 +24,84 @@ const createChat = async (req, res) => {
 
 const findUserChats = async (req, res) => {
   const { userId } = req.params;
-  console.log("userId:", userId);
   try {
-    const chats = await chatModel.find({
-      members: { $in: [userId] },
-    });
-    console.dir(chats);
+    const chats = await chatModel.aggregate([
+      {
+        $match: {
+          members: {
+            $in: [new mongoose.Types.ObjectId(userId)],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            chatMembers: "$members",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ["$_id", "$$chatMembers"],
+                },
+              },
+            },
+          ],
+          as: "joinedUsers",
+        },
+      },
+      {
+        $lookup: {
+          from: "messages",
+          let: {
+            chatId: "$_id",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$chatId", "$$chatId"],
+                },
+              },
+            },
+            {
+              $sort: { createdAt: -1 },
+            },
+            {
+              $limit: 1,
+            },
+          ],
+          as: "latestMessage",
+        },
+      },
+      {
+        $addFields: {
+          latestMessage: {
+            $arrayElemAt: ["$latestMessage", 0],
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          chatId: "$_id",
+          createdAt: 1,
+          updatedAt: 1,
+          joinedUsers: {
+            $map: {
+              input: "$joinedUsers",
+              as: "user",
+              in: {
+                _id: "$$user._id",
+                userName: "$$user.userName",
+              },
+            },
+          },
+          latestMessage: "$latestMessage.text",
+        },
+      },
+    ]);
     res.apiSuccess(chats);
   } catch (error) {
     console.error(error);
