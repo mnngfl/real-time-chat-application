@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { LoginUserRequest, LoginUserResponse } from "../types/users";
+import { LoginUserReq, LoginUserRes } from "../types/users";
 import { loginUser } from "../services/users";
 import { useAlertDialog } from "../context/AlertDialogProvider";
 import validator from "validator";
@@ -26,11 +26,11 @@ const Login = () => {
   const [user, setUser] = useRecoilState(userState);
   const { openAlert } = useAlertDialog();
 
-  const [formData, setFormData] = useState<LoginUserRequest>({
+  const [formData, setFormData] = useState<LoginUserReq>({
     userName: "",
     password: "",
   });
-  const [errors, setErrors] = useState<Partial<LoginUserRequest>>({});
+  const [errors, setErrors] = useState<Partial<LoginUserReq>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitLoading, setIsSubmitLoding] = useState(false);
 
@@ -60,7 +60,7 @@ const Login = () => {
 
     try {
       setIsSubmitLoding(true);
-      const res: LoginUserResponse = await loginUser(formData);
+      const res: LoginUserRes = await loginUser(formData);
       localStorage.setItem("user", JSON.stringify(res));
       setUser({ _id: res._id, userName: res.userName });
       navigate("/");
@@ -79,7 +79,7 @@ const Login = () => {
   };
 
   const validateField = (
-    prevErrors: Partial<LoginUserRequest>,
+    prevErrors: Partial<LoginUserReq>,
     fieldName: string,
     value: string
   ) => {

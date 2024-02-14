@@ -1,23 +1,26 @@
-export interface RegisterUserRequest {
+export interface BaseUser {
+  _id: string;
+  userName: string;
+}
+
+export interface UserToken {
+  accessToken?: string;
+  refreshToken?: string;
+}
+
+export interface LoginUserReq {
   userName: string;
   password: string;
+}
+
+export type LoginUserRes = BaseUser & UserToken;
+
+export type RegisterUserReq = LoginUserReq & {
   passwordConfirm: string;
-}
+};
 
-export interface RegisterUserResponse {
-  _id: string;
-  userName: string;
-}
+export type RegisterUserRes = BaseUser;
 
-export interface LoginUserRequest {
-  userName: string;
-  password: string;
-}
+export type FindUserRes = BaseUser;
 
-export interface LoginUserResponse {
-  _id: string;
-  userName: string;
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-}
+export type GetUsersRes = BaseUser;
