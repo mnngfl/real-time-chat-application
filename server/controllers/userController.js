@@ -1,10 +1,11 @@
 const userModel = require("../models/userModel");
+const { getUserIdFromRequest } = require("../utils/jwtUtils");
 
 const findUser = async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    const user = await userModel.findById(userId);
+    const user = await userModel.findById(userId).select(["_id", "userName"]);
     return res.apiSuccess(user);
   } catch (error) {
     console.error(error);
@@ -12,9 +13,15 @@ const findUser = async (req, res) => {
   }
 };
 
-const getUsers = async (req, res) => {
+const getOtherUsers = async (req, res) => {
+  const userId = getUserIdFromRequest(req);
+
   try {
-    const users = await userModel.find();
+    const users = await userModel
+      .find({
+        _id: { $nin: [userId] },
+      })
+      .select(["_id", "userName"]);
     return res.apiSuccess(users);
   } catch (error) {
     console.error(error);
@@ -22,4 +29,4 @@ const getUsers = async (req, res) => {
   }
 };
 
-module.exports = { findUser, getUsers };
+module.exports = { findUser, getOtherUsers };

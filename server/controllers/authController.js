@@ -61,20 +61,12 @@ const loginUser = async (req, res) => {
 
     const accessToken = jwtUtils.generateAccessToken(user._id);
     const refreshToken = jwtUtils.generateRefreshToken(user._id);
-    const currentTime = new Date();
-    const expiresIn = Math.floor(
-      new Date(currentTime.getTime() + 1 * 60 * 60 * 24 * 1000).getTime() / 1000
-    ); // 1d
-    // const expiresIn = Math.floor(
-    //   new Date(currentTime.getTime() + 1 * 60 * 1000).getTime() / 1000
-    // ); // 1m
 
     return res.apiSuccess({
       _id: user._id,
       userName,
       accessToken,
       refreshToken,
-      expiresIn,
     });
   } catch (error) {
     console.error(error);

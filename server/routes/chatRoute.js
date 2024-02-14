@@ -8,7 +8,7 @@ const {
 const router = express.Router();
 
 router.post("/", createChat);
-router.get("/:userId", findUserChats);
-router.get("/find/:firstId/:secondId", findChat);
+router.get("/", findUserChats);
+router.get("/:chatId", findChat);
 
 module.exports = router;

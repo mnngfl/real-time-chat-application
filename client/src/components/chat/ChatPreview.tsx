@@ -1,11 +1,13 @@
-import { Avatar, Box, Flex, Icon, Text, VStack } from "@chakra-ui/react";
+import { Avatar, Flex, Icon, Text, VStack } from "@chakra-ui/react";
 import { BaseUser } from "../../types/users";
-import { BaseChat } from "../../types/chats";
-import { useRecoilValue } from "recoil";
+import { PreviewChat } from "../../types/chats";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userIdSelector } from "../../state";
 import { useEffect, useState } from "react";
+import { currentChatState } from "../../state/atoms/chatState";
 
-const ChatPreview = ({ chat }: { chat: BaseChat }) => {
+const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
+  const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
   const userId = useRecoilValue(userIdSelector);
   const [chatUser, setChatUser] = useState<BaseUser>({
     _id: "",
@@ -18,7 +20,17 @@ const ChatPreview = ({ chat }: { chat: BaseChat }) => {
   }, [chat?.joinedUsers, userId]);
 
   return (
-    <Flex color={"white"} paddingX={12} paddingY={6} alignItems={"center"}>
+    <Flex
+      color={"white"}
+      paddingX={12}
+      paddingY={6}
+      alignItems={"center"}
+      bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
+      _hover={{ bgColor: "gray.600", cursor: "pointer" }}
+      onClick={() =>
+        setCurrentChat({ _id: chat.chatId, userName: chatUser.userName })
+      }
+    >
       <Avatar src="#" />
       <Flex justifyContent={"space-between"} w={"100%"}>
         <VStack alignItems={"start"} ml={4}>

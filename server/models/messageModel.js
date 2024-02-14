@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema(
   {
     chatId: mongoose.Schema.Types.ObjectId,
-    senderId: String,
+    senderId: mongoose.Schema.Types.ObjectId,
     text: String,
   },
   { timestamps: true }

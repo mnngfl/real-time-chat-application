@@ -1,5 +1,4 @@
 import axios from "axios";
-import { refreshToken } from "../services/users";
 
 const baseUrl = "http://localhost:3000/api";
 
@@ -11,12 +10,13 @@ const instance = axios.create({
   },
 });
 
-const token = JSON.parse(localStorage.getItem("user")!).accessToken;
+const user = JSON.parse(localStorage.getItem("user")!);
+let isCalled = false;
 
 instance.interceptors.request.use(
   (config) => {
     if (!config.url?.startsWith("/auth")) {
-      config.headers["Authorization"] = token;
+      config.headers["Authorization"] = user.accessToken;
     }
 
     return config;
@@ -32,13 +32,32 @@ instance.interceptors.response.use(
     return response.data.data;
   },
   async (error) => {
-    console.error(error);
-    if (error.response.status === 401) {
-      const newToken = await refreshToken({ refreshToken: token });
-      instance.defaults.headers.common["Authorization"] = newToken.accessToken;
-    } else {
-      return Promise.reject(error.response.data.message);
+    if (error.response.status === 401 && user.accessToken) {
+      if (isCalled) return;
+      isCalled = true;
+
+      try {
+        const res = await axios.post(baseUrl + "/auth/refresh-token", {
+          refreshToken: user.refreshToken,
+        });
+        isCalled = false;
+        const newToken = res?.data?.accessToken;
+
+        if (newToken) {
+          instance.defaults.headers.common["Authorization"] = newToken;
+          user.accessToken = newToken;
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+
+        const originRequest = error.config;
+        originRequest.headers["Authorization"] = newToken;
+        return instance(originRequest);
+      } catch (error) {
+        console.error("Failed to refresh access token: ", error);
+        throw error;
+      }
     }
+    return Promise.reject(error.response.data.message);
   }
 );
 

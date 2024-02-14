@@ -1,18 +1,21 @@
 const mongoose = require("mongoose");
 const chatModel = require("../models/chatModel");
+const { getUserIdFromRequest } = require("../utils/jwtUtils");
 
 const createChat = async (req, res) => {
-  const { firstId, secondId } = req.body;
+  const userId = getUserIdFromRequest(req);
+  const { recipientId } = req.body;
+
   try {
     const chat = await chatModel.findOne({
-      members: { $all: [firstId, secondId] },
+      members: { $all: [userId, recipientId] },
     });
     if (chat) {
       return res.apiSuccess(chat);
     }
 
     const newChat = new chatModel({
-      members: [firstId, secondId],
+      members: [userId, recipientId],
     });
     const response = await newChat.save();
     return res.apiSuccess(response, "Chat created", 201);
@@ -23,7 +26,7 @@ const createChat = async (req, res) => {
 };
 
 const findUserChats = async (req, res) => {
-  const { userId } = req.params;
+  const userId = getUserIdFromRequest(req);
   try {
     const chats = await chatModel.aggregate([
       {
@@ -110,11 +113,9 @@ const findUserChats = async (req, res) => {
 };
 
 const findChat = async (req, res) => {
-  const { firstId, secondId } = req.params;
+  const { chatId } = req.params;
   try {
-    const chat = await chatModel.findOne({
-      members: { $all: [firstId, secondId] },
-    });
+    const chat = await chatModel.findById(chatId);
     res.apiSuccess(chat);
   } catch (error) {
     console.error(error);

@@ -6,7 +6,6 @@ export interface BaseUser {
 export interface UserToken {
   accessToken?: string;
   refreshToken?: string;
-  expiresIn?: number;
 }
 
 export interface LoginUserReq {
@@ -23,3 +22,5 @@ export type RegisterUserReq = LoginUserReq & {
 export type RegisterUserRes = BaseUser;
 
 export type FindUserRes = BaseUser;
+
+export type GetUsersRes = BaseUser;
