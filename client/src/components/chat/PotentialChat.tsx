@@ -27,16 +27,18 @@ const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
 
   const getPotentialUsers = useCallback(async () => {
     const res = await getOtherUsers();
-    const pUsers = res.filter((user) => {
-      const isChatCreated = chatList.some((chat) => {
-        return (
-          chat.joinedUsers[0]._id === user._id ||
-          chat.joinedUsers[1]._id === user._id
-        );
+    if (res && chatList?.length > 0) {
+      const pUsers = res.filter((user) => {
+        const isChatCreated = chatList.some((chat) => {
+          return (
+            chat.joinedUsers[0]._id === user._id ||
+            chat.joinedUsers[1]._id === user._id
+          );
+        });
+        return !isChatCreated;
       });
-      return !isChatCreated;
-    });
-    setUsers(pUsers);
+      setUsers(pUsers);
+    }
   }, [chatList]);
 
   useEffect(() => {
@@ -57,19 +59,20 @@ const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
     <Popover defaultIsOpen={true} placement="top">
       <PopoverAnchor>
         <Flex h={"15%"} overflowX={"auto"} p={6}>
-          {users.map((user, index) => {
-            return (
-              <VStack
-                key={user._id}
-                ml={index === 0 ? "0" : "6"}
-                _hover={{ cursor: "pointer", transform: "scale(1.05)" }}
-                onClick={() => createNewChat(user._id)}
-              >
-                <Avatar />
-                <Text>{user.userName}</Text>
-              </VStack>
-            );
-          })}
+          {users.length > 0 &&
+            users.map((user, index) => {
+              return (
+                <VStack
+                  key={user._id}
+                  ml={index === 0 ? "0" : "6"}
+                  _hover={{ cursor: "pointer", transform: "scale(1.05)" }}
+                  onClick={() => createNewChat(user._id)}
+                >
+                  <Avatar />
+                  <Text>{user.userName}</Text>
+                </VStack>
+              );
+            })}
         </Flex>
       </PopoverAnchor>
       <PopoverContent>

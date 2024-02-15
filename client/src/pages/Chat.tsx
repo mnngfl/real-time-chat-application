@@ -11,16 +11,18 @@ import {
 } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { findUserChats } from "../services/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userIdSelector } from "../state";
 import { chatListState } from "../state/atoms/chatState";
 import PotentialChat from "../components/chat/PotentialChat";
+import { Socket, io } from "socket.io-client";
 
 const Chat = () => {
   const userId = useRecoilValue(userIdSelector);
   const [chats, setChats] = useRecoilState(chatListState);
+  const [socket, setSocket] = useState<Socket>();
 
   const fetchChats = useCallback(async () => {
     if (!userId) return;
@@ -31,6 +33,15 @@ const Chat = () => {
   useEffect(() => {
     fetchChats();
   }, [fetchChats]);
+
+  useEffect(() => {
+    const newSocket = io("http://localhost:3030");
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   return (
     <Flex w="90%">
