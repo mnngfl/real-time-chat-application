@@ -14,6 +14,7 @@ export interface PreviewChat extends CommonTimestamp {
 
 export interface CurrentChat {
   _id: string;
+  userId: string;
   userName: string;
 }
 

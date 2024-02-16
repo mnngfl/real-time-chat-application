@@ -6,16 +6,19 @@ import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { AlertDialogProvider } from "./context/AlertDialogProvider";
 import { RecoilRoot } from "recoil";
+import { SocketProvider } from "./context/SocketProvider.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <RecoilRoot>
       <ChakraProvider>
-        <AlertDialogProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </AlertDialogProvider>
+        <SocketProvider>
+          <AlertDialogProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </AlertDialogProvider>
+        </SocketProvider>
       </ChakraProvider>
     </RecoilRoot>
   </React.StrictMode>

@@ -14,13 +14,18 @@ import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect } from "react";
 import { findUserChats } from "../services/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { userIdSelector } from "../state";
+import { onlineUserListState, userIdSelector } from "../state";
 import { chatListState } from "../state/atoms/chatState";
 import PotentialChat from "../components/chat/PotentialChat";
+import { OnlineUser } from "../types/users";
+import { useSocket } from "../context/SocketProvider";
 
 const Chat = () => {
+  const socket = useSocket();
   const userId = useRecoilValue(userIdSelector);
   const [chats, setChats] = useRecoilState(chatListState);
+  const [onlineUserList, setOnlineUserList] =
+    useRecoilState(onlineUserListState);
 
   const fetchChats = useCallback(async () => {
     if (!userId) return;
@@ -29,8 +34,24 @@ const Chat = () => {
   }, [setChats, userId]);
 
   useEffect(() => {
+    console.log(chats);
+  }, [chats]);
+  useEffect(() => {
     fetchChats();
   }, [fetchChats]);
+
+  useEffect(() => {
+    if (!socket || !userId) return;
+
+    socket.emit("addNewUser", userId);
+    socket.on("getOnlineUsers", (res: Array<OnlineUser>) => {
+      setOnlineUserList(res);
+    });
+
+    return () => {
+      socket.off("getOnlineUsers");
+    };
+  }, [setOnlineUserList, socket, userId]);
 
   return (
     <Flex w="90%">

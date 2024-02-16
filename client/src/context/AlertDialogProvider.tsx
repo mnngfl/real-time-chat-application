@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import AlertOverlay from "../components/common/AlertOverlay";
 
+// TODO: Context api 사용한 부분 Recoil로 변경
+
 interface AlertDialogActionProps {
   content: string;
   handler: () => void;
