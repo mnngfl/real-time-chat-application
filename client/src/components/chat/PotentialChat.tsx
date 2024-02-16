@@ -1,6 +1,8 @@
 import {
   Avatar,
+  AvatarBadge,
   Flex,
+  HStack,
   Popover,
   PopoverAnchor,
   PopoverArrow,
@@ -10,11 +12,11 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BaseUser } from "../../types/users";
 import { getOtherUsers } from "../../services/users";
 import { useRecoilValue } from "recoil";
-import { userIdSelector } from "../../state";
+import { onlineUserListState, userIdSelector } from "../../state";
 import { chatListState } from "../../state/atoms/chatState";
 import { createChat } from "../../services/chats";
 import { useAlertDialog } from "../../context/AlertDialogProvider";
@@ -22,6 +24,7 @@ import { useAlertDialog } from "../../context/AlertDialogProvider";
 const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
   const userId = useRecoilValue(userIdSelector);
   const chatList = useRecoilValue(chatListState);
+  const onlineUserList = useRecoilValue(onlineUserListState);
   const [users, setUsers] = useState<Array<BaseUser> | []>([]);
   const { openAlert } = useAlertDialog();
 
@@ -61,6 +64,10 @@ const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
         <Flex h={"15%"} overflowX={"auto"} p={6}>
           {users.length > 0 &&
             users.map((user, index) => {
+              const isOnlineUser = onlineUserList.some(
+                (onlineUser) => onlineUser.userId === user._id
+              );
+
               return (
                 <VStack
                   key={user._id}
@@ -68,7 +75,13 @@ const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
                   _hover={{ cursor: "pointer", transform: "scale(1.05)" }}
                   onClick={() => createNewChat(user._id)}
                 >
-                  <Avatar />
+                  <HStack>
+                    <Avatar>
+                      {isOnlineUser && (
+                        <AvatarBadge bg="green.500" boxSize="1.25em" />
+                      )}
+                    </Avatar>
+                  </HStack>
                   <Text>{user.userName}</Text>
                 </VStack>
               );

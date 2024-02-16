@@ -1,5 +1,6 @@
 import {
   Avatar,
+  AvatarBadge,
   Box,
   Center,
   Divider,
@@ -15,16 +16,25 @@ import {
   currentChatState,
   currentChatMessageListState,
 } from "../../state/atoms/chatState";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { findMessages } from "../../services/chats";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
+import { onlineUserListState } from "../../state";
+import { useSocket } from "../../context/SocketProvider";
 
 const ChatRoom = () => {
+  const socket = useSocket();
   const currentChat = useRecoilValue(currentChatState);
   const [currentChatMessageList, setCurrentChatMessageList] = useRecoilState(
     currentChatMessageListState
   );
+  const onlineUserList = useRecoilValue(onlineUserListState);
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  const isOnlineUser = useMemo(() => {
+    return onlineUserList.some((user) => user.userId === currentChat.userId);
+  }, [currentChat.userId, onlineUserList]);
 
   const getMessages = useCallback(async () => {
     const res = await findMessages(currentChat._id);
@@ -35,6 +45,26 @@ const ChatRoom = () => {
     if (!currentChat._id) return;
     getMessages();
   }, [currentChat, getMessages]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("getMessage", (newMessage) => {
+      if (currentChat._id !== newMessage.chatId) return;
+
+      setCurrentChatMessageList((prev) => [...prev, newMessage]);
+    });
+
+    return () => {
+      socket.off("getMessage");
+    };
+  }, [currentChat._id, setCurrentChatMessageList, socket]);
+
+  useEffect(() => {
+    if (boxRef.current) {
+      boxRef.current.scrollTop = boxRef.current.scrollHeight;
+    }
+  }, [currentChatMessageList]);
 
   // const renderDivider = (currDate, prevDate) => {
   //   if (!prevDate) return null;
@@ -56,12 +86,20 @@ const ChatRoom = () => {
     <>
       <Flex mb={4}>
         <Center>
-          <Avatar mr={4} />
+          <Avatar mr={4}>
+            {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
+          </Avatar>
           <Text fontSize={"xl"}>{currentChat.userName}</Text>
         </Center>
       </Flex>
       <Divider />
-      <Box h={"85%"} overflowY={"auto"} paddingY={4} bgColor={"gray.700"}>
+      <Box
+        h={"85%"}
+        overflowY={"auto"}
+        paddingY={4}
+        bgColor={"gray.700"}
+        ref={boxRef}
+      >
         {/* <ChatBubble />
         <DividerWithDate date={"Today"} bgColor={"gray.700"} />
         <ChatBubble /> */}
@@ -70,7 +108,7 @@ const ChatRoom = () => {
         })}
       </Box>
       <Divider />
-      <ChatBox getMessages={getMessages} />
+      <ChatBox />
     </>
   ) : (
     <Flex h={"100%"} alignItems={"center"} justifyContent={"center"}>

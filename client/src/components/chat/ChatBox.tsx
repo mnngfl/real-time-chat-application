@@ -10,11 +10,15 @@ import { useState } from "react";
 import { useAlertDialog } from "../../context/AlertDialogProvider";
 import { sendMessage } from "../../services/chats";
 import { useRecoilValue } from "recoil";
-import { currentChatIdSelector } from "../../state/selectors/chatSelectors";
+import { useSocket } from "../../context/SocketProvider";
+import { currentChatState } from "../../state/atoms/chatState";
+import { userIdSelector } from "../../state";
 
-const ChatBox = ({ getMessages }: { getMessages: () => Promise<void> }) => {
+const ChatBox = () => {
+  const socket = useSocket();
   const { openAlert } = useAlertDialog();
-  const currentChatId = useRecoilValue(currentChatIdSelector);
+  const userId = useRecoilValue(userIdSelector);
+  const currentChat = useRecoilValue(currentChatState);
   const [inputText, setInputText] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,11 +33,26 @@ const ChatBox = ({ getMessages }: { getMessages: () => Promise<void> }) => {
       return;
     }
     try {
-      await sendMessage({
-        chatId: currentChatId,
+      const res = await sendMessage({
+        chatId: currentChat._id,
         text: text,
       });
-      await getMessages();
+
+      if (!socket) return;
+      socket.emit("sendMessage", {
+        _id: res._id,
+        chatId: res.chatId,
+        text: res.text,
+        sendUser: {
+          _id: userId,
+        },
+        receiveUser: {
+          _id: currentChat._id,
+          userName: currentChat.userName,
+        },
+        createdAt: res.createdAt,
+        updatedAt: res.updatedAt,
+      });
       setInputText("");
     } catch (error) {
       openAlert("Send message Failed", error as string);

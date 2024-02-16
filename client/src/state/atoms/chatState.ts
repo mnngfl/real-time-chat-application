@@ -10,6 +10,7 @@ export const currentChatState = atom<CurrentChat>({
   key: "currentChatState",
   default: {
     _id: "",
+    userId: "",
     userName: "",
   },
 });

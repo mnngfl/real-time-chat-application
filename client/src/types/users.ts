@@ -3,6 +3,11 @@ export interface BaseUser {
   userName: string;
 }
 
+export interface OnlineUser {
+  userId: string;
+  socketId: string;
+}
+
 export interface UserToken {
   accessToken?: string;
   refreshToken?: string;

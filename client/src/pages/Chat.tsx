@@ -11,18 +11,21 @@ import {
 } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { findUserChats } from "../services/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { userIdSelector } from "../state";
+import { onlineUserListState, userIdSelector } from "../state";
 import { chatListState } from "../state/atoms/chatState";
 import PotentialChat from "../components/chat/PotentialChat";
-import { Socket, io } from "socket.io-client";
+import { OnlineUser } from "../types/users";
+import { useSocket } from "../context/SocketProvider";
 
 const Chat = () => {
+  const socket = useSocket();
   const userId = useRecoilValue(userIdSelector);
   const [chats, setChats] = useRecoilState(chatListState);
-  const [socket, setSocket] = useState<Socket>();
+  const [onlineUserList, setOnlineUserList] =
+    useRecoilState(onlineUserListState);
 
   const fetchChats = useCallback(async () => {
     if (!userId) return;
@@ -31,17 +34,24 @@ const Chat = () => {
   }, [setChats, userId]);
 
   useEffect(() => {
+    console.log(chats);
+  }, [chats]);
+  useEffect(() => {
     fetchChats();
   }, [fetchChats]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3030");
-    setSocket(newSocket);
+    if (!socket || !userId) return;
+
+    socket.emit("addNewUser", userId);
+    socket.on("getOnlineUsers", (res: Array<OnlineUser>) => {
+      setOnlineUserList(res);
+    });
 
     return () => {
-      newSocket.disconnect();
+      socket.off("getOnlineUsers");
     };
-  }, []);
+  }, [setOnlineUserList, socket, userId]);
 
   return (
     <Flex w="90%">

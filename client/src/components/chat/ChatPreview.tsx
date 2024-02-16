@@ -1,18 +1,31 @@
-import { Avatar, Flex, Icon, Text, VStack } from "@chakra-ui/react";
+import {
+  Avatar,
+  AvatarBadge,
+  Flex,
+  HStack,
+  Icon,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { BaseUser } from "../../types/users";
 import { PreviewChat } from "../../types/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { userIdSelector } from "../../state";
-import { useEffect, useState } from "react";
+import { onlineUserListState, userIdSelector } from "../../state";
+import { useEffect, useMemo, useState } from "react";
 import { currentChatState } from "../../state/atoms/chatState";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
   const userId = useRecoilValue(userIdSelector);
+  const onlineUserList = useRecoilValue(onlineUserListState);
   const [chatUser, setChatUser] = useState<BaseUser>({
     _id: "",
     userName: "",
   });
+
+  const isOnlineUser = useMemo(() => {
+    return onlineUserList.some((user) => user.userId === chatUser._id);
+  }, [chatUser._id, onlineUserList]);
 
   useEffect(() => {
     const recipient = chat?.joinedUsers.find((id) => id._id !== userId);
@@ -28,10 +41,18 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
       _hover={{ bgColor: "gray.600", cursor: "pointer" }}
       onClick={() =>
-        setCurrentChat({ _id: chat.chatId, userName: chatUser.userName })
+        setCurrentChat({
+          _id: chat.chatId,
+          userId: chatUser._id,
+          userName: chatUser.userName,
+        })
       }
     >
-      <Avatar src="#" />
+      <HStack>
+        <Avatar src="#">
+          {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
+        </Avatar>
+      </HStack>
       <Flex justifyContent={"space-between"} w={"100%"}>
         <VStack alignItems={"start"} ml={4}>
           <Text fontWeight={"bold"}>{chatUser.userName}</Text>
