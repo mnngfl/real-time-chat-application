@@ -51,7 +51,6 @@ const ChatRoom = () => {
 
     socket.on("getMessage", (newMessage) => {
       if (currentChat._id !== newMessage.chatId) return;
-
       setCurrentChatMessageList((prev) => [...prev, newMessage]);
     });
 

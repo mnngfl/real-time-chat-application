@@ -40,13 +40,13 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       alignItems={"center"}
       bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
       _hover={{ bgColor: "gray.600", cursor: "pointer" }}
-      onClick={() =>
+      onClick={() => {
         setCurrentChat({
           _id: chat.chatId,
           userId: chatUser._id,
           userName: chatUser.userName,
-        })
-      }
+        });
+      }}
     >
       <HStack>
         <Avatar src="#">
@@ -62,27 +62,29 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
         </VStack>
         <VStack alignItems={"end"} ml={4}>
           <Text fontSize={"small"} whiteSpace={"nowrap"}>
-            {chat.updatedAt}
+            {chat.latestMessageAt}
           </Text>
-          <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
-            <svg>
-              <path
-                fill="currentColor"
-                d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
-              />
-              <text
-                x="50%"
-                y="51%"
-                alignmentBaseline="middle"
-                textAnchor="middle"
-                fill="white"
-                fontSize={80}
-                fontWeight={600}
-              >
-                12
-              </text>
-            </svg>
-          </Icon>
+          {chat.unreadCount > 0 && (
+            <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
+              <svg>
+                <path
+                  fill="currentColor"
+                  d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+                />
+                <text
+                  x="50%"
+                  y="51%"
+                  alignmentBaseline="middle"
+                  textAnchor="middle"
+                  fill="white"
+                  fontSize={80}
+                  fontWeight={600}
+                >
+                  {chat.unreadCount}
+                </text>
+              </svg>
+            </Icon>
+          )}
         </VStack>
       </Flex>
     </Flex>

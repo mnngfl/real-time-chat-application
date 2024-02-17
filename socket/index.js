@@ -22,15 +22,29 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", (message) => {
-    console.log(message);
-    const users = onlineUsers.filter(
-      (user) =>
-        user.userId === message.sendUserId ||
-        user.userId === message.receiveUser._id
-    );
+    const users = onlineUsers
+      .filter(
+        (user) =>
+          user.userId === message.sendUser._id ||
+          user.userId === message.receiveUser._id
+      )
+      .map((v) => v.socketId);
 
-    if (users) {
+    if (users.length > 0) {
       io.to(users).emit("getMessage", message);
+      io.to(users).emit("getNotification", {
+        chatId: message.chatId,
+        sendUser: {
+          _id: message.sendUser._id,
+          userName: message.sendUser.userName,
+        },
+        receiveUser: {
+          _id: message.receiveUser._id,
+          userName: message.receiveUser.userName,
+        },
+        latestMessage: message.text,
+        latestMessageAt: new Date(),
+      });
     }
   });
 

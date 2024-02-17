@@ -83,6 +83,7 @@ const findUserChats = async (req, res) => {
           latestMessage: {
             $arrayElemAt: ["$latestMessage", 0],
           },
+          unreadCount: 0,
         },
       },
       {
@@ -102,6 +103,8 @@ const findUserChats = async (req, res) => {
             },
           },
           latestMessage: "$latestMessage.text",
+          latestMessageAt: "$latestMessage.createdAt",
+          unreadCount: 1, // TODO: notification 연동
         },
       },
     ]);

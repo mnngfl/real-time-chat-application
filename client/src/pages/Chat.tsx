@@ -19,23 +19,21 @@ import { chatListState } from "../state/atoms/chatState";
 import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
 import { useSocket } from "../context/SocketProvider";
+import { currentChatIdSelector } from "../state/selectors/chatSelectors";
 
 const Chat = () => {
   const socket = useSocket();
   const userId = useRecoilValue(userIdSelector);
-  const [chats, setChats] = useRecoilState(chatListState);
-  const [onlineUserList, setOnlineUserList] =
-    useRecoilState(onlineUserListState);
+  const currentChatId = useRecoilValue(currentChatIdSelector);
+  const [chatList, setChatList] = useRecoilState(chatListState);
+  const [, setOnlineUserList] = useRecoilState(onlineUserListState);
 
   const fetchChats = useCallback(async () => {
     if (!userId) return;
     const res = await findUserChats();
-    setChats(res);
-  }, [setChats, userId]);
+    setChatList(res);
+  }, [setChatList, userId]);
 
-  useEffect(() => {
-    console.log(chats);
-  }, [chats]);
   useEffect(() => {
     fetchChats();
   }, [fetchChats]);
@@ -52,6 +50,54 @@ const Chat = () => {
       socket.off("getOnlineUsers");
     };
   }, [setOnlineUserList, socket, userId]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("getNotification", (notification) => {
+      if (notification.receiveUser._id !== userId) return;
+      if (notification.chatId === currentChatId) return;
+
+      const updateChatIndex = chatList.findIndex((chat) => {
+        return chat.chatId === notification.chatId;
+      });
+      setChatList((prevList) => {
+        return prevList.map((prevChat, index) => {
+          if (index === updateChatIndex) {
+            return {
+              ...prevChat,
+              latestMessage: notification.latestMessage,
+              latestMessageAt: notification.latestMessageAt,
+              unreadCount: prevChat.unreadCount + 1,
+            };
+          } else {
+            return prevChat;
+          }
+        });
+      });
+    });
+
+    return () => {
+      socket.off("getNotification");
+    };
+  }, [chatList, currentChatId, setChatList, socket, userId]);
+
+  useEffect(() => {
+    if (!currentChatId) return;
+
+    setChatList((prevList) => {
+      return prevList.map((prevChat) => {
+        if (prevChat.chatId === currentChatId) {
+          return {
+            ...prevChat,
+            unreadCount: 0,
+          };
+        } else {
+          return prevChat;
+        }
+      });
+    });
+  }, [currentChatId, setChatList]);
 
   return (
     <Flex w="90%">
@@ -73,7 +119,7 @@ const Chat = () => {
         <Divider borderColor="gray.600" />
         <PotentialChat fetchChats={fetchChats} />
         <Divider borderColor="gray.600" />
-        {chats?.length > 0 && <ChatList chats={chats} />}
+        {chatList?.length > 0 && <ChatList chatList={chatList} />}
       </Box>
       <Box w="65%" bg="gray.900" p={12} color={"white"}>
         <ChatRoom />
