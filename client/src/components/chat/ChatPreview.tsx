@@ -13,6 +13,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { onlineUserListState, userIdSelector } from "../../state";
 import { useEffect, useMemo, useState } from "react";
 import { currentChatState } from "../../state/atoms/chatState";
+import { deleteNotifications } from "../../services/chats";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
@@ -28,9 +29,26 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   }, [chatUser._id, onlineUserList]);
 
   useEffect(() => {
-    const recipient = chat?.joinedUsers.find((id) => id._id !== userId);
+    if (!userId || !chat?.joinedUsers) return;
+    const recipient = chat.joinedUsers.find((id) => id._id !== userId);
     if (recipient) setChatUser(recipient);
   }, [chat?.joinedUsers, userId]);
+
+  const unreadCount = useMemo(() => {
+    return chat.notifications.find((noti) => noti._id[1] === userId)
+      ?.unreadCount;
+  }, [chat.notifications, userId]);
+
+  const onChangeChat = async () => {
+    setCurrentChat({
+      _id: chat.chatId,
+      userId: chatUser._id,
+      userName: chatUser.userName,
+    });
+
+    if (!unreadCount) return;
+    await deleteNotifications(chat.chatId);
+  };
 
   return (
     <Flex
@@ -40,13 +58,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       alignItems={"center"}
       bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
       _hover={{ bgColor: "gray.600", cursor: "pointer" }}
-      onClick={() => {
-        setCurrentChat({
-          _id: chat.chatId,
-          userId: chatUser._id,
-          userName: chatUser.userName,
-        });
-      }}
+      onClick={() => onChangeChat()}
     >
       <HStack>
         <Avatar src="#">
@@ -64,7 +76,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
           <Text fontSize={"small"} whiteSpace={"nowrap"}>
             {chat.latestMessageAt}
           </Text>
-          {chat.unreadCount > 0 && (
+          {unreadCount && (
             <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
               <svg>
                 <path
@@ -80,7 +92,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
                   fontSize={80}
                   fontWeight={600}
                 >
-                  {chat.unreadCount}
+                  {unreadCount}
                 </text>
               </svg>
             </Icon>

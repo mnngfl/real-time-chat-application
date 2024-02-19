@@ -21,10 +21,8 @@ import { findMessages } from "../../services/chats";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
 import { onlineUserListState } from "../../state";
-import { useSocket } from "../../context/SocketProvider";
 
 const ChatRoom = () => {
-  const socket = useSocket();
   const currentChat = useRecoilValue(currentChatState);
   const [currentChatMessageList, setCurrentChatMessageList] = useRecoilState(
     currentChatMessageListState
@@ -45,19 +43,6 @@ const ChatRoom = () => {
     if (!currentChat._id) return;
     getMessages();
   }, [currentChat, getMessages]);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("getMessage", (newMessage) => {
-      if (currentChat._id !== newMessage.chatId) return;
-      setCurrentChatMessageList((prev) => [...prev, newMessage]);
-    });
-
-    return () => {
-      socket.off("getMessage");
-    };
-  }, [currentChat._id, setCurrentChatMessageList, socket]);
 
   useEffect(() => {
     if (boxRef.current) {
@@ -102,8 +87,8 @@ const ChatRoom = () => {
         {/* <ChatBubble />
         <DividerWithDate date={"Today"} bgColor={"gray.700"} />
         <ChatBubble /> */}
-        {currentChatMessageList.map((message) => {
-          return <ChatBubble key={message._id} message={message} />;
+        {currentChatMessageList.map((message, index) => {
+          return <ChatBubble key={message._id || index} message={message} />;
         })}
       </Box>
       <Divider />

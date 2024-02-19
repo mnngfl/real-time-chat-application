@@ -34,16 +34,10 @@ const ChatBox = () => {
       return;
     }
     try {
-      const res = await sendMessage({
-        chatId: currentChat._id,
-        text: text,
-      });
-
       if (!socket) return;
       const newMessage = {
-        _id: res._id,
-        chatId: res.chatId,
-        text: res.text,
+        chatId: currentChat._id,
+        text: text,
         sendUser: {
           _id: userId,
           userName: userName,
@@ -52,8 +46,8 @@ const ChatBox = () => {
           _id: currentChat.userId,
           userName: currentChat.userName,
         },
-        createdAt: res.createdAt,
-        updatedAt: res.updatedAt,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       socket.emit("sendMessage", newMessage);
       setInputText("");

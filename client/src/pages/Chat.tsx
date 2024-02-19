@@ -15,7 +15,10 @@ import { useCallback, useEffect } from "react";
 import { findUserChats } from "../services/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { onlineUserListState, userIdSelector } from "../state";
-import { chatListState } from "../state/atoms/chatState";
+import {
+  chatListState,
+  currentChatMessageListState,
+} from "../state/atoms/chatState";
 import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
 import { useSocket } from "../context/SocketProvider";
@@ -27,21 +30,37 @@ const Chat = () => {
   const currentChatId = useRecoilValue(currentChatIdSelector);
   const [chatList, setChatList] = useRecoilState(chatListState);
   const [, setOnlineUserList] = useRecoilState(onlineUserListState);
+  const [, setCurrentChatMessageList] = useRecoilState(
+    currentChatMessageListState
+  );
 
   const fetchChats = useCallback(async () => {
-    if (!userId) return;
-    const res = await findUserChats();
-    setChatList(res);
-  }, [setChatList, userId]);
+    if (!socket) return;
+
+    try {
+      const res = await findUserChats();
+      setChatList(res);
+
+      const rooms = res.map((v) => v.chatId);
+      socket.emit("enterRoom", rooms);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [setChatList, socket]);
 
   useEffect(() => {
     fetchChats();
-  }, [fetchChats]);
+  }, [currentChatId, fetchChats]);
 
   useEffect(() => {
     if (!socket || !userId) return;
 
     socket.emit("addNewUser", userId);
+  }, [socket, userId]);
+
+  useEffect(() => {
+    if (!socket) return;
+
     socket.on("getOnlineUsers", (res: Array<OnlineUser>) => {
       setOnlineUserList(res);
     });
@@ -49,55 +68,49 @@ const Chat = () => {
     return () => {
       socket.off("getOnlineUsers");
     };
-  }, [setOnlineUserList, socket, userId]);
+  }, [setOnlineUserList, socket]);
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("getNotification", (notification) => {
-      if (notification.receiveUser._id !== userId) return;
-      if (notification.chatId === currentChatId) return;
+    socket.on("getNotification", () => {
+      fetchChats();
+    });
+
+    return () => {
+      socket.off("getNotification");
+    };
+  }, [fetchChats, socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("getMessage", (message) => {
+      if (message.chatId !== currentChatId) return;
 
       const updateChatIndex = chatList.findIndex((chat) => {
-        return chat.chatId === notification.chatId;
+        return chat.chatId === message.chatId;
       });
       setChatList((prevList) => {
         return prevList.map((prevChat, index) => {
           if (index === updateChatIndex) {
             return {
               ...prevChat,
-              latestMessage: notification.latestMessage,
-              latestMessageAt: notification.latestMessageAt,
-              unreadCount: prevChat.unreadCount + 1,
+              latestMessage: message.text,
+              latestMessageAt: message.createdAt,
             };
           } else {
             return prevChat;
           }
         });
       });
+      setCurrentChatMessageList((prev) => [...prev, message]);
     });
 
     return () => {
-      socket.off("getNotification");
+      socket.off("getMessage");
     };
-  }, [chatList, currentChatId, setChatList, socket, userId]);
-
-  useEffect(() => {
-    if (!currentChatId) return;
-
-    setChatList((prevList) => {
-      return prevList.map((prevChat) => {
-        if (prevChat.chatId === currentChatId) {
-          return {
-            ...prevChat,
-            unreadCount: 0,
-          };
-        } else {
-          return prevChat;
-        }
-      });
-    });
-  }, [currentChatId, setChatList]);
+  }, [chatList, currentChatId, setChatList, setCurrentChatMessageList, socket]);
 
   return (
     <Flex w="90%">

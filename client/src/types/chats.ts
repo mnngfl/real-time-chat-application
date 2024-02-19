@@ -12,6 +12,7 @@ export interface PreviewChat extends CommonTimestamp {
   latestMessage: string;
   latestMessageAt: string;
   unreadCount: number;
+  notifications: Array<BaseNotification> | [];
 }
 
 export interface CurrentChat {
@@ -30,7 +31,7 @@ export interface BaseMessage extends CommonTimestamp {
   _id: string;
   chatId: string;
   sendUser: BaseUser;
-  receiveUser?: BaseUser;
+  receiveUser: BaseUser;
   text: string;
 }
 
@@ -44,4 +45,9 @@ export interface MessageRes extends CommonTimestamp {
   chatId: string;
   senderId: string;
   text: string;
+}
+
+export interface BaseNotification {
+  _id: Array<string>;
+  unreadCount: number;
 }

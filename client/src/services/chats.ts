@@ -16,8 +16,8 @@ export const findUserChats = async (): Promise<Array<PreviewChat>> => {
   return await instance.get(`/chats`);
 };
 
-export const findChat = async (chatId: string): Promise<ChatRes> => {
-  return await instance.get(`/chats/${chatId}`);
+export const deleteNotifications = async (chatId: string): Promise<number> => {
+  return await instance.delete(`/chats/notify/${chatId}`);
 };
 
 export const findMessages = async (

@@ -2,13 +2,13 @@ const express = require("express");
 const {
   createChat,
   findUserChats,
-  findChat,
+  deleteNotifications,
 } = require("../controllers/chatController");
 
 const router = express.Router();
 
 router.post("/", createChat);
 router.get("/", findUserChats);
-router.get("/:chatId", findChat);
+router.delete("/notify/:chatId", deleteNotifications);
 
 module.exports = router;
