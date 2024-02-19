@@ -12,7 +12,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BaseUser } from "../../types/users";
 import { getOtherUsers } from "../../services/users";
 import { useRecoilValue } from "recoil";

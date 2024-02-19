@@ -2,13 +2,18 @@ import { Box, Button, VStack } from "@chakra-ui/react";
 import { useRecoilState } from "recoil";
 import { userState } from "../../state";
 import { useNavigate } from "react-router-dom";
+import { useSocket } from "../../context/SocketProvider";
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const socket = useSocket();
 
   const [user, setUser] = useRecoilState(userState);
 
   const handleLogout = () => {
+    if (!user) return;
+    socket.emit("logout", user._id);
+
     setUser(null);
     localStorage.removeItem("user");
     navigate("/login");

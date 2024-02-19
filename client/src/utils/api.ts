@@ -10,13 +10,14 @@ const instance = axios.create({
   },
 });
 
-const user = JSON.parse(localStorage.getItem("user")!);
 let isCalled = false;
 
 instance.interceptors.request.use(
   (config) => {
+    const existToken = JSON.parse(localStorage.getItem("user")!);
+
     if (!config.url?.startsWith("/auth")) {
-      config.headers["Authorization"] = user.accessToken;
+      config.headers["Authorization"] = existToken.accessToken;
     }
 
     return config;
@@ -32,21 +33,23 @@ instance.interceptors.response.use(
     return response.data.data;
   },
   async (error) => {
-    if (error.response.status === 401 && user.accessToken) {
+    const existToken = JSON.parse(localStorage.getItem("user")!);
+
+    if (error.response.status === 401 && existToken.accessToken) {
       if (isCalled) return;
       isCalled = true;
 
       try {
         const res = await axios.post(baseUrl + "/auth/refresh-token", {
-          refreshToken: user.refreshToken,
+          refreshToken: existToken.refreshToken,
         });
         isCalled = false;
         const newToken = res?.data?.accessToken;
 
         if (newToken) {
           instance.defaults.headers.common["Authorization"] = newToken;
-          user.accessToken = newToken;
-          localStorage.setItem("user", JSON.stringify(user));
+          existToken.accessToken = newToken;
+          localStorage.setItem("user", JSON.stringify(existToken));
         }
 
         const originRequest = error.config;

@@ -12,12 +12,13 @@ import { sendMessage } from "../../services/chats";
 import { useRecoilValue } from "recoil";
 import { useSocket } from "../../context/SocketProvider";
 import { currentChatState } from "../../state/atoms/chatState";
-import { userIdSelector } from "../../state";
+import { userIdSelector, userNameSelector } from "../../state";
 
 const ChatBox = () => {
-  const socket = useSocket();
   const { openAlert } = useAlertDialog();
+  const socket = useSocket();
   const userId = useRecoilValue(userIdSelector);
+  const userName = useRecoilValue(userNameSelector);
   const currentChat = useRecoilValue(currentChatState);
   const [inputText, setInputText] = useState("");
 
@@ -33,26 +34,22 @@ const ChatBox = () => {
       return;
     }
     try {
-      const res = await sendMessage({
+      if (!socket) return;
+      const newMessage = {
         chatId: currentChat._id,
         text: text,
-      });
-
-      if (!socket) return;
-      socket.emit("sendMessage", {
-        _id: res._id,
-        chatId: res.chatId,
-        text: res.text,
         sendUser: {
           _id: userId,
+          userName: userName,
         },
         receiveUser: {
-          _id: currentChat._id,
+          _id: currentChat.userId,
           userName: currentChat.userName,
         },
-        createdAt: res.createdAt,
-        updatedAt: res.updatedAt,
-      });
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      socket.emit("sendMessage", newMessage);
       setInputText("");
     } catch (error) {
       openAlert("Send message Failed", error as string);

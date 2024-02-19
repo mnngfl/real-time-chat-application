@@ -15,6 +15,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", jwtUtils.authenticateToken, userRoute);
 app.use("/api/chats", jwtUtils.authenticateToken, chatRoute);
 app.use("/api/messages", jwtUtils.authenticateToken, messageRoute);
+app.use("/api/messages2", messageRoute);
 
 const port = process.env.PORT || 3000;
 app.on("ready", () =>
