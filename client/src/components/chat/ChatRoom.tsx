@@ -62,6 +62,7 @@ const ChatRoom = () => {
   );
 
   const getNextPage = async () => {
+    if (isLoading) return;
     setCurrPage(currPage + 1);
     await getMessages(currPage + 1);
   };

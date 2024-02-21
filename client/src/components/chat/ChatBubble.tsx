@@ -2,6 +2,7 @@ import { Avatar, Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { BaseMessage } from "../../types/chats";
 import { useRecoilValue } from "recoil";
 import { userIdSelector } from "../../state";
+import { format } from "date-fns";
 
 const ChatBubble = ({ message }: { message: BaseMessage }) => {
   const userId = useRecoilValue(userIdSelector);
@@ -18,7 +19,7 @@ const ChatBubble = ({ message }: { message: BaseMessage }) => {
         <>
           <HStack mr={3} ml={"25%"}>
             <Text fontSize={"small"} textAlign={"right"}>
-              {message.createdAt}
+              {format(message.createdAt, "yyyy-MM-dd HH:mm")}
             </Text>
             <Box
               w="auto"
@@ -50,7 +51,9 @@ const ChatBubble = ({ message }: { message: BaseMessage }) => {
               >
                 {message.text}
               </Box>
-              <Text fontSize={"small"}>{message.createdAt}</Text>
+              <Text fontSize={"small"}>
+                {format(message.createdAt, "yyyy-MM-dd HH:mm")}
+              </Text>
             </HStack>
           </Box>
         </>

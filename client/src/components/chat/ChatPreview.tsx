@@ -14,6 +14,7 @@ import { onlineUserListState, userIdSelector } from "../../state";
 import { useEffect, useMemo, useState } from "react";
 import { currentChatState } from "../../state/atoms/chatState";
 import { deleteNotifications } from "../../services/chats";
+import { format } from "date-fns";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
@@ -74,7 +75,8 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
         </VStack>
         <VStack alignItems={"end"} ml={4}>
           <Text fontSize={"small"} whiteSpace={"nowrap"}>
-            {chat.latestMessageAt}
+            {chat.latestMessageAt &&
+              format(chat.latestMessageAt, "yyyy-MM-dd HH:mm")}
           </Text>
           {unreadCount && (
             <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
