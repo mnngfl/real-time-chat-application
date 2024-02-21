@@ -3,9 +3,11 @@ import {
   AvatarBadge,
   Box,
   Center,
+  Circle,
   Divider,
   Flex,
   Icon,
+  Spinner,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -16,9 +18,9 @@ import {
   currentChatState,
   currentChatMessageListState,
 } from "../../state/atoms/chatState";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { findMessages } from "../../services/chats";
-import { InfoOutlineIcon } from "@chakra-ui/icons";
+import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
 import { onlineUserListState } from "../../state";
 
@@ -29,26 +31,63 @@ const ChatRoom = () => {
   );
   const onlineUserList = useRecoilValue(onlineUserListState);
   const boxRef = useRef<HTMLDivElement>(null);
+  const [currPage, setCurrPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [viewCount, setViewCount] = useState(0);
 
   const isOnlineUser = useMemo(() => {
     return onlineUserList.some((user) => user.userId === currentChat.userId);
   }, [currentChat.userId, onlineUserList]);
 
-  const getMessages = useCallback(async () => {
-    const res = await findMessages(currentChat._id);
-    if (res) setCurrentChatMessageList(res);
-  }, [currentChat, setCurrentChatMessageList]);
+  const getMessages = useCallback(
+    async (page = 1) => {
+      setIsLoading(true);
+      try {
+        const res = await findMessages(currentChat._id, page);
+        if (res) {
+          setCurrentChatMessageList((prev) => {
+            return [...res.data, ...prev];
+          });
+          setHasNextPage(res.pageInfo.hasMorePages);
+          setViewCount(res.data.length);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentChat._id, setCurrentChatMessageList]
+  );
+
+  const getNextPage = async () => {
+    setCurrPage(currPage + 1);
+    await getMessages(currPage + 1);
+  };
 
   useEffect(() => {
     if (!currentChat._id) return;
+    setViewCount(0);
+    setCurrPage(1);
+    setHasNextPage(false);
+    setCurrentChatMessageList([]);
     getMessages();
-  }, [currentChat, getMessages]);
+  }, [currentChat._id, getMessages, setCurrentChatMessageList]);
 
   useEffect(() => {
-    if (boxRef.current) {
-      boxRef.current.scrollTop = boxRef.current.scrollHeight;
+    if (boxRef.current && viewCount > 0) {
+      const elements = boxRef.current
+        .querySelectorAll("[name='chat-bubble']")
+        .values();
+      const offsetHeight = Array.from(elements)
+        .slice(0, viewCount)
+        .reduce((acc, curr) => {
+          return (acc += curr.clientHeight);
+        }, 0);
+      boxRef.current.scrollTop = offsetHeight;
     }
-  }, [currentChatMessageList]);
+  }, [viewCount, currentChatMessageList]);
 
   // const renderDivider = (currDate, prevDate) => {
   //   if (!prevDate) return null;
@@ -84,11 +123,29 @@ const ChatRoom = () => {
         bgColor={"gray.700"}
         ref={boxRef}
       >
+        {hasNextPage && (
+          <Circle
+            size="2.5rem"
+            bg="gray.500"
+            color="white"
+            mb={4}
+            marginX={"auto"}
+            _hover={{ cursor: "pointer" }}
+            onClick={() => getNextPage()}
+          >
+            {isLoading ? <Spinner size={"sm"} /> : <ArrowUpIcon />}
+          </Circle>
+        )}
         {/* <ChatBubble />
         <DividerWithDate date={"Today"} bgColor={"gray.700"} />
         <ChatBubble /> */}
-        {currentChatMessageList.map((message, index) => {
-          return <ChatBubble key={message._id || index} message={message} />;
+        {currentChatMessageList.map((message) => {
+          return (
+            <ChatBubble
+              key={message._id || message.chatId + message.createdAt}
+              message={message}
+            />
+          );
         })}
       </Box>
       <Divider />

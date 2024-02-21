@@ -6,6 +6,7 @@ import {
   MessageRes,
   PreviewChat,
 } from "../types/chats";
+import { CommonPagination } from "../types/common";
 import instance from "../utils/api";
 
 export const createChat = async (data: ChatReq): Promise<ChatRes> => {
@@ -21,9 +22,10 @@ export const deleteNotifications = async (chatId: string): Promise<number> => {
 };
 
 export const findMessages = async (
-  chatId: string
-): Promise<Array<BaseMessage>> => {
-  return await instance.get(`/messages/${chatId}`);
+  chatId: string,
+  page: number = 1
+): Promise<{ data: Array<BaseMessage>; pageInfo: CommonPagination }> => {
+  return await instance.get(`/messages/${chatId}?page=${page}`);
 };
 
 export const sendMessage = async (data: MessageReq): Promise<MessageRes> => {

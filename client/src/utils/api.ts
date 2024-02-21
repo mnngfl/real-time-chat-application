@@ -30,7 +30,8 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    return response.data.data;
+    const { data, pageInfo } = response.data;
+    return pageInfo ? { data, pageInfo } : data;
   },
   async (error) => {
     const existToken = JSON.parse(localStorage.getItem("user")!);
