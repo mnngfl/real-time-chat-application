@@ -2,8 +2,22 @@ const responseFormatter = (req, res, next) => {
   res.apiSuccess = (data, message = "Success", status = 200) => {
     res.status(status).json({
       success: true,
-      message: message,
+      message,
       data,
+    });
+  };
+
+  res.apiSuccessPagination = (
+    data,
+    pageInfo,
+    message = "Success",
+    status = 200
+  ) => {
+    res.status(status).json({
+      success: true,
+      message,
+      data,
+      pageInfo,
     });
   };
 

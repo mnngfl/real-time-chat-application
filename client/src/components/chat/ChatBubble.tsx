@@ -10,6 +10,7 @@ const ChatBubble = ({ message }: { message: BaseMessage }) => {
 
   return (
     <Flex
+      name="chat-bubble"
       flexDir={"row"}
       justifyContent={isMyMessage ? "flex-end" : "flex-start"}
     >
