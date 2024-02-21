@@ -15,8 +15,10 @@ import { useEffect, useMemo, useState } from "react";
 import { currentChatState } from "../../state/atoms/chatState";
 import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
+import { useSocket } from "../../context/SocketProvider";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
+  const socket = useSocket();
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
   const userId = useRecoilValue(userIdSelector);
   const onlineUserList = useRecoilValue(onlineUserListState);
@@ -47,6 +49,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       userName: chatUser.userName,
     });
 
+    socket.emit("changeRoom", chat.chatId);
     if (!unreadCount) return;
     await deleteNotifications(chat.chatId);
   };

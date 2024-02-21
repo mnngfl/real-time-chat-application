@@ -8,7 +8,6 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useAlertDialog } from "../../context/AlertDialogProvider";
-import { sendMessage } from "../../services/chats";
 import { useRecoilValue } from "recoil";
 import { useSocket } from "../../context/SocketProvider";
 import { currentChatState } from "../../state/atoms/chatState";

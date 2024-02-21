@@ -7,10 +7,18 @@ const io = new Server({
 
 let onlineUsers = [];
 let messagesById = {};
+let selectedRoomById = {};
 
 const createMessages = async (messages) => {
   return await axios.post(
     "http://localhost:3000/api/messages2/multiple",
+    messages
+  );
+};
+
+const createNotifications = async (messages) => {
+  return await axios.post(
+    "http://localhost:3000/api/messages2/notifications",
     messages
   );
 };
@@ -35,6 +43,11 @@ io.on("connection", (socket) => {
     console.log("Room: ", socket.rooms);
   });
 
+  socket.on("changeRoom", (chatId) => {
+    selectedRoomById[socket.id] = chatId;
+    console.log("Change Room: ", selectedRoomById);
+  });
+
   socket.on("sendMessage", (message) => {
     if (!messagesById[socket.id]) {
       messagesById[socket.id] = {
@@ -53,17 +66,24 @@ io.on("connection", (socket) => {
     });
     if (messagesToSave.length === 0) return;
 
-    const req = messagesToSave.flatMap((key) => {
-      messagesById[key].isSaving = true;
-      return messagesById[key].data;
-    });
+    messagesToSave.forEach((key) => (messagesById[key].isSaving = true));
+    const req = messagesToSave.flatMap((key) => messagesById[key].data);
     const res = await createMessages(req);
+
+    const notiReq = req.filter((item) => {
+      return (
+        Object.values(selectedRoomById).filter(
+          (roomId) => roomId === item.chatId
+        ).length <= 1
+      );
+    });
+    const notiRes = await createNotifications(notiReq);
 
     messagesToSave.forEach((key) => {
       delete messagesById[key];
     });
 
-    const notifyTarget = res.data.data.map((v) => v.chatId);
+    const notifyTarget = notiReq.map((v) => v.chatId);
     socket.to(notifyTarget).emit("getNotification");
   }, 10000);
 
@@ -73,6 +93,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", async () => {
+    delete selectedRoomById[socket.id];
     onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
     io.emit("getOnlineUsers", onlineUsers);
 
@@ -87,10 +108,21 @@ io.on("connection", (socket) => {
 
     try {
       messagesById[socket.id].isSaving = true;
-      const res = await createMessages(messagesById[socket.id].data);
+      const req = messagesById[socket.id].data;
+      const res = await createMessages(req);
+
+      const notiReq = req.filter((item) => {
+        return (
+          Object.values(selectedRoomById).filter(
+            (roomId) => roomId === item.chatId
+          ).length <= 1
+        );
+      });
+      const notiRes = await createNotifications(notiReq);
+
       delete messagesById[socket.id];
 
-      const notifyTarget = res.data.data.map((v) => v.chatId);
+      const notifyTarget = notiReq.map((v) => v.chatId);
       socket.to(notifyTarget).emit("getNotification");
     } catch (error) {
       console.error(error);
