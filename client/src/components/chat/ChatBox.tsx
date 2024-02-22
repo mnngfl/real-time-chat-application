@@ -26,12 +26,20 @@ const ChatBox = () => {
     setInputText(value);
   };
 
+  const handleKeyUp = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleSubmit();
+    }
+  };
+
   const handleSubmit = async () => {
-    const text = inputText.trim();
+    const text = inputText.replace(/\n$/, "").trim();
+
     if (text.length === 0) {
       setInputText("");
       return;
     }
+
     try {
       if (!socket) return;
       const newMessage = {
@@ -78,15 +86,17 @@ const ChatBox = () => {
         </InputLeftElement>
         <Textarea
           paddingX={10}
-          placeholder="Type something..."
+          placeholder="Type something...&#10;Press Shift + Enter to line break / Press Enter to send message"
           borderColor="gray.900"
           focusBorderColor="gray.300"
           name="text"
           resize={"none"}
           rows={2}
           value={inputText}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e)}
+          onKeyUp={(e) => handleKeyUp(e)}
           style={{ scrollbarWidth: "none" }}
+          maxLength={2000}
         />
         <InputRightElement
           _hover={{ cursor: "pointer" }}

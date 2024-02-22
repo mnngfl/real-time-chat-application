@@ -23,7 +23,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-  const [user, setUser] = useRecoilState(userState);
+  const [, setUser] = useRecoilState(userState);
   const { openAlert } = useAlertDialog();
 
   const [formData, setFormData] = useState<LoginUserReq>({
@@ -48,8 +48,13 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      await handleSubmit();
+    }
+  };
+
+  const handleSubmit = async () => {
     setIsSubmitted(true);
 
     const validationErrors = validateForm();
@@ -134,6 +139,7 @@ const Login = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              onKeyUp={handleKeyUp}
             />
             {errors?.password && (
               <FormErrorMessage>{errors.password}</FormErrorMessage>
@@ -147,7 +153,7 @@ const Login = () => {
             my={4}
             w={"100%"}
             isLoading={isSubmitLoading}
-            onClick={(e) => handleSubmit(e)}
+            onClick={() => handleSubmit()}
           >
             Sign In
           </Button>
