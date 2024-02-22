@@ -12,6 +12,8 @@ import { useRecoilValue } from "recoil";
 import { useSocket } from "../../context/SocketProvider";
 import { currentChatState } from "../../state/atoms/chatState";
 import { userIdSelector, userNameSelector } from "../../state";
+import ChatEmoji from "./ChatEmoji";
+import { EmojiClickData } from "emoji-picker-react";
 
 const ChatBox = () => {
   const { openAlert } = useAlertDialog();
@@ -20,6 +22,7 @@ const ChatBox = () => {
   const userName = useRecoilValue(userNameSelector);
   const currentChat = useRecoilValue(currentChatState);
   const [inputText, setInputText] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
@@ -30,6 +33,11 @@ const ChatBox = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       await handleSubmit();
     }
+  };
+
+  const handleEmoji = (emojiData: EmojiClickData) => {
+    setInputText(inputText + emojiData.emoji);
+    setShowPicker(false);
   };
 
   const handleSubmit = async () => {
@@ -67,7 +75,13 @@ const ChatBox = () => {
     <Flex paddingY={4}>
       <InputGroup>
         <InputLeftElement>
-          <Icon viewBox="0 0 24 24" boxSize={6} color="gray.300">
+          <Icon
+            viewBox="0 0 24 24"
+            boxSize={6}
+            color="gray.300"
+            _hover={{ cursor: "pointer" }}
+            onClick={() => setShowPicker(!showPicker)}
+          >
             {/* <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> */}
             <svg
               viewBox="0 0 24 24"
@@ -84,6 +98,7 @@ const ChatBox = () => {
             </svg>
           </Icon>
         </InputLeftElement>
+        <ChatEmoji open={showPicker} handler={handleEmoji} />
         <Textarea
           paddingX={10}
           placeholder="Type something...&#10;Press Shift + Enter to line break / Press Enter to send message"
