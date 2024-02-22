@@ -1,14 +1,4 @@
-import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
-import {
-  Box,
-  Divider,
-  Flex,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Divider, Flex, Text } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect } from "react";
@@ -116,18 +106,7 @@ const Chat = () => {
     <Flex w="90%">
       <Box w="35%" bg="gray.800" color={"white"}>
         <Box p={12}>
-          <Text fontSize={"2xl"} mb={6}>
-            Messages
-          </Text>
-          <InputGroup>
-            <InputLeftElement pointerEvents={"none"}>
-              <Search2Icon color="gray.300" />
-            </InputLeftElement>
-            <InputRightElement>
-              <CloseIcon color="gray.300" />
-            </InputRightElement>
-            <Input placeholder="Search" />
-          </InputGroup>
+          <Text fontSize={"2xl"}>Messages</Text>
         </Box>
         <Divider borderColor="gray.600" />
         <PotentialChat fetchChats={fetchChats} />

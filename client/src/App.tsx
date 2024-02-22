@@ -22,7 +22,7 @@ function App() {
   };
 
   return (
-    <Flex height={"100vh"}>
+    <Flex height={"100vh"} overflowY={"hidden"}>
       {isLoggedIn ? <NavBar /> : <></>}
       <Routes>
         <Route path="/register" element={<RegisterRedirect />} />

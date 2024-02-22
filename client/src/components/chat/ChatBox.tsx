@@ -1,10 +1,10 @@
 import {
   Flex,
   Icon,
-  Input,
   InputGroup,
   InputLeftElement,
   InputRightElement,
+  Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useAlertDialog } from "../../context/AlertDialogProvider";
@@ -21,7 +21,7 @@ const ChatBox = () => {
   const currentChat = useRecoilValue(currentChatState);
   const [inputText, setInputText] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
     setInputText(value);
   };
@@ -76,13 +76,17 @@ const ChatBox = () => {
             </svg>
           </Icon>
         </InputLeftElement>
-        <Input
+        <Textarea
+          paddingX={10}
           placeholder="Type something..."
           borderColor="gray.900"
-          focusBorderColor="gray.900"
+          focusBorderColor="gray.300"
           name="text"
+          resize={"none"}
+          rows={2}
           value={inputText}
           onChange={handleChange}
+          style={{ scrollbarWidth: "none" }}
         />
         <InputRightElement
           _hover={{ cursor: "pointer" }}
