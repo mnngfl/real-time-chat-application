@@ -116,7 +116,9 @@ const getMessages = async (req, res) => {
       })
       .exec();
 
-    const totalItems = messages[0] ? messages[0].totalItems[0].count : 0;
+    const totalItems = messages[0]?.totalItems[0]
+      ? messages[0].totalItems[0].count
+      : 0;
     const totalPage = Math.ceil(totalItems / limitNum);
     const hasMorePages = pageNum < totalPage;
 
