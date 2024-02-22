@@ -4,7 +4,7 @@ import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect } from "react";
 import { findUserChats } from "../services/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { onlineUserListState, userIdSelector } from "../state";
+import { onlineUserListState, userState } from "../state";
 import {
   chatListState,
   currentChatMessageListState,
@@ -16,7 +16,7 @@ import { currentChatIdSelector } from "../state/selectors/chatSelectors";
 
 const Chat = () => {
   const socket = useSocket();
-  const userId = useRecoilValue(userIdSelector);
+  const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
   const [chatList, setChatList] = useRecoilState(chatListState);
   const [, setOnlineUserList] = useRecoilState(onlineUserListState);
@@ -43,10 +43,10 @@ const Chat = () => {
   }, [currentChatId, fetchChats]);
 
   useEffect(() => {
-    if (!socket || !userId) return;
+    if (!socket || !user?._id) return;
 
-    socket.emit("addNewUser", userId);
-  }, [socket, userId]);
+    socket.emit("addNewUser", user._id);
+  }, [socket, user?._id]);
 
   useEffect(() => {
     if (!socket) return;
@@ -106,7 +106,7 @@ const Chat = () => {
     <Flex w="90%">
       <Box w="35%" bg="gray.800" color={"white"}>
         <Box p={12}>
-          <Text fontSize={"2xl"}>Messages</Text>
+          <Text fontSize={"2xl"}>Hello, {user?.userName} 😺</Text>
         </Box>
         <Divider borderColor="gray.600" />
         <PotentialChat fetchChats={fetchChats} />

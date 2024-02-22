@@ -1,8 +1,9 @@
-import { Box, Button, VStack } from "@chakra-ui/react";
+import { Box, Button, Text, VStack, theme } from "@chakra-ui/react";
 import { useRecoilState } from "recoil";
 import { userState } from "../../state";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../../context/SocketProvider";
+import { ChatIcon } from "@chakra-ui/icons";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -27,12 +28,21 @@ const NavBar = () => {
         paddingY={12}
         justifyContent={"space-between"}
       >
-        <Box>Main</Box>
+        <Box>
+          <VStack _hover={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+            <ChatIcon boxSize={8} />
+            <Text fontSize={"sm"}>Chatting</Text>
+          </VStack>
+        </Box>
         <VStack>
           <Box>
-            <Button onClick={() => handleLogout()}>Logout</Button>
+            <Button
+              onClick={() => handleLogout()}
+              _hover={{ bgColor: theme.colors.gray[300] }}
+            >
+              Logout
+            </Button>
           </Box>
-          <Box>Hello, {user?.userName}!</Box>
         </VStack>
       </VStack>
     </Box>
