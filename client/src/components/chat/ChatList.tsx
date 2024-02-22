@@ -4,7 +4,11 @@ import ChatPreview from "./ChatPreview";
 
 const ChatList = ({ chatList }: { chatList: Array<PreviewChat> }) => {
   return (
-    <Box overflowY={"auto"} h={"calc(100vh - 37%)"}>
+    <Box
+      overflowY={"auto"}
+      h={"calc(100vh - 30%)"}
+      style={{ scrollbarWidth: "none" }}
+    >
       {chatList.map((chat) => {
         return <ChatPreview key={chat.chatId} chat={chat} />;
       })}

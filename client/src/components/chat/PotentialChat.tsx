@@ -61,7 +61,12 @@ const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
   return (
     <Popover defaultIsOpen={true} placement="top">
       <PopoverAnchor>
-        <Flex h={"15%"} overflowX={"auto"} p={6}>
+        <Flex
+          h={"15%"}
+          overflowX={"auto"}
+          p={6}
+          style={{ scrollbarWidth: "none", alignItems: "center" }}
+        >
           {users.length > 0 &&
             users.map((user, index) => {
               const isOnlineUser = onlineUserList.some(

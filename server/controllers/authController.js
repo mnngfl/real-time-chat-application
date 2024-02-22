@@ -31,7 +31,7 @@ const registerUser = async (req, res) => {
 
     user = new userModel({ userName, password });
     const salt = await bcrypt.genSalt(10);
-    user.password = bcrypt.hash(user.password, salt);
+    user.password = await bcrypt.hash(user.password, salt);
     await user.save();
 
     return res.apiSuccess(

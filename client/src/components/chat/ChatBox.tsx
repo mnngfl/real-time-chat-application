@@ -1,18 +1,19 @@
 import {
   Flex,
   Icon,
-  Input,
   InputGroup,
   InputLeftElement,
   InputRightElement,
+  Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useAlertDialog } from "../../context/AlertDialogProvider";
-import { sendMessage } from "../../services/chats";
 import { useRecoilValue } from "recoil";
 import { useSocket } from "../../context/SocketProvider";
 import { currentChatState } from "../../state/atoms/chatState";
 import { userIdSelector, userNameSelector } from "../../state";
+import ChatEmoji from "./ChatEmoji";
+import { EmojiClickData } from "emoji-picker-react";
 
 const ChatBox = () => {
   const { openAlert } = useAlertDialog();
@@ -21,18 +22,32 @@ const ChatBox = () => {
   const userName = useRecoilValue(userNameSelector);
   const currentChat = useRecoilValue(currentChatState);
   const [inputText, setInputText] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
     setInputText(value);
   };
 
+  const handleKeyUp = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleSubmit();
+    }
+  };
+
+  const handleEmoji = (emojiData: EmojiClickData) => {
+    setInputText(inputText + emojiData.emoji);
+    setShowPicker(false);
+  };
+
   const handleSubmit = async () => {
-    const text = inputText.trim();
+    const text = inputText.replace(/\n$/, "").trim();
+
     if (text.length === 0) {
       setInputText("");
       return;
     }
+
     try {
       if (!socket) return;
       const newMessage = {
@@ -60,7 +75,13 @@ const ChatBox = () => {
     <Flex paddingY={4}>
       <InputGroup>
         <InputLeftElement>
-          <Icon viewBox="0 0 24 24" boxSize={6} color="gray.300">
+          <Icon
+            viewBox="0 0 24 24"
+            boxSize={6}
+            color="gray.300"
+            _hover={{ cursor: "pointer" }}
+            onClick={() => setShowPicker(!showPicker)}
+          >
             {/* <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> */}
             <svg
               viewBox="0 0 24 24"
@@ -77,13 +98,20 @@ const ChatBox = () => {
             </svg>
           </Icon>
         </InputLeftElement>
-        <Input
-          placeholder="Type something..."
+        <ChatEmoji open={showPicker} handler={handleEmoji} />
+        <Textarea
+          paddingX={10}
+          placeholder="Type something...&#10;Press Shift + Enter to line break / Press Enter to send message"
           borderColor="gray.900"
-          focusBorderColor="gray.900"
+          focusBorderColor="gray.300"
           name="text"
+          resize={"none"}
+          rows={2}
           value={inputText}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e)}
+          onKeyUp={(e) => handleKeyUp(e)}
+          style={{ scrollbarWidth: "none" }}
+          maxLength={2000}
         />
         <InputRightElement
           _hover={{ cursor: "pointer" }}

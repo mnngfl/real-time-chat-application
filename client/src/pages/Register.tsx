@@ -46,8 +46,13 @@ const Register = () => {
     }
   };
 
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      await handleSubmit();
+    }
+  };
+
+  const handleSubmit = async () => {
     setIsSubmitted(true);
 
     const validationErrors = validateForm();
@@ -164,6 +169,7 @@ const Register = () => {
               name="passwordConfirm"
               value={formData.passwordConfirm}
               onChange={handleChange}
+              onKeyUp={handleKeyUp}
             />
             {errors?.passwordConfirm && (
               <FormErrorMessage>{errors.passwordConfirm}</FormErrorMessage>
@@ -176,7 +182,7 @@ const Register = () => {
             my={4}
             w={"100%"}
             isLoading={isSubmitLoading}
-            onClick={(e) => handleSubmit(e)}
+            onClick={() => handleSubmit()}
           >
             Sign Up
           </Button>

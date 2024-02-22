@@ -1,20 +1,10 @@
-import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
-import {
-  Box,
-  Divider,
-  Flex,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Divider, Flex, Text } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect } from "react";
 import { findUserChats } from "../services/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { onlineUserListState, userIdSelector } from "../state";
+import { onlineUserListState, userState } from "../state";
 import {
   chatListState,
   currentChatMessageListState,
@@ -26,7 +16,7 @@ import { currentChatIdSelector } from "../state/selectors/chatSelectors";
 
 const Chat = () => {
   const socket = useSocket();
-  const userId = useRecoilValue(userIdSelector);
+  const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
   const [chatList, setChatList] = useRecoilState(chatListState);
   const [, setOnlineUserList] = useRecoilState(onlineUserListState);
@@ -53,10 +43,10 @@ const Chat = () => {
   }, [currentChatId, fetchChats]);
 
   useEffect(() => {
-    if (!socket || !userId) return;
+    if (!socket || !user?._id) return;
 
-    socket.emit("addNewUser", userId);
-  }, [socket, userId]);
+    socket.emit("addNewUser", user._id);
+  }, [socket, user?._id]);
 
   useEffect(() => {
     if (!socket) return;
@@ -116,18 +106,7 @@ const Chat = () => {
     <Flex w="90%">
       <Box w="35%" bg="gray.800" color={"white"}>
         <Box p={12}>
-          <Text fontSize={"2xl"} mb={6}>
-            Messages
-          </Text>
-          <InputGroup>
-            <InputLeftElement pointerEvents={"none"}>
-              <Search2Icon color="gray.300" />
-            </InputLeftElement>
-            <InputRightElement>
-              <CloseIcon color="gray.300" />
-            </InputRightElement>
-            <Input placeholder="Search" />
-          </InputGroup>
+          <Text fontSize={"2xl"}>Hello, {user?.userName} 😺</Text>
         </Box>
         <Divider borderColor="gray.600" />
         <PotentialChat fetchChats={fetchChats} />

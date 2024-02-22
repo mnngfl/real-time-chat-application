@@ -18,11 +18,19 @@ import {
   currentChatState,
   currentChatMessageListState,
 } from "../../state/atoms/chatState";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { findMessages } from "../../services/chats";
 import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
 import { onlineUserListState } from "../../state";
+import { parseISO, isSameDay } from "date-fns";
 
 const ChatRoom = () => {
   const currentChat = useRecoilValue(currentChatState);
@@ -62,6 +70,7 @@ const ChatRoom = () => {
   );
 
   const getNextPage = async () => {
+    if (isLoading) return;
     setCurrPage(currPage + 1);
     await getMessages(currPage + 1);
   };
@@ -89,21 +98,13 @@ const ChatRoom = () => {
     }
   }, [viewCount, currentChatMessageList]);
 
-  // const renderDivider = (currDate, prevDate) => {
-  //   if (!prevDate) return null;
-
-  //   const currDateStr = currDate.toLocaleDateString();
-  //   const prevDateStr = prevDate.toLocaleDateString();
-
-  //   if (currDateStr !== prevDateStr) {
-  //     return (
-  //       <DividerWithDate
-  //         date={currDateStr}
-  //         bgColor={"gray.700"}
-  //       ></DividerWithDate>
-  //     );
-  //   }
-  // };
+  const renderDivider = (currDate: Date, prevDate: Date | null) => {
+    if (prevDate === null || !isSameDay(currDate, prevDate)) {
+      return (
+        <DividerWithDate date={currDate} bgColor={"gray.900"}></DividerWithDate>
+      );
+    }
+  };
 
   return currentChat._id ? (
     <>
@@ -120,7 +121,7 @@ const ChatRoom = () => {
         h={"85%"}
         overflowY={"auto"}
         paddingY={4}
-        bgColor={"gray.700"}
+        bgColor={"gray.900"}
         ref={boxRef}
       >
         {hasNextPage && (
@@ -136,15 +137,16 @@ const ChatRoom = () => {
             {isLoading ? <Spinner size={"sm"} /> : <ArrowUpIcon />}
           </Circle>
         )}
-        {/* <ChatBubble />
-        <DividerWithDate date={"Today"} bgColor={"gray.700"} />
-        <ChatBubble /> */}
-        {currentChatMessageList.map((message) => {
+        {currentChatMessageList.map((message, index, arr) => {
+          const currDate = parseISO(message.createdAt);
+          const prevDate =
+            index > 0 ? parseISO(arr[index - 1].createdAt) : null;
+
           return (
-            <ChatBubble
-              key={message._id || message.chatId + message.createdAt}
-              message={message}
-            />
+            <Fragment key={message._id || message.chatId + message.createdAt}>
+              {renderDivider(currDate, prevDate)}
+              <ChatBubble message={message} />
+            </Fragment>
           );
         })}
       </Box>

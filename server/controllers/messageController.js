@@ -17,6 +17,17 @@ const createMessages = async (req, res) => {
     });
     const response = await messageModel.insertMany(messageModels);
 
+    res.apiSuccess(response, "Message created", 201);
+  } catch (error) {
+    console.error(error);
+    res.apiError(error);
+  }
+};
+
+const createNotifications = async (req, res) => {
+  const messages = req.body;
+
+  try {
     const notiMap = new Map();
     messages.forEach(({ chatId, receiveUser }) => {
       const key = `${chatId}-${receiveUser._id}`;
@@ -26,9 +37,9 @@ const createMessages = async (req, res) => {
       const [chatId, userId] = key.split("-");
       return new notificationModel({ chatId, userId, unreadCount });
     });
-    await notificationModel.insertMany(notiArr);
+    const response = await notificationModel.insertMany(notiArr);
 
-    res.apiSuccess(response, "Message created", 201);
+    res.apiSuccess(response, "Notification created", 201);
   } catch (error) {
     console.error(error);
     res.apiError(error);
@@ -105,7 +116,9 @@ const getMessages = async (req, res) => {
       })
       .exec();
 
-    const totalItems = messages[0] ? messages[0].totalItems[0].count : 0;
+    const totalItems = messages[0]?.totalItems[0]
+      ? messages[0].totalItems[0].count
+      : 0;
     const totalPage = Math.ceil(totalItems / limitNum);
     const hasMorePages = pageNum < totalPage;
 
@@ -124,4 +137,4 @@ const getMessages = async (req, res) => {
   }
 };
 
-module.exports = { createMessages, getMessages };
+module.exports = { createMessages, createNotifications, getMessages };

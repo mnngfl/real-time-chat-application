@@ -1,7 +1,8 @@
 import { AbsoluteCenter, Box, Divider } from "@chakra-ui/react";
+import { formatSameDay } from "../../utils/dateUtil";
 
 interface DividerWithDateProps {
-  date: string;
+  date: Date;
   bgColor: string;
 }
 
@@ -10,7 +11,7 @@ const DividerWithDate: React.FC<DividerWithDateProps> = ({ date, bgColor }) => {
     <Box position={"relative"} p={"10"}>
       <Divider />
       <AbsoluteCenter bg={bgColor} px={"4"}>
-        {date}
+        {formatSameDay(date)}
       </AbsoluteCenter>
     </Box>
   );
