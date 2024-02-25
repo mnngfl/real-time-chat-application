@@ -114,7 +114,7 @@ node_modules
 psd
 thumb
 sketch
-.vscode
+.vscode/
 
 ### mongodb ###
 data
