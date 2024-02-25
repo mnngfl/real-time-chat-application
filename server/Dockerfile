@@ -1,4 +1,4 @@
-FROM node:lts-buster-slim AS development
+FROM node:lts-buster-slim 
 
 WORKDIR /usr/src/app
 
@@ -10,19 +10,4 @@ COPY . /usr/src/app
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "dev" ]
-
-FROM development as dev-envs
-RUN <<EOF
-apt-get update
-apt-get install -y --no-install-recommends git
-EOF
-
-RUN <<EOF
-useradd -s /bin/bash -m vscode
-groupadd docker
-usermod -aG docker vscode
-EOF
-
-COPY --from=gloursdocker/docker / /
 CMD [ "npm", "run", "dev" ]

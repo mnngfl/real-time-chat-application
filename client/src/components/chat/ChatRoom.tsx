@@ -86,9 +86,7 @@ const ChatRoom = () => {
 
   useEffect(() => {
     if (boxRef.current && viewCount > 0) {
-      const elements = boxRef.current
-        .querySelectorAll("[name='chat-bubble']")
-        .values();
+      const elements = boxRef.current.querySelectorAll(".chat-bubble").values();
       const offsetHeight = Array.from(elements)
         .slice(0, viewCount)
         .reduce((acc, curr) => {
