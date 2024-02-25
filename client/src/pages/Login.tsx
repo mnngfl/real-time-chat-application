@@ -11,7 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { LoginUserReq, LoginUserRes } from "../types/users";
 import { loginUser } from "../services/users";
@@ -21,8 +21,8 @@ import { userState } from "../state";
 
 const Login = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
+  // const location = useLocation();
+  // const from = location.state?.from?.pathname || "/";
   const [, setUser] = useRecoilState(userState);
   const { openAlert } = useAlertDialog();
 

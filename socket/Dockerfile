@@ -1,4 +1,4 @@
-FROM node:lts-buster-slim 
+FROM node:lts-buster-slim
 
 WORKDIR /usr/src/app
 
@@ -8,6 +8,6 @@ RUN npm ci
 
 COPY . /usr/src/app
 
-EXPOSE 3000
+EXPOSE 3030
 
-CMD [ "npm", "run", "dev" ]
+CMD ["npm", "run", "dev"]

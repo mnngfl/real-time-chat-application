@@ -1,27 +1,24 @@
 version: "3.1"
 
 services:
-  # client:
-  #   build:
-  #     context: client
-  #     target: development
-  #   ports:
-  #     - 3000:3000
-  #   stdin_open: true
-  #   volumes:
-  #     - ./client:/usr/src/app
-  #     - /usr/src/app/node_modules
-  #   restart: always
-  #   networks:
-  #     - react-express
-  #   depends_on:
-  #     - server
-
+  client:
+    restart: always
+    build:
+      context: client
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - server
+      - socket
+    networks:
+      - app-network
+    ports:
+      - "5173:80"
   server:
     restart: always
     build:
       context: server
-      target: development
     env_file:
       - ./server/.env
     volumes:
@@ -30,23 +27,30 @@ services:
     depends_on:
       - db
     networks:
-      - express-mongo
-      # - react-express
+      - app-network
     ports:
       - "3000:3000"
-    expose:
-      - 3000
+  socket:
+    restart: always
+    build:
+      context: socket
+    volumes:
+      - ./socket:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - server
+    networks:
+      - app-network
+    ports:
+      - "3030:3030"
   db:
     restart: always
     image: mongo:6.0.13
     volumes:
       - ./data:/data/db
     networks:
-      - express-mongo
+      - app-network
     ports:
       - "27017:27017"
-    expose:
-      - 27017
 networks:
-  # react-express:
-  express-mongo:
+  app-network:

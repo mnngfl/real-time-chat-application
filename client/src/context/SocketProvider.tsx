@@ -31,7 +31,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const contextValue: SocketContextProps = { socket: socket as Socket };
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3030");
+    const newSocket = io("http://socket:3030");
     setSocket(newSocket);
 
     return () => {

@@ -3,7 +3,7 @@ import { userState } from ".";
 import { useEffect } from "react";
 
 const useRecoilInitialize = () => {
-  const [user, setUser] = useRecoilState(userState);
+  const [, setUser] = useRecoilState(userState);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

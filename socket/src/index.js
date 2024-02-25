@@ -2,7 +2,17 @@ const { Server } = require("socket.io");
 const axios = require("axios");
 
 const io = new Server({
-  cors: "http://localhost:5173",
+  cors: {
+    origin: ["http://localhost:5173"],
+  },
+});
+
+const instance = axios.create({
+  baseURL: "http://server:3000/api",
+  timeout: 1000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 let onlineUsers = [];
@@ -10,17 +20,11 @@ let messagesById = {};
 let selectedRoomById = {};
 
 const createMessages = async (messages) => {
-  return await axios.post(
-    "http://localhost:3000/api/messages2/multiple",
-    messages
-  );
+  return await instance.post("/messages2/multiple", messages);
 };
 
 const createNotifications = async (messages) => {
-  return await axios.post(
-    "http://localhost:3000/api/messages2/notifications",
-    messages
-  );
+  return await instance.post("/messages2/notifications", messages);
 };
 
 io.on("connection", (socket) => {
@@ -68,23 +72,27 @@ io.on("connection", (socket) => {
 
     messagesToSave.forEach((key) => (messagesById[key].isSaving = true));
     const req = messagesToSave.flatMap((key) => messagesById[key].data);
-    const res = await createMessages(req);
+    try {
+      const res = await createMessages(req);
 
-    const notiReq = req.filter((item) => {
-      return (
-        Object.values(selectedRoomById).filter(
-          (roomId) => roomId === item.chatId
-        ).length <= 1
-      );
-    });
-    const notiRes = await createNotifications(notiReq);
+      const notiReq = req.filter((item) => {
+        return (
+          Object.values(selectedRoomById).filter(
+            (roomId) => roomId === item.chatId
+          ).length <= 1
+        );
+      });
+      const notiRes = await createNotifications(notiReq);
 
-    messagesToSave.forEach((key) => {
-      delete messagesById[key];
-    });
+      messagesToSave.forEach((key) => {
+        delete messagesById[key];
+      });
 
-    const notifyTarget = notiReq.map((v) => v.chatId);
-    socket.to(notifyTarget).emit("getNotification");
+      const notifyTarget = notiReq.map((v) => v.chatId);
+      socket.to(notifyTarget).emit("getNotification");
+    } catch (error) {
+      console.error(error);
+    }
   }, 10000);
 
   socket.on("logout", (userId) => {
