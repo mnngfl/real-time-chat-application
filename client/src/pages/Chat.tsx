@@ -31,7 +31,7 @@ const Chat = () => {
       const res = await findUserChats();
       setChatList(res);
 
-      const rooms = res.map((v) => v.chatId);
+      const rooms = res?.map((v) => v.chatId);
       socket.emit("enterRoom", rooms);
     } catch (error) {
       console.log(error);

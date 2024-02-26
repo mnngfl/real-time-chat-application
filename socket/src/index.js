@@ -1,14 +1,15 @@
 const { Server } = require("socket.io");
 const axios = require("axios");
+require("dotenv").config();
 
 const io = new Server({
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: process.env.CLIENT_URL,
   },
 });
 
 const instance = axios.create({
-  baseURL: "http://server:3000/api",
+  baseURL: `${process.env.SERVER_URL}/api`,
   timeout: 1000,
   headers: {
     "Content-Type": "application/json",
