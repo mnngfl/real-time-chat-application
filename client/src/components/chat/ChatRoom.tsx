@@ -2,6 +2,7 @@ import {
   Avatar,
   AvatarBadge,
   Box,
+  Button,
   Center,
   Circle,
   Divider,
@@ -22,6 +23,7 @@ import {
   Fragment,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -32,9 +34,15 @@ import ChatBox from "./ChatBox";
 import { onlineUserListState } from "../../state";
 import { parseISO, isSameDay } from "date-fns";
 
-const ChatRoom = () => {
+const ChatRoom = ({
+  showNewMessageButton,
+  setShowNewMessageButton,
+}: {
+  showNewMessageButton: boolean;
+  setShowNewMessageButton: (newState: boolean) => void;
+}) => {
   const currentChat = useRecoilValue(currentChatState);
-  const [currentChatMessageList, setCurrentChatMessageList] = useRecoilState(
+  const [messageList, setMessageList] = useRecoilState(
     currentChatMessageListState
   );
   const onlineUserList = useRecoilValue(onlineUserListState);
@@ -43,6 +51,7 @@ const ChatRoom = () => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [viewCount, setViewCount] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(0);
 
   const isOnlineUser = useMemo(() => {
     return onlineUserList.some((user) => user.userId === currentChat.userId);
@@ -54,7 +63,7 @@ const ChatRoom = () => {
       try {
         const res = await findMessages(currentChat._id, page);
         if (res) {
-          setCurrentChatMessageList((prev) => {
+          setMessageList((prev) => {
             return [...res.data, ...prev];
           });
           setHasNextPage(res.pageInfo.hasMorePages);
@@ -66,7 +75,7 @@ const ChatRoom = () => {
         setIsLoading(false);
       }
     },
-    [currentChat._id, setCurrentChatMessageList]
+    [currentChat._id, setMessageList]
   );
 
   const getNextPage = async () => {
@@ -80,11 +89,11 @@ const ChatRoom = () => {
     setViewCount(0);
     setCurrPage(1);
     setHasNextPage(false);
-    setCurrentChatMessageList([]);
+    setMessageList([]);
     getMessages();
-  }, [currentChat._id, getMessages, setCurrentChatMessageList]);
+  }, [currentChat._id, getMessages, setMessageList]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (boxRef.current && viewCount > 0) {
       const elements = boxRef.current.querySelectorAll(".chat-bubble").values();
       const offsetHeight = Array.from(elements)
@@ -92,9 +101,22 @@ const ChatRoom = () => {
         .reduce((acc, curr) => {
           return (acc += curr.clientHeight);
         }, 0);
-      boxRef.current.scrollTop = offsetHeight;
+      setScrollOffset(offsetHeight);
     }
-  }, [viewCount, currentChatMessageList]);
+  }, [viewCount, messageList]);
+
+  useEffect(() => {
+    if (boxRef.current) {
+      boxRef.current.scrollTop = scrollOffset;
+    }
+  }, [scrollOffset]);
+
+  const showNewMessage = () => {
+    if (boxRef.current) {
+      boxRef.current.scrollTop = boxRef.current.scrollHeight;
+      setShowNewMessageButton(false);
+    }
+  };
 
   const renderDivider = (currDate: Date, prevDate: Date | null) => {
     if (prevDate === null || !isSameDay(currDate, prevDate)) {
@@ -135,7 +157,7 @@ const ChatRoom = () => {
             {isLoading ? <Spinner size={"sm"} /> : <ArrowUpIcon />}
           </Circle>
         )}
-        {currentChatMessageList.map((message, index, arr) => {
+        {messageList.map((message, index, arr) => {
           const currDate = parseISO(message.createdAt);
           const prevDate =
             index > 0 ? parseISO(arr[index - 1].createdAt) : null;
@@ -147,9 +169,22 @@ const ChatRoom = () => {
             </Fragment>
           );
         })}
+        {showNewMessageButton && (
+          <Center position="absolute" bottom={"15%"} width={"50%"}>
+            <Button
+              bgColor={"gray.100"}
+              color={"gray.900"}
+              size={"sm"}
+              _hover={{ cursor: "pointer" }}
+              onClick={() => showNewMessage()}
+            >
+              ↓ New Message
+            </Button>
+          </Center>
+        )}
       </Box>
       <Divider />
-      <ChatBox />
+      <ChatBox boxRef={boxRef} />
     </>
   ) : (
     <Flex h={"100%"} alignItems={"center"} justifyContent={"center"}>
