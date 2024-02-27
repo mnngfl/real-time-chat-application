@@ -89,8 +89,13 @@ io.on("connection", (socket) => {
         delete messagesById[key];
       });
 
-      const notifyTarget = notiReq.map((v) => v.chatId);
-      socket.to(notifyTarget).emit("getNotification");
+      const notifyTarget = req.map((v) => ({
+        chatId: v.chatId,
+        receiverId: v.receiveUser._id,
+      }));
+      notifyTarget.forEach((target) => {
+        io.to(target.chatId).emit("getNotification", target);
+      });
     } catch (error) {
       console.error(error);
     }
@@ -131,8 +136,13 @@ io.on("connection", (socket) => {
 
       delete messagesById[socket.id];
 
-      const notifyTarget = notiReq.map((v) => v.chatId);
-      socket.to(notifyTarget).emit("getNotification");
+      const notifyTarget = req.map((v) => ({
+        chatId: v.chatId,
+        receiverId: v.receiveUser._id,
+      }));
+      notifyTarget.forEach((target) => {
+        io.to(target.chatId).emit("getNotification", target);
+      });
     } catch (error) {
       console.error(error);
     }

@@ -31,16 +31,21 @@ import {
 import { findMessages } from "../../services/chats";
 import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
-import { onlineUserListState } from "../../state";
+import { onlineUserListState, userIdSelector } from "../../state";
 import { parseISO, isSameDay } from "date-fns";
+import { useSocket } from "../../context/SocketProvider";
 
 const ChatRoom = ({
-  showNewMessageButton,
-  setShowNewMessageButton,
+  showNewButton,
+  setShowNewButton,
+  fetchChats,
 }: {
-  showNewMessageButton: boolean;
-  setShowNewMessageButton: (newState: boolean) => void;
+  showNewButton: boolean;
+  setShowNewButton: (newState: boolean) => void;
+  fetchChats: () => Promise<void>;
 }) => {
+  const socket = useSocket();
+  const userId = useRecoilValue(userIdSelector);
   const currentChat = useRecoilValue(currentChatState);
   const [messageList, setMessageList] = useRecoilState(
     currentChatMessageListState
@@ -49,7 +54,7 @@ const ChatRoom = ({
   const boxRef = useRef<HTMLDivElement>(null);
   const [currPage, setCurrPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [viewCount, setViewCount] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
 
@@ -64,7 +69,10 @@ const ChatRoom = ({
         const res = await findMessages(currentChat._id, page);
         if (res) {
           setMessageList((prev) => {
-            return [...res.data, ...prev];
+            const newMessages = res.data.filter(
+              (v) => !prev.some((message) => message._id === v._id)
+            );
+            return [...newMessages, ...prev];
           });
           setHasNextPage(res.pageInfo.hasMorePages);
           setViewCount(res.data.length);
@@ -78,6 +86,24 @@ const ChatRoom = ({
     [currentChat._id, setMessageList]
   );
 
+  const getMessagesNewOnly = useCallback(async () => {
+    if (!currentChat._id) return;
+
+    try {
+      const res = await findMessages(currentChat._id);
+      if (res) {
+        setMessageList((prev) => {
+          const newMessages = res.data.filter(
+            (v) => !prev.some((message) => message._id === v._id)
+          );
+          return [...prev, ...newMessages];
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [currentChat._id, setMessageList]);
+
   const getNextPage = async () => {
     if (isLoading) return;
     setCurrPage(currPage + 1);
@@ -85,13 +111,34 @@ const ChatRoom = ({
   };
 
   useEffect(() => {
+    if (!socket) return;
+    socket.on("getNotification", (noti) => {
+      if (noti.receiverId === userId) {
+        fetchChats();
+        if (noti.chatId === currentChat._id) {
+          getMessagesNewOnly();
+        }
+      }
+    });
+
+    return () => {
+      socket.off("getNotification");
+    };
+  }, [currentChat._id, fetchChats, getMessagesNewOnly, socket, userId]);
+
+  useEffect(() => {
     if (!currentChat._id) return;
     setViewCount(0);
     setCurrPage(1);
     setHasNextPage(false);
     setMessageList([]);
+    setIsLoading(null);
+  }, [currentChat._id, setMessageList]);
+
+  useEffect(() => {
+    if (!currentChat._id || viewCount > 0 || isLoading !== null) return;
     getMessages();
-  }, [currentChat._id, getMessages, setMessageList]);
+  }, [currentChat._id, getMessages, viewCount, isLoading]);
 
   useLayoutEffect(() => {
     if (boxRef.current && viewCount > 0) {
@@ -101,20 +148,24 @@ const ChatRoom = ({
         .reduce((acc, curr) => {
           return (acc += curr.clientHeight);
         }, 0);
-      setScrollOffset(offsetHeight);
+      if (!showNewButton) {
+        setScrollOffset(offsetHeight);
+      }
     }
-  }, [viewCount, messageList]);
+  }, [viewCount, messageList, showNewButton]);
 
-  useEffect(() => {
-    if (boxRef.current) {
+  useLayoutEffect(() => {
+    if (boxRef.current && scrollOffset > 0) {
       boxRef.current.scrollTop = scrollOffset;
+      setScrollOffset(0);
+      setViewCount(0);
     }
   }, [scrollOffset]);
 
   const showNewMessage = () => {
     if (boxRef.current) {
       boxRef.current.scrollTop = boxRef.current.scrollHeight;
-      setShowNewMessageButton(false);
+      setShowNewButton(false);
     }
   };
 
@@ -169,7 +220,7 @@ const ChatRoom = ({
             </Fragment>
           );
         })}
-        {showNewMessageButton && (
+        {showNewButton && (
           <Center position="absolute" bottom={"15%"} width={"50%"}>
             <Button
               bgColor={"gray.100"}

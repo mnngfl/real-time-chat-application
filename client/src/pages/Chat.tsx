@@ -23,7 +23,7 @@ const Chat = () => {
   const [, setCurrentChatMessageList] = useRecoilState(
     currentChatMessageListState
   );
-  const [showNewMessageButton, setShowNewMessageButton] = useState(false);
+  const [showNewButton, setShowNewButton] = useState(false);
 
   const fetchChats = useCallback(async () => {
     if (!socket) return;
@@ -64,18 +64,6 @@ const Chat = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("getNotification", () => {
-      fetchChats();
-    });
-
-    return () => {
-      socket.off("getNotification");
-    };
-  }, [fetchChats, socket]);
-
-  useEffect(() => {
-    if (!socket) return;
-
     socket.on("getMessage", (message) => {
       if (message.chatId !== currentChatId) return;
 
@@ -99,8 +87,10 @@ const Chat = () => {
       setCurrentChatMessageList((prev) => [...prev, message]);
 
       if (message.receiveUser._id === user?._id) {
-        setShowNewMessageButton(true);
+        setShowNewButton(true);
       }
+
+      socket.off("getNotification");
     });
 
     return () => {
@@ -128,8 +118,9 @@ const Chat = () => {
       </Box>
       <Box w="65%" bg="gray.900" p={12} color={"white"}>
         <ChatRoom
-          showNewMessageButton={showNewMessageButton}
-          setShowNewMessageButton={setShowNewMessageButton}
+          showNewButton={showNewButton}
+          setShowNewButton={setShowNewButton}
+          fetchChats={fetchChats}
         />
       </Box>
     </Flex>
