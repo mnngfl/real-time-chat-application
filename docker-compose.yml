@@ -5,6 +5,8 @@ services:
     restart: always
     build:
       context: client
+    env_file:
+      - ./client/.env.dev
     volumes:
       - ./client:/usr/src/app
       - /usr/src/app/node_modules
@@ -20,7 +22,7 @@ services:
     build:
       context: server
     env_file:
-      - ./server/.env
+      - ./server/.env.dev
     volumes:
       - ./server:/usr/src/app
       - /usr/src/app/node_modules
@@ -34,6 +36,8 @@ services:
     restart: always
     build:
       context: socket
+    env_file:
+      - ./socket/.env.dev
     volumes:
       - ./socket:/usr/src/app
       - /usr/src/app/node_modules

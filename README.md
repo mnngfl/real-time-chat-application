@@ -25,7 +25,7 @@ cd real-time-chat-application
 docker-compose up --build -d
 ```
 
-실행시키기 위해 Docker Desktop 혹은 Compose plugin 설치가 필요합니다. ([설치 가이드](https://docs.docker.com/compose/install/))
+실행시키기 위해 Docker Desktop 혹은 Compose plugin이 설치되어 있어야 합니다.([설치 가이드](https://docs.docker.com/compose/install/))<br />
 명령이 정상적으로 실행된 경우, http://localhost:5173 경로를 통해 클라이언트 애플리케이션이 제공됩니다.
 
 #### 3. 접근 방법

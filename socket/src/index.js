@@ -1,14 +1,15 @@
 const { Server } = require("socket.io");
 const axios = require("axios");
+require("dotenv").config();
 
 const io = new Server({
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: process.env.CLIENT_URL,
   },
 });
 
 const instance = axios.create({
-  baseURL: "http://server:3000/api",
+  baseURL: `${process.env.SERVER_URL}/api`,
   timeout: 1000,
   headers: {
     "Content-Type": "application/json",
@@ -88,8 +89,13 @@ io.on("connection", (socket) => {
         delete messagesById[key];
       });
 
-      const notifyTarget = notiReq.map((v) => v.chatId);
-      socket.to(notifyTarget).emit("getNotification");
+      const notifyTarget = req.map((v) => ({
+        chatId: v.chatId,
+        receiverId: v.receiveUser._id,
+      }));
+      notifyTarget.forEach((target) => {
+        io.to(target.chatId).emit("getNotification", target);
+      });
     } catch (error) {
       console.error(error);
     }
@@ -130,8 +136,13 @@ io.on("connection", (socket) => {
 
       delete messagesById[socket.id];
 
-      const notifyTarget = notiReq.map((v) => v.chatId);
-      socket.to(notifyTarget).emit("getNotification");
+      const notifyTarget = req.map((v) => ({
+        chatId: v.chatId,
+        receiverId: v.receiveUser._id,
+      }));
+      notifyTarget.forEach((target) => {
+        io.to(target.chatId).emit("getNotification", target);
+      });
     } catch (error) {
       console.error(error);
     }

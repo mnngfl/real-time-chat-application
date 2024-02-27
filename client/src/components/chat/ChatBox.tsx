@@ -15,7 +15,7 @@ import { userIdSelector, userNameSelector } from "../../state";
 import ChatEmoji from "./ChatEmoji";
 import { EmojiClickData } from "emoji-picker-react";
 
-const ChatBox = () => {
+const ChatBox = ({ boxRef }: { boxRef: React.RefObject<HTMLDivElement> }) => {
   const { openAlert } = useAlertDialog();
   const socket = useSocket();
   const userId = useRecoilValue(userIdSelector);
@@ -66,6 +66,12 @@ const ChatBox = () => {
       };
       socket.emit("sendMessage", newMessage);
       setInputText("");
+
+      setTimeout(() => {
+        if (boxRef.current) {
+          boxRef.current.scrollTop = boxRef.current.scrollHeight;
+        }
+      }, 1);
     } catch (error) {
       openAlert("Send message Failed", error as string);
     }

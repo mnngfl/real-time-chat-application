@@ -20,7 +20,7 @@ app.use("/api/messages2", messageRoute);
 const port = process.env.PORT || 3000;
 app.on("ready", () =>
   app.listen(port, () => {
-    console.log(`Listening on http://localhost:${port}`);
+    console.log(`Listening on port:${port}`);
   })
 );
 
