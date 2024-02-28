@@ -16,10 +16,6 @@ import ChatBubble from "./ChatBubble";
 import DividerWithDate from "./DividerWithDate";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
-  currentChatState,
-  currentChatMessageListState,
-} from "../../state/atoms/chatState";
-import {
   Fragment,
   useCallback,
   useEffect,
@@ -31,7 +27,12 @@ import {
 import { findMessages } from "../../services/chats";
 import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
-import { onlineUserListState, userIdSelector } from "../../state";
+import {
+  currentChatMessageListState,
+  currentChatState,
+  onlineUserListState,
+  userIdSelector,
+} from "../../state";
 import { parseISO, isSameDay } from "date-fns";
 import { useSocket } from "../../context/SocketProvider";
 

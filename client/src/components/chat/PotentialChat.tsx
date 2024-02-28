@@ -16,10 +16,13 @@ import { useCallback, useEffect, useState } from "react";
 import { BaseUser } from "../../types/users";
 import { getOtherUsers } from "../../services/users";
 import { useRecoilValue } from "recoil";
-import { onlineUserListState, userIdSelector } from "../../state";
-import { chatListState } from "../../state/atoms/chatState";
+import {
+  chatListState,
+  onlineUserListState,
+  userIdSelector,
+} from "../../state";
 import { createChat } from "../../services/chats";
-import { useAlertDialog } from "../../context/AlertDialogProvider";
+import useAlertDialog from "../../hooks/useAlertDialog";
 
 const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
   const userId = useRecoilValue(userIdSelector);

@@ -4,7 +4,6 @@ import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
-import { AlertDialogProvider } from "./context/AlertDialogProvider";
 import { RecoilRoot } from "recoil";
 import { SocketProvider } from "./context/SocketProvider.tsx";
 
@@ -13,11 +12,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <RecoilRoot>
       <ChakraProvider>
         <SocketProvider>
-          <AlertDialogProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </AlertDialogProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
         </SocketProvider>
       </ChakraProvider>
     </RecoilRoot>

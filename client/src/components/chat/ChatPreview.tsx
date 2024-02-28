@@ -10,9 +10,12 @@ import {
 import { BaseUser } from "../../types/users";
 import { PreviewChat } from "../../types/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { onlineUserListState, userIdSelector } from "../../state";
+import {
+  currentChatState,
+  onlineUserListState,
+  userIdSelector,
+} from "../../state";
 import { useEffect, useMemo, useState } from "react";
-import { currentChatState } from "../../state/atoms/chatState";
 import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
 import { useSocket } from "../../context/SocketProvider";

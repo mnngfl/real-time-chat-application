@@ -7,13 +7,16 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useAlertDialog } from "../../context/AlertDialogProvider";
 import { useRecoilValue } from "recoil";
 import { useSocket } from "../../context/SocketProvider";
-import { currentChatState } from "../../state/atoms/chatState";
-import { userIdSelector, userNameSelector } from "../../state";
+import {
+  currentChatState,
+  userIdSelector,
+  userNameSelector,
+} from "../../state";
 import ChatEmoji from "./ChatEmoji";
 import { EmojiClickData } from "emoji-picker-react";
+import useAlertDialog from "../../hooks/useAlertDialog";
 
 const ChatBox = ({ boxRef }: { boxRef: React.RefObject<HTMLDivElement> }) => {
   const { openAlert } = useAlertDialog();
