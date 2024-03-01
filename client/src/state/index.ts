@@ -5,3 +5,5 @@ export * from "./atoms/chatState";
 export * from "./selectors/chatSelectors";
 
 export * from "./atoms/alertDialogState";
+
+export * from "./atoms/socketState";

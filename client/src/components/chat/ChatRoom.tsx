@@ -31,10 +31,10 @@ import {
   currentChatMessageListState,
   currentChatState,
   onlineUserListState,
+  socketState,
   userIdSelector,
 } from "../../state";
 import { parseISO, isSameDay } from "date-fns";
-import { useSocket } from "../../context/SocketProvider";
 
 const ChatRoom = ({
   showNewButton,
@@ -45,7 +45,7 @@ const ChatRoom = ({
   setShowNewButton: (newState: boolean) => void;
   fetchChats: () => Promise<void>;
 }) => {
-  const socket = useSocket();
+  const [socket] = useRecoilState(socketState);
   const userId = useRecoilValue(userIdSelector);
   const currentChat = useRecoilValue(currentChatState);
   const [messageList, setMessageList] = useRecoilState(

@@ -9,9 +9,12 @@ import { isLoggedInSelector } from "./state";
 import useRecoilInitialize from "./state/useRecoilInitialize";
 import RequireAuth from "./components/auth/RequireAuth";
 import AlertOverlay from "./components/common/AlertOverlay";
+import useSocket from "./hooks/useSocket";
 
 function App() {
   useRecoilInitialize();
+  useSocket();
+
   const isLoggedIn = useRecoilValue(isLoggedInSelector);
 
   const LoginRedirect = () => {

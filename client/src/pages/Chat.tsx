@@ -9,14 +9,14 @@ import {
   currentChatIdSelector,
   currentChatMessageListState,
   onlineUserListState,
+  socketState,
   userState,
 } from "../state";
 import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
-import { useSocket } from "../context/SocketProvider";
 
 const Chat = () => {
-  const socket = useSocket();
+  const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
   const [chatList, setChatList] = useRecoilState(chatListState);

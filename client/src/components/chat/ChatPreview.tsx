@@ -13,15 +13,15 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import {
   currentChatState,
   onlineUserListState,
+  socketState,
   userIdSelector,
 } from "../../state";
 import { useEffect, useMemo, useState } from "react";
 import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
-import { useSocket } from "../../context/SocketProvider";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
-  const socket = useSocket();
+  const socket = useRecoilValue(socketState);
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
   const userId = useRecoilValue(userIdSelector);
   const onlineUserList = useRecoilValue(onlineUserListState);
@@ -46,6 +46,8 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   }, [chat.notifications, userId]);
 
   const onChangeChat = async () => {
+    if (!socket) return;
+
     setCurrentChat({
       _id: chat.chatId,
       userId: chatUser._id,
@@ -53,6 +55,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
     });
 
     socket.emit("changeRoom", chat.chatId);
+
     if (!unreadCount) return;
     await deleteNotifications(chat.chatId);
   };

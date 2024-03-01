@@ -7,10 +7,10 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useRecoilValue } from "recoil";
-import { useSocket } from "../../context/SocketProvider";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {
   currentChatState,
+  socketState,
   userIdSelector,
   userNameSelector,
 } from "../../state";
@@ -20,7 +20,7 @@ import useAlertDialog from "../../hooks/useAlertDialog";
 
 const ChatBox = ({ boxRef }: { boxRef: React.RefObject<HTMLDivElement> }) => {
   const { openAlert } = useAlertDialog();
-  const socket = useSocket();
+  const [socket] = useRecoilState(socketState);
   const userId = useRecoilValue(userIdSelector);
   const userName = useRecoilValue(userNameSelector);
   const currentChat = useRecoilValue(currentChatState);
