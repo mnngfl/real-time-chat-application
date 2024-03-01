@@ -14,7 +14,7 @@ import useAlertDialog from "../../hooks/useAlertDialog";
 
 const AlertOverlay = () => {
   const alertDialog = useRecoilValue(alertDialogState);
-  const { closeAlert } = useAlertDialog();
+  const { closeAlert, hasButtonAction } = useAlertDialog();
   const cancelRef = useRef(null);
 
   return (
@@ -38,16 +38,15 @@ const AlertOverlay = () => {
             >
               Close
             </Button>
-            {alertDialog.action?.label &&
-              typeof alertDialog.action?.handler === "function" && (
-                <Button
-                  colorScheme="teal"
-                  ml={3}
-                  onClick={alertDialog.action.handler}
-                >
-                  {alertDialog.action.label}
-                </Button>
-              )}
+            {hasButtonAction() && (
+              <Button
+                colorScheme="teal"
+                ml={3}
+                onClick={alertDialog.action.handler}
+              >
+                {alertDialog.action.label}
+              </Button>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialogOverlay>
