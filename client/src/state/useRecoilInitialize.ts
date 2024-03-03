@@ -1,9 +1,9 @@
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { userState } from ".";
 import { useEffect } from "react";
 
 const useRecoilInitialize = () => {
-  const [, setUser] = useRecoilState(userState);
+  const setUser = useSetRecoilState(userState);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

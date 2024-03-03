@@ -3,24 +3,25 @@ import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect, useState } from "react";
 import { findUserChats } from "../services/chats";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { onlineUserListState, userState } from "../state";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   chatListState,
+  currentChatIdSelector,
   currentChatMessageListState,
-} from "../state/atoms/chatState";
+  onlineUserListState,
+  socketState,
+  userState,
+} from "../state";
 import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
-import { useSocket } from "../context/SocketProvider";
-import { currentChatIdSelector } from "../state/selectors/chatSelectors";
 
 const Chat = () => {
-  const socket = useSocket();
+  const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
   const [chatList, setChatList] = useRecoilState(chatListState);
-  const [, setOnlineUserList] = useRecoilState(onlineUserListState);
-  const [, setCurrentChatMessageList] = useRecoilState(
+  const setOnlineUserList = useSetRecoilState(onlineUserListState);
+  const setCurrentChatMessageList = useSetRecoilState(
     currentChatMessageListState
   );
   const [showNewButton, setShowNewButton] = useState(false);

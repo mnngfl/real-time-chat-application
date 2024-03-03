@@ -16,10 +16,6 @@ import ChatBubble from "./ChatBubble";
 import DividerWithDate from "./DividerWithDate";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
-  currentChatState,
-  currentChatMessageListState,
-} from "../../state/atoms/chatState";
-import {
   Fragment,
   useCallback,
   useEffect,
@@ -31,9 +27,15 @@ import {
 import { findMessages } from "../../services/chats";
 import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
-import { onlineUserListState, userIdSelector } from "../../state";
+import {
+  currentChatMessageListState,
+  currentChatState,
+  onlineUserListState,
+  socketState,
+  userIdSelector,
+} from "../../state";
 import { parseISO, isSameDay } from "date-fns";
-import { useSocket } from "../../context/SocketProvider";
+import { throttle } from "lodash";
 
 const ChatRoom = ({
   showNewButton,
@@ -44,7 +46,7 @@ const ChatRoom = ({
   setShowNewButton: (newState: boolean) => void;
   fetchChats: () => Promise<void>;
 }) => {
-  const socket = useSocket();
+  const [socket] = useRecoilState(socketState);
   const userId = useRecoilValue(userIdSelector);
   const currentChat = useRecoilValue(currentChatState);
   const [messageList, setMessageList] = useRecoilState(
@@ -139,6 +141,29 @@ const ChatRoom = ({
     if (!currentChat._id || viewCount > 0 || isLoading !== null) return;
     getMessages();
   }, [currentChat._id, getMessages, viewCount, isLoading]);
+
+  const handleScroll = throttle(() => {
+    const boxEl = boxRef.current;
+
+    if (
+      boxEl &&
+      showNewButton &&
+      boxEl.scrollTop === boxEl.scrollHeight - boxEl.offsetHeight
+    ) {
+      setShowNewButton(false);
+    }
+  }, 300);
+
+  useEffect(() => {
+    const boxEl = boxRef.current;
+    if (!boxEl) return;
+
+    boxEl?.addEventListener("scroll", handleScroll);
+
+    return () => {
+      boxEl?.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
   useLayoutEffect(() => {
     if (boxRef.current && viewCount > 0) {

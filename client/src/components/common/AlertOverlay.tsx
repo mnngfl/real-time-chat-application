@@ -7,54 +7,44 @@ import {
   AlertDialogOverlay,
   Button,
 } from "@chakra-ui/react";
-import React, { useRef } from "react";
+import { useRef } from "react";
+import { useRecoilValue } from "recoil";
+import { alertDialogState } from "../../state";
+import useAlertDialog from "../../hooks/useAlertDialog";
 
-interface AlertOverlayActionProps {
-  content: string;
-  handler: () => void;
-}
-
-interface AlertOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  description: string;
-  action: Partial<AlertOverlayActionProps>;
-}
-
-const AlertOverlay: React.FC<AlertOverlayProps> = ({
-  isOpen,
-  onClose,
-  title,
-  description,
-  action,
-}) => {
+const AlertOverlay = () => {
+  const alertDialog = useRecoilValue(alertDialogState);
+  const { closeAlert, hasButtonAction } = useAlertDialog();
   const cancelRef = useRef(null);
 
   return (
     <AlertDialog
-      isOpen={isOpen}
-      onClose={onClose}
+      isOpen={alertDialog.isOpen}
+      onClose={closeAlert}
       leastDestructiveRef={cancelRef}
       isCentered
     >
       <AlertDialogOverlay>
         <AlertDialogContent>
           <AlertDialogHeader fontSize={"md"} fontWeight={"bold"}>
-            {title}
+            {alertDialog.title}
           </AlertDialogHeader>
-          <AlertDialogBody>{description}</AlertDialogBody>
+          <AlertDialogBody>{alertDialog.desc}</AlertDialogBody>
           <AlertDialogFooter>
             <Button
               colorScheme="gray"
-              onClick={onClose}
+              onClick={closeAlert}
               ref={cancelRef.current}
             >
               Close
             </Button>
-            {action?.content && typeof action?.handler === "function" && (
-              <Button colorScheme="teal" ml={3} onClick={action.handler}>
-                {action.content}
+            {hasButtonAction() && (
+              <Button
+                colorScheme="teal"
+                ml={3}
+                onClick={alertDialog.action.handler}
+              >
+                {alertDialog.action.label}
               </Button>
             )}
           </AlertDialogFooter>

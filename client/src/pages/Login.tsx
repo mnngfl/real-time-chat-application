@@ -12,18 +12,18 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { LoginUserReq, LoginUserRes } from "../types/users";
 import { loginUser } from "../services/users";
-import { useAlertDialog } from "../context/AlertDialogProvider";
 import validator from "validator";
 import { userState } from "../state";
+import useAlertDialog from "../hooks/useAlertDialog";
 
 const Login = () => {
   const navigate = useNavigate();
   // const location = useLocation();
   // const from = location.state?.from?.pathname || "/";
-  const [, setUser] = useRecoilState(userState);
+  const setUser = useSetRecoilState(userState);
   const { openAlert } = useAlertDialog();
 
   const [formData, setFormData] = useState<LoginUserReq>({

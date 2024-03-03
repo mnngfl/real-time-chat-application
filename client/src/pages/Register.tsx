@@ -15,8 +15,8 @@ import { useState } from "react";
 import validator from "validator";
 import { RegisterUserReq, RegisterUserRes } from "../types/users";
 import { registerUser } from "../services/users";
-import { useAlertDialog } from "../context/AlertDialogProvider";
 import { useNavigate } from "react-router-dom";
+import useAlertDialog from "../hooks/useAlertDialog";
 
 const Register = () => {
   const navigate = useNavigate();

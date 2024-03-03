@@ -1,18 +1,16 @@
-import { Box, Button, Text, VStack, theme } from "@chakra-ui/react";
-import { useRecoilState } from "recoil";
-import { userState } from "../../state";
+import { Box, Button, Text, VStack } from "@chakra-ui/react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { socketState, userState } from "../../state";
 import { useNavigate } from "react-router-dom";
-import { useSocket } from "../../context/SocketProvider";
 import { ChatIcon } from "@chakra-ui/icons";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const socket = useSocket();
-
+  const socket = useRecoilValue(socketState);
   const [user, setUser] = useRecoilState(userState);
 
   const handleLogout = () => {
-    if (!user) return;
+    if (!user || !socket) return;
     socket.emit("logout", user._id);
 
     setUser(null);
@@ -38,7 +36,7 @@ const NavBar = () => {
           <Box>
             <Button
               onClick={() => handleLogout()}
-              _hover={{ bgColor: theme.colors.gray[300] }}
+              _hover={{ bgColor: "gray.300" }}
             >
               Logout
             </Button>

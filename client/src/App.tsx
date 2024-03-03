@@ -8,9 +8,13 @@ import { useRecoilValue } from "recoil";
 import { isLoggedInSelector } from "./state";
 import useRecoilInitialize from "./state/useRecoilInitialize";
 import RequireAuth from "./components/auth/RequireAuth";
+import AlertOverlay from "./components/common/AlertOverlay";
+import useSocket from "./hooks/useSocket";
 
 function App() {
   useRecoilInitialize();
+  useSocket();
+
   const isLoggedIn = useRecoilValue(isLoggedInSelector);
 
   const LoginRedirect = () => {
@@ -22,22 +26,25 @@ function App() {
   };
 
   return (
-    <Flex height={"100vh"} overflowY={"hidden"} bgColor={"gray.900"}>
-      {isLoggedIn ? <NavBar /> : <></>}
-      <Routes>
-        <Route path="/register" element={<RegisterRedirect />} />
-        <Route path="/login" element={<LoginRedirect />} />
-        <Route
-          path="/"
-          element={
-            <RequireAuth isLoggedIn={isLoggedIn}>
-              <Chat />
-            </RequireAuth>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </Flex>
+    <>
+      <Flex height={"100vh"} overflowY={"hidden"} bgColor={"gray.900"}>
+        {isLoggedIn ? <NavBar /> : <></>}
+        <Routes>
+          <Route path="/register" element={<RegisterRedirect />} />
+          <Route path="/login" element={<LoginRedirect />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth isLoggedIn={isLoggedIn}>
+                <Chat />
+              </RequireAuth>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Flex>
+      <AlertOverlay />
+    </>
   );
 }
 
