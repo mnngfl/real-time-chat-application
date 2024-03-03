@@ -13,8 +13,7 @@ const useAlertDialog = () => {
       isOpen: true,
       title,
       desc,
-      action:
-        action?.label && typeof action.handler === "function" ? action : {},
+      action: action && hasButtonAction() ? action : {},
     });
   };
 

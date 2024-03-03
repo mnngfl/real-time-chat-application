@@ -35,6 +35,7 @@ import {
   userIdSelector,
 } from "../../state";
 import { parseISO, isSameDay } from "date-fns";
+import { throttle } from "lodash";
 
 const ChatRoom = ({
   showNewButton,
@@ -140,6 +141,29 @@ const ChatRoom = ({
     if (!currentChat._id || viewCount > 0 || isLoading !== null) return;
     getMessages();
   }, [currentChat._id, getMessages, viewCount, isLoading]);
+
+  const handleScroll = throttle(() => {
+    const boxEl = boxRef.current;
+
+    if (
+      boxEl &&
+      showNewButton &&
+      boxEl.scrollTop === boxEl.scrollHeight - boxEl.offsetHeight
+    ) {
+      setShowNewButton(false);
+    }
+  }, 300);
+
+  useEffect(() => {
+    const boxEl = boxRef.current;
+    if (!boxEl) return;
+
+    boxEl?.addEventListener("scroll", handleScroll);
+
+    return () => {
+      boxEl?.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
   useLayoutEffect(() => {
     if (boxRef.current && viewCount > 0) {
