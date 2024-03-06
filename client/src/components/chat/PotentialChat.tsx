@@ -33,9 +33,9 @@ const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
 
   const getPotentialUsers = useCallback(async () => {
     const res = await getOtherUsers();
-    if (res && chatList?.length > 0) {
+    if (res) {
       const pUsers = res.filter((user) => {
-        const isChatCreated = chatList.some((chat) => {
+        const isChatCreated = chatList?.some((chat) => {
           return (
             chat.joinedUsers[0]._id === user._id ||
             chat.joinedUsers[1]._id === user._id
