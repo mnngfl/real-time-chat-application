@@ -115,7 +115,17 @@ const Chat = () => {
         <Divider borderColor="gray.600" />
         <PotentialChat fetchChats={fetchChats} />
         <Divider borderColor="gray.600" />
-        {chatList?.length > 0 && <ChatList chatList={chatList} />}
+        {chatList?.length > 0 ? (
+          <ChatList chatList={chatList} />
+        ) : (
+          <Flex
+            h={"calc(100vh - 30%)"}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            No chats started
+          </Flex>
+        )}
       </Box>
       <Box w="65%" bg="gray.900" p={12} color={"white"}>
         <ChatRoom
