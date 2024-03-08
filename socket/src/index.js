@@ -107,6 +107,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", async () => {
+    const selectedRoomByIdCopy = { ...selectedRoomById };
     delete selectedRoomById[socket.id];
     onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
     io.emit("getOnlineUsers", onlineUsers);
@@ -127,7 +128,7 @@ io.on("connection", (socket) => {
 
       const notiReq = req.filter((item) => {
         return (
-          Object.values(selectedRoomById).filter(
+          Object.values(selectedRoomByIdCopy).filter(
             (roomId) => roomId === item.chatId
           ).length <= 1
         );

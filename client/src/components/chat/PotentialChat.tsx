@@ -23,13 +23,15 @@ import {
 } from "../../state";
 import { createChat } from "../../services/chats";
 import useAlertDialog from "../../hooks/useAlertDialog";
+import useFetchChats from "../../hooks/useFetchChats";
 
-const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
+const PotentialChat = () => {
   const userId = useRecoilValue(userIdSelector);
   const chatList = useRecoilValue(chatListState);
   const onlineUserList = useRecoilValue(onlineUserListState);
   const [users, setUsers] = useState<Array<BaseUser> | []>([]);
   const { openAlert } = useAlertDialog();
+  const { fetchChats } = useFetchChats();
 
   const getPotentialUsers = useCallback(async () => {
     const res = await getOtherUsers();
@@ -55,7 +57,7 @@ const PotentialChat = ({ fetchChats }: { fetchChats: () => Promise<void> }) => {
   const createNewChat = async (recipientId: string) => {
     try {
       await createChat({ recipientId: recipientId });
-      fetchChats();
+      await fetchChats();
     } catch (error) {
       openAlert("Create chat Failed", error as string);
     }

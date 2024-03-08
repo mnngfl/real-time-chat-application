@@ -36,16 +36,16 @@ import {
 } from "../../state";
 import { parseISO, isSameDay } from "date-fns";
 import { throttle } from "lodash";
+import useFetchChats from "../../hooks/useFetchChats";
 
 const ChatRoom = ({
   showNewButton,
   setShowNewButton,
-  fetchChats,
 }: {
   showNewButton: boolean;
   setShowNewButton: (newState: boolean) => void;
-  fetchChats: () => Promise<void>;
 }) => {
+  const { fetchChats } = useFetchChats();
   const [socket] = useRecoilState(socketState);
   const userId = useRecoilValue(userIdSelector);
   const currentChat = useRecoilValue(currentChatState);
@@ -148,7 +148,8 @@ const ChatRoom = ({
     if (
       boxEl &&
       showNewButton &&
-      boxEl.scrollTop === boxEl.scrollHeight - boxEl.offsetHeight
+      Math.round(boxEl.scrollTop) >=
+        Math.round(boxEl.scrollHeight - boxEl.offsetHeight)
     ) {
       setShowNewButton(false);
     }
