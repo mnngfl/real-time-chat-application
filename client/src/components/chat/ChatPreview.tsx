@@ -19,8 +19,10 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
+import useFetchChats from "../../hooks/useFetchChats";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
+  const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
   const userId = useRecoilValue(userIdSelector);
@@ -45,8 +47,8 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       ?.unreadCount;
   }, [chat.notifications, userId]);
 
-  const onChangeChat = async () => {
-    if (!socket) return;
+  const onChangeChat = async (chatId: string) => {
+    if (currentChat._id === chatId) return;
 
     setCurrentChat({
       _id: chat.chatId,
@@ -54,10 +56,12 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       userName: chatUser.userName,
     });
 
+    if (!socket) return;
     socket.emit("changeRoom", chat.chatId);
 
     if (!unreadCount) return;
     await deleteNotifications(chat.chatId);
+    await fetchChats();
   };
 
   return (
@@ -68,7 +72,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       alignItems={"center"}
       bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
       _hover={{ bgColor: "gray.600", cursor: "pointer" }}
-      onClick={() => onChangeChat()}
+      onClick={() => onChangeChat(chat.chatId)}
     >
       <HStack>
         <Avatar src="#">

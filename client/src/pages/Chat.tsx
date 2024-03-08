@@ -2,7 +2,6 @@ import { Box, Divider, Flex, Text } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect, useState } from "react";
-import { findUserChats } from "../services/chats";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   chatListState,
@@ -14,8 +13,10 @@ import {
 } from "../state";
 import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
+import useFetchChats from "../hooks/useFetchChats";
 
 const Chat = () => {
+  const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
@@ -26,23 +27,23 @@ const Chat = () => {
   );
   const [showNewButton, setShowNewButton] = useState(false);
 
-  const fetchChats = useCallback(async () => {
-    if (!socket) return;
+  const handleFetchChats = useCallback(async () => {
+    if (!socket || !fetchChats) return;
 
     try {
-      const res = await findUserChats();
-      setChatList(res);
-
-      const rooms = res?.map((v) => v.chatId);
-      socket.emit("enterRoom", rooms);
+      const res = await fetchChats();
+      if (res) {
+        const rooms = res.map((v) => v.chatId);
+        socket.emit("enterRoom", rooms);
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [setChatList, socket]);
+  }, [fetchChats, socket]);
 
   useEffect(() => {
-    fetchChats();
-  }, [currentChatId, fetchChats]);
+    handleFetchChats();
+  }, [handleFetchChats]);
 
   useEffect(() => {
     if (!socket || !user?._id) return;
@@ -113,7 +114,7 @@ const Chat = () => {
           <Text fontSize={"2xl"}>Hello, {user?.userName} 😺</Text>
         </Box>
         <Divider borderColor="gray.600" />
-        <PotentialChat fetchChats={fetchChats} />
+        <PotentialChat />
         <Divider borderColor="gray.600" />
         {chatList?.length > 0 ? (
           <ChatList chatList={chatList} />
@@ -131,7 +132,6 @@ const Chat = () => {
         <ChatRoom
           showNewButton={showNewButton}
           setShowNewButton={setShowNewButton}
-          fetchChats={fetchChats}
         />
       </Box>
     </Flex>

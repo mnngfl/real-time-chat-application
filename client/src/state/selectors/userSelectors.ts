@@ -22,6 +22,9 @@ export const isLoggedInSelector = selector({
   key: "isLoggedInSelector",
   get: ({ get }) => {
     const user: BaseUser | null = get(userState);
+    if (user === null) {
+      return null;
+    }
     return !!user;
   },
 });
