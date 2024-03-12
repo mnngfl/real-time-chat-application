@@ -1,8 +1,19 @@
-import { Box, Divider, Flex, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Divider,
+  Flex,
+  SkeletonCircle,
+  SkeletonText,
+  Text,
+} from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
-import { useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useRecoilStateLoadable,
+  useRecoilValue,
+  useSetRecoilState,
+} from "recoil";
 import {
   chatListState,
   currentChatIdSelector,
@@ -14,18 +25,23 @@ import {
 import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
 import useFetchChats from "../hooks/useFetchChats";
+import { PreviewChat } from "../types/chats";
 
 const Chat = () => {
   const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
-  const [chatList, setChatList] = useRecoilState(chatListState);
+  const [chatList, setChatList] = useRecoilStateLoadable(chatListState);
   const setOnlineUserList = useSetRecoilState(onlineUserListState);
   const setCurrentChatMessageList = useSetRecoilState(
     currentChatMessageListState
   );
   const [showNewButton, setShowNewButton] = useState(false);
+  const isLoaded = useMemo(
+    () => chatList.state === "hasValue",
+    [chatList.state]
+  );
 
   const handleFetchChats = useCallback(async () => {
     if (!socket || !fetchChats) return;
@@ -69,9 +85,11 @@ const Chat = () => {
     socket.on("getMessage", (message) => {
       if (message.chatId !== currentChatId) return;
 
-      const updateChatIndex = chatList.findIndex((chat) => {
-        return chat.chatId === message.chatId;
-      });
+      const updateChatIndex = chatList.contents.findIndex(
+        (chat: PreviewChat) => {
+          return chat.chatId === message.chatId;
+        }
+      );
       setChatList((prevList) => {
         return prevList.map((prevChat, index) => {
           if (index === updateChatIndex) {
@@ -116,15 +134,33 @@ const Chat = () => {
         <Divider borderColor="gray.600" />
         <PotentialChat />
         <Divider borderColor="gray.600" />
-        {chatList?.length > 0 ? (
-          <ChatList chatList={chatList} />
-        ) : (
+        {isLoaded &&
+          (chatList.contents.length > 0 ? (
+            <ChatList chatList={chatList.contents} />
+          ) : (
+            <Flex
+              h={"calc(100vh - 30%)"}
+              alignItems={"center"}
+              justifyContent={"center"}
+            >
+              No chats started
+            </Flex>
+          ))}
+        {!isLoaded && (
           <Flex
-            h={"calc(100vh - 30%)"}
+            paddingX={12}
+            paddingY={6}
             alignItems={"center"}
-            justifyContent={"center"}
+            justifyContent={"space-between"}
+            bgColor={"gray.800"}
           >
-            No chats started
+            <SkeletonCircle size="12" />
+            <SkeletonText
+              noOfLines={2}
+              spacing={4}
+              skeletonHeight={"2"}
+              width={"80%"}
+            />
           </Flex>
         )}
       </Box>
