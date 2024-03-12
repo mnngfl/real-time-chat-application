@@ -58,6 +58,7 @@ const ChatRoom = ({
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [viewCount, setViewCount] = useState(0);
+  const [isScrollCreated, setScrollCreated] = useState(false);
 
   const isOnlineUser = useMemo(() => {
     return onlineUserList.some((user) => user.userId === currentChat.userId);
@@ -169,6 +170,18 @@ const ChatRoom = ({
     };
   }, [handleScroll]);
 
+  useEffect(() => {
+    const boxEl = boxRef.current;
+
+    if (boxEl && showNewButton) {
+      if (boxEl.scrollHeight > boxEl.clientHeight) {
+        setScrollCreated(true);
+      } else {
+        setScrollCreated(false);
+      }
+    }
+  }, [showNewButton, messageList]);
+
   useLayoutEffect(() => {
     if (boxRef.current && viewCount > 0) {
       const elements = [...boxRef.current.querySelectorAll(".chat-bubble")];
@@ -242,7 +255,7 @@ const ChatRoom = ({
             </Fragment>
           );
         })}
-        {showNewButton && (
+        {isScrollCreated && showNewButton && (
           <Center position="absolute" bottom={"15%"} width={"50%"}>
             <Button
               bgColor={"gray.100"}

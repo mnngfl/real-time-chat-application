@@ -49,7 +49,6 @@ const PotentialChat = () => {
   const getPotentialUsers = useCallback(async () => {
     if (chatList.state !== "hasValue") return;
     try {
-      setUserLoaded(false);
       const res = await getOtherUsers();
       if (res) {
         const pUsers = res.filter(
