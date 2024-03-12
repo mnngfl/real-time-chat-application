@@ -58,7 +58,7 @@ const ChatRoom = ({
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [viewCount, setViewCount] = useState(0);
-  const [scrollOffset, setScrollOffset] = useState(0);
+  const [isScrollCreated, setScrollCreated] = useState(false);
 
   const isOnlineUser = useMemo(() => {
     return onlineUserList.some((user) => user.userId === currentChat.userId);
@@ -66,18 +66,19 @@ const ChatRoom = ({
 
   const getMessages = useCallback(
     async (page = 1) => {
+      if (!currentChat._id) return;
       setIsLoading(true);
       try {
         const res = await findMessages(currentChat._id, page);
         if (res) {
+          setViewCount(res.data.length);
+          setHasNextPage(res.pageInfo.hasMorePages);
           setMessageList((prev) => {
             const newMessages = res.data.filter(
               (v) => !prev.some((message) => message._id === v._id)
             );
             return [...newMessages, ...prev];
           });
-          setHasNextPage(res.pageInfo.hasMorePages);
-          setViewCount(res.data.length);
         }
       } catch (error) {
         console.log(error);
@@ -100,11 +101,12 @@ const ChatRoom = ({
           );
           return [...prev, ...newMessages];
         });
+        setShowNewButton(true);
       }
     } catch (error) {
       console.log(error);
     }
-  }, [currentChat._id, setMessageList]);
+  }, [currentChat._id, setMessageList, setShowNewButton]);
 
   const getNextPage = async () => {
     if (isLoading) return;
@@ -130,17 +132,19 @@ const ChatRoom = ({
 
   useEffect(() => {
     if (!currentChat._id) return;
-    setViewCount(0);
-    setCurrPage(1);
-    setHasNextPage(false);
-    setMessageList([]);
     setIsLoading(null);
+    setMessageList([]);
   }, [currentChat._id, setMessageList]);
 
   useEffect(() => {
-    if (!currentChat._id || viewCount > 0 || isLoading !== null) return;
+    // fetch messages whenever chatId is changed
+    if (!currentChat._id || isLoading !== null) return;
+    setCurrPage(1);
+    setViewCount(0);
+    setHasNextPage(false);
+
     getMessages();
-  }, [currentChat._id, getMessages, viewCount, isLoading]);
+  }, [getMessages, currentChat._id, isLoading]);
 
   const handleScroll = throttle(() => {
     const boxEl = boxRef.current;
@@ -166,27 +170,32 @@ const ChatRoom = ({
     };
   }, [handleScroll]);
 
-  useLayoutEffect(() => {
-    if (boxRef.current && viewCount > 0) {
-      const elements = boxRef.current.querySelectorAll(".chat-bubble").values();
-      const offsetHeight = Array.from(elements)
-        .slice(0, viewCount)
-        .reduce((acc, curr) => {
-          return (acc += curr.clientHeight);
-        }, 0);
-      if (!showNewButton) {
-        setScrollOffset(offsetHeight);
+  useEffect(() => {
+    const boxEl = boxRef.current;
+
+    if (boxEl && showNewButton) {
+      if (boxEl.scrollHeight > boxEl.clientHeight) {
+        setScrollCreated(true);
+      } else {
+        setScrollCreated(false);
       }
     }
-  }, [viewCount, messageList, showNewButton]);
+  }, [showNewButton, messageList]);
 
   useLayoutEffect(() => {
-    if (boxRef.current && scrollOffset > 0) {
-      boxRef.current.scrollTop = scrollOffset;
-      setScrollOffset(0);
+    if (boxRef.current && viewCount > 0) {
+      const elements = [...boxRef.current.querySelectorAll(".chat-bubble")];
+      let offsetHeight = 0;
+
+      for (const el of elements.slice(0, viewCount)) {
+        offsetHeight += el.clientHeight;
+      }
+
+      boxRef.current.scrollTop = offsetHeight;
+
       setViewCount(0);
     }
-  }, [scrollOffset]);
+  }, [viewCount]);
 
   const showNewMessage = () => {
     if (boxRef.current) {
@@ -246,7 +255,7 @@ const ChatRoom = ({
             </Fragment>
           );
         })}
-        {showNewButton && (
+        {isScrollCreated && showNewButton && (
           <Center position="absolute" bottom={"15%"} width={"50%"}>
             <Button
               bgColor={"gray.100"}
