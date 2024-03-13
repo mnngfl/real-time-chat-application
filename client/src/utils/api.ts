@@ -58,6 +58,9 @@ instance.interceptors.response.use(
         return instance(originRequest);
       } catch (error) {
         console.error("Failed to refresh access token: ", error);
+
+        localStorage.removeItem("user");
+
         throw error;
       }
     }

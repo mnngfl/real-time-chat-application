@@ -66,8 +66,7 @@ const Login = () => {
     try {
       setIsSubmitLoding(true);
       const res: LoginUserRes = await loginUser(formData);
-      localStorage.setItem("user", JSON.stringify(res));
-      setUser({ _id: res._id, userName: res.userName });
+      setUser(res);
       navigate("/");
     } catch (error) {
       openAlert("Login Failed", error as string);

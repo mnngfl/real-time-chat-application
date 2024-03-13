@@ -1,17 +1,21 @@
 import { atom } from "recoil";
-import { BaseUser, OnlineUser } from "../../types/users";
+import { LoginUserRes, OnlineUser } from "../../types/users";
 
-export const userState = atom<BaseUser | null>({
+export const userState = atom<LoginUserRes | null>({
   key: "userState",
   default: null,
   effects: [
-    ({ setSelf }) => {
+    ({ setSelf, onSet }) => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         setSelf(JSON.parse(storedUser));
-      } else {
-        setSelf(null);
       }
+
+      onSet((newValue, _, isReset) => {
+        isReset
+          ? localStorage.removeItem("user")
+          : localStorage.setItem("user", JSON.stringify(newValue));
+      });
     },
   ],
 });

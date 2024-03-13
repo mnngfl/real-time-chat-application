@@ -1,5 +1,5 @@
 import { Box, Button, Text, VStack } from "@chakra-ui/react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue, useResetRecoilState } from "recoil";
 import { socketState, userState } from "../../state";
 import { useNavigate } from "react-router-dom";
 import { ChatIcon } from "@chakra-ui/icons";
@@ -7,14 +7,14 @@ import { ChatIcon } from "@chakra-ui/icons";
 const NavBar = () => {
   const navigate = useNavigate();
   const socket = useRecoilValue(socketState);
-  const [user, setUser] = useRecoilState(userState);
+  const user = useRecoilValue(userState);
+  const resetUser = useResetRecoilState(userState);
 
   const handleLogout = () => {
     if (!user || !socket) return;
     socket.emit("logout", user._id);
 
-    setUser(null);
-    localStorage.removeItem("user");
+    resetUser();
     navigate("/login");
   };
 
