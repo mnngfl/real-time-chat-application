@@ -68,6 +68,7 @@ const ChatRoom = ({
     async (page = 1) => {
       if (!currentChat._id) return;
       setIsLoading(true);
+      setViewCount(0);
       try {
         const res = await findMessages(currentChat._id, page);
         if (res) {
@@ -192,8 +193,6 @@ const ChatRoom = ({
       }
 
       boxRef.current.scrollTop = offsetHeight;
-
-      setViewCount(0);
     }
   }, [viewCount]);
 

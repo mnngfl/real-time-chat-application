@@ -1,8 +1,8 @@
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { AlertDialogStateAction, alertDialogState } from "../state";
 
 const useAlertDialog = () => {
-  const [alertDialog, setAlertDialog] = useRecoilState(alertDialogState);
+  const setAlertDialog = useSetRecoilState(alertDialogState);
 
   const openAlert = (
     title: string,
@@ -13,7 +13,7 @@ const useAlertDialog = () => {
       isOpen: true,
       title,
       desc,
-      action: action && hasButtonAction() ? action : {},
+      action: action && hasButtonAction(action) ? action : {},
     });
   };
 
@@ -24,11 +24,8 @@ const useAlertDialog = () => {
     }));
   };
 
-  const hasButtonAction = () => {
-    return (
-      alertDialog.action?.label &&
-      typeof alertDialog.action?.handler === "function"
-    );
+  const hasButtonAction = (action: Partial<AlertDialogStateAction>) => {
+    return action?.label && typeof action?.handler === "function";
   };
 
   return { openAlert, closeAlert, hasButtonAction };
