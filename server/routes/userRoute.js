@@ -1,9 +1,16 @@
 const express = require("express");
-const { findUser, getOtherUsers } = require("../controllers/userController");
+const {
+  getProfile,
+  getOtherUsers,
+  validateNickname,
+  updateNickname,
+} = require("../controllers/userController");
 
 const router = express.Router();
 
-router.get("/find/:userId", findUser);
+router.get("/profile", getProfile);
 router.get("/others", getOtherUsers);
+router.get("/validate/:newNickname", validateNickname);
+router.put("/update-name/:newNickname", updateNickname);
 
 module.exports = router;
