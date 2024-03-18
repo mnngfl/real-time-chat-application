@@ -4,7 +4,6 @@ import {
   Flex,
   SkeletonCircle,
   SkeletonText,
-  Text,
 } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
@@ -28,6 +27,7 @@ import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
 import useFetchChats from "../hooks/useFetchChats";
 import { PreviewChat } from "../types/chats";
+import ChatProfile from "../components/chat/ChatProfile";
 
 const Chat = () => {
   const { fetchChats } = useFetchChats();
@@ -143,14 +143,12 @@ const Chat = () => {
   return (
     <Flex w="90%">
       <Box w="35%" bg="gray.800" color={"white"}>
-        <Box p={12}>
-          <Text fontSize={"2xl"}>Hello, {user?.userName} 😺</Text>
-        </Box>
+        <ChatProfile />
         <Divider borderColor="gray.600" />
         <PotentialChat />
         <Divider borderColor="gray.600" />
         {isLoaded &&
-          (chatList.contents.length > 0 ? (
+          (chatList?.contents.length > 0 ? (
             <ChatList chatList={chatList.contents} />
           ) : (
             <Flex

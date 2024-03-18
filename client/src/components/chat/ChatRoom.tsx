@@ -218,7 +218,12 @@ const ChatRoom = ({
           <Avatar mr={4}>
             {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
           </Avatar>
-          <Text fontSize={"xl"}>{currentChat.userName}</Text>
+          <Box>
+            <Text fontWeight={"semibold"} fontSize={"xl"}>
+              {currentChat.nickname || "Anonymous"}
+            </Text>
+            <Text fontSize={"small"}>({currentChat.userName})</Text>
+          </Box>
         </Center>
       </Flex>
       <Divider />

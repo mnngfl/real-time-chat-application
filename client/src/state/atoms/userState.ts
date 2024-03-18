@@ -1,9 +1,13 @@
 import { atom } from "recoil";
 import { LoginUserRes, OnlineUser } from "../../types/users";
 
-export const userState = atom<LoginUserRes | null>({
+export const userState = atom<LoginUserRes>({
   key: "userState",
-  default: null,
+  default: {
+    _id: "",
+    userName: "",
+    nickname: "",
+  },
   effects: [
     ({ setSelf, onSet }) => {
       const storedUser = localStorage.getItem("user");

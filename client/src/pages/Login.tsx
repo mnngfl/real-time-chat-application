@@ -49,6 +49,8 @@ const Login = () => {
   };
 
   const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!formData.userName || !formData.password) return;
+
     if (e.key === "Enter") {
       await handleSubmit();
     }
@@ -124,6 +126,7 @@ const Login = () => {
               name="userName"
               value={formData.userName}
               onChange={handleChange}
+              onKeyUp={handleKeyUp}
             />
             {errors?.userName && (
               <FormErrorMessage>{errors.userName}</FormErrorMessage>

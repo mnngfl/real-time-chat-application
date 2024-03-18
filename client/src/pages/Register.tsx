@@ -11,12 +11,13 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import validator from "validator";
 import { RegisterUserReq, RegisterUserRes } from "../types/users";
 import { registerUser } from "../services/users";
 import { useNavigate } from "react-router-dom";
 import useAlertDialog from "../hooks/useAlertDialog";
+import { trim } from "lodash";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const Register = () => {
     userName: "",
     password: "",
     passwordConfirm: "",
+    nickname: "",
   });
   const [errors, setErrors] = useState<Partial<RegisterUserReq>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -47,6 +49,10 @@ const Register = () => {
   };
 
   const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!formData.userName || !formData.password || !formData.passwordConfirm) {
+      return;
+    }
+
     if (e.key === "Enter") {
       await handleSubmit();
     }
@@ -63,7 +69,11 @@ const Register = () => {
 
     try {
       setIsSubmitLoding(true);
-      const res: RegisterUserRes = await registerUser(formData);
+      const nicknameTrim = trim(formData.nickname);
+      const res: RegisterUserRes = await registerUser({
+        ...formData,
+        nickname: nicknameTrim.length > 0 ? nicknameTrim : undefined,
+      });
       toast({
         title: "Register Succeed",
         description: `Hello, ${res.userName}`,
@@ -88,6 +98,13 @@ const Register = () => {
       "passwordConfirm",
       formData.passwordConfirm
     );
+    if (formData.nickname && formData.nickname.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        nickname: trim(prev.nickname),
+      }));
+      newErrors = validateField(newErrors, "nickname", trim(formData.nickname));
+    }
     return newErrors;
   };
 
@@ -122,6 +139,19 @@ const Register = () => {
           delete newErrors.passwordConfirm;
         }
         break;
+      case "nickname": {
+        if (
+          !validator.matches(
+            value,
+            "^(?!\\s)[a-zA-Z0-9ㄱ-힣\\s]{0,29}[a-zA-Z0-9ㄱ-힣]$"
+          )
+        ) {
+          newErrors.nickname = "Enter up to 30 letters and numbers.";
+        } else {
+          delete newErrors.nickname;
+        }
+        break;
+      }
       default:
         break;
     }
@@ -135,20 +165,21 @@ const Register = () => {
           <Text fontSize={"3xl"} fontWeight={500}>
             Register
           </Text>
-          <FormControl my={4} isInvalid={!!errors?.userName}>
+          <FormControl my={4} isInvalid={!!errors?.userName} isRequired>
             <FormLabel>User name</FormLabel>
             <Input
               placeholder="Enter 4 to 30 lowercase letters and numbers"
               name="userName"
               value={formData.userName}
               onChange={handleChange}
+              onKeyUp={handleKeyUp}
             />
             {errors?.userName && (
               <FormErrorMessage>{errors.userName}</FormErrorMessage>
             )}
           </FormControl>
 
-          <FormControl mb={4} isInvalid={!!errors?.password}>
+          <FormControl mb={4} isInvalid={!!errors?.password} isRequired>
             <FormLabel>Password</FormLabel>
             <Input
               type="password"
@@ -156,13 +187,14 @@ const Register = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              onKeyUp={handleKeyUp}
             />
             {errors?.password && (
               <FormErrorMessage>{errors.password}</FormErrorMessage>
             )}
           </FormControl>
 
-          <FormControl mb={4} isInvalid={!!errors?.passwordConfirm}>
+          <FormControl mb={4} isInvalid={!!errors?.passwordConfirm} isRequired>
             <FormLabel>Password Confirm</FormLabel>
             <Input
               type="password"
@@ -173,6 +205,21 @@ const Register = () => {
             />
             {errors?.passwordConfirm && (
               <FormErrorMessage>{errors.passwordConfirm}</FormErrorMessage>
+            )}
+          </FormControl>
+
+          <FormControl mb={4} isInvalid={!!errors?.nickname}>
+            <FormLabel>Nickname</FormLabel>
+            <Input
+              type="text"
+              placeholder="Please enter a nickname (optional)"
+              name="nickname"
+              value={formData.nickname}
+              onChange={handleChange}
+              onKeyUp={handleKeyUp}
+            />
+            {errors?.nickname && (
+              <FormErrorMessage>{errors.nickname}</FormErrorMessage>
             )}
           </FormControl>
 

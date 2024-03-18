@@ -10,3 +10,11 @@ export interface CommonPagination {
   totalPage: number;
   hasMorePages: boolean;
 }
+
+export interface CommonQueryRes {
+  acknowledged: boolean | undefined;
+  matchedCount: number;
+  modifiedCount: number;
+  upsertedCount: number;
+  upsertedId: string | null;
+}
