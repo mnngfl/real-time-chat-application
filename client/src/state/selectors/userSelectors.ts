@@ -14,7 +14,23 @@ export const userNameSelector = selector({
   key: "userNameSelector",
   get: ({ get }) => {
     const user: BaseUser | null = get(userState);
-    return user ? user.userName : "Guest";
+    return user.userName || "Anonymous";
+  },
+});
+
+export const nicknameSelector = selector({
+  key: "nicknameSelector",
+  get: ({ get }) => {
+    const user: BaseUser | null = get(userState);
+    return user.nickname || "Anonymous";
+  },
+});
+
+export const avatarSelector = selector({
+  key: "avatarSelector",
+  get: ({ get }) => {
+    const user: BaseUser | null = get(userState);
+    return user.avatar || "";
   },
 });
 
@@ -22,6 +38,6 @@ export const isLoggedInSelector = selector({
   key: "isLoggedInSelector",
   get: ({ get }) => {
     const user: BaseUser | null = get(userState);
-    return !!user;
+    return !!user?._id;
   },
 });

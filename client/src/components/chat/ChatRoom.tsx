@@ -1,5 +1,4 @@
 import {
-  Avatar,
   AvatarBadge,
   Box,
   Button,
@@ -37,6 +36,7 @@ import {
 import { parseISO, isSameDay } from "date-fns";
 import { throttle } from "lodash";
 import useFetchChats from "../../hooks/useFetchChats";
+import UserAvatar from "../common/UserAvatar";
 
 const ChatRoom = ({
   showNewButton,
@@ -68,6 +68,7 @@ const ChatRoom = ({
     async (page = 1) => {
       if (!currentChat._id) return;
       setIsLoading(true);
+      setViewCount(0);
       try {
         const res = await findMessages(currentChat._id, page);
         if (res) {
@@ -192,8 +193,6 @@ const ChatRoom = ({
       }
 
       boxRef.current.scrollTop = offsetHeight;
-
-      setViewCount(0);
     }
   }, [viewCount]);
 
@@ -216,10 +215,15 @@ const ChatRoom = ({
     <>
       <Flex mb={4}>
         <Center>
-          <Avatar mr={4}>
+          <UserAvatar avatar={currentChat.avatar}>
             {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
-          </Avatar>
-          <Text fontSize={"xl"}>{currentChat.userName}</Text>
+          </UserAvatar>
+          <Box ml={4}>
+            <Text fontWeight={"semibold"} fontSize={"xl"}>
+              {currentChat.nickname || "Anonymous"}
+            </Text>
+            <Text fontSize={"small"}>({currentChat.userName})</Text>
+          </Box>
         </Center>
       </Flex>
       <Divider />
@@ -251,7 +255,13 @@ const ChatRoom = ({
           return (
             <Fragment key={message._id || message.chatId + message.createdAt}>
               {renderDivider(currDate, prevDate)}
-              <ChatBubble message={message} />
+              <ChatBubble
+                message={message}
+                otherUser={{
+                  nickname: currentChat?.nickname,
+                  avatar: currentChat?.avatar,
+                }}
+              />
             </Fragment>
           );
         })}

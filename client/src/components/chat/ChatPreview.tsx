@@ -1,5 +1,4 @@
 import {
-  Avatar,
   AvatarBadge,
   Flex,
   HStack,
@@ -20,6 +19,7 @@ import { useEffect, useMemo, useState } from "react";
 import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
 import useFetchChats from "../../hooks/useFetchChats";
+import UserAvatar from "../common/UserAvatar";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   const { fetchChats } = useFetchChats();
@@ -30,6 +30,8 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   const [chatUser, setChatUser] = useState<BaseUser>({
     _id: "",
     userName: "",
+    nickname: "",
+    avatar: "",
   });
 
   const isOnlineUser = useMemo(() => {
@@ -54,6 +56,8 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       _id: chat.chatId,
       userId: chatUser._id,
       userName: chatUser.userName,
+      nickname: chatUser?.nickname,
+      avatar: chatUser?.avatar,
     });
 
     if (!socket) return;
@@ -75,16 +79,31 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       onClick={() => onChangeChat(chat.chatId)}
     >
       <HStack>
-        <Avatar src="#">
+        <UserAvatar avatar={chatUser.avatar}>
           {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
-        </Avatar>
+        </UserAvatar>
       </HStack>
       <Flex justifyContent={"space-between"} w={"100%"}>
         <VStack alignItems={"start"} ml={4}>
-          <Text fontWeight={"bold"}>{chatUser.userName}</Text>
-          <Text fontSize={"small"} lineHeight="tight" noOfLines={1}>
-            {chat.latestMessage}
-          </Text>
+          <HStack alignItems={"baseline"}>
+            <Text fontWeight={"bold"}>{chatUser.nickname || "Anonymous"}</Text>
+            <Text fontSize={"small"}>({chatUser.userName})</Text>
+          </HStack>
+          {chat.latestMessage?.length > 0 ? (
+            <Text fontSize={"small"} lineHeight="tight" noOfLines={1}>
+              {chat.latestMessage}
+            </Text>
+          ) : (
+            <Text
+              fontSize={"small"}
+              color={"gray.400"}
+              fontStyle={"italic"}
+              lineHeight="tight"
+              noOfLines={1}
+            >
+              There are no messages yet.
+            </Text>
+          )}
         </VStack>
         <VStack alignItems={"end"} ml={4}>
           <Text fontSize={"small"} whiteSpace={"nowrap"}>

@@ -3,6 +3,7 @@ const express = require("express");
 const db = require("../db");
 const jwtUtils = require("../utils/jwtUtils");
 const responseFormatter = require("../utils/responseFormatter");
+const commonMessages = require("../utils/commonMessages");
 
 const { authRoute, userRoute, chatRoute, messageRoute } = require("../routes");
 
@@ -10,6 +11,7 @@ const app = express();
 db.connect(app);
 app.use(cors());
 app.use(responseFormatter);
+app.use(commonMessages);
 app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/users", jwtUtils.authenticateToken, userRoute);

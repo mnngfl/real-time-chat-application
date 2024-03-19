@@ -49,6 +49,8 @@ const Login = () => {
   };
 
   const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!formData.userName || !formData.password) return;
+
     if (e.key === "Enter") {
       await handleSubmit();
     }
@@ -66,8 +68,7 @@ const Login = () => {
     try {
       setIsSubmitLoding(true);
       const res: LoginUserRes = await loginUser(formData);
-      localStorage.setItem("user", JSON.stringify(res));
-      setUser({ _id: res._id, userName: res.userName });
+      setUser(res);
       navigate("/");
     } catch (error) {
       openAlert("Login Failed", error as string);
@@ -125,6 +126,7 @@ const Login = () => {
               name="userName"
               value={formData.userName}
               onChange={handleChange}
+              onKeyUp={handleKeyUp}
             />
             {errors?.userName && (
               <FormErrorMessage>{errors.userName}</FormErrorMessage>

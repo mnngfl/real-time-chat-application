@@ -4,7 +4,6 @@ import {
   Flex,
   SkeletonCircle,
   SkeletonText,
-  Text,
 } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatRoom from "../components/chat/ChatRoom";
@@ -12,12 +11,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   useRecoilStateLoadable,
   useRecoilValue,
+  useResetRecoilState,
   useSetRecoilState,
 } from "recoil";
 import {
   chatListState,
   currentChatIdSelector,
   currentChatMessageListState,
+  currentChatState,
   onlineUserListState,
   socketState,
   userState,
@@ -26,12 +27,14 @@ import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
 import useFetchChats from "../hooks/useFetchChats";
 import { PreviewChat } from "../types/chats";
+import ChatProfile from "../components/chat/ChatProfile";
 
 const Chat = () => {
   const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
+  const resetCurrentChat = useResetRecoilState(currentChatState);
   const [chatList, setChatList] = useRecoilStateLoadable(chatListState);
   const setOnlineUserList = useSetRecoilState(onlineUserListState);
   const setCurrentChatMessageList = useSetRecoilState(
@@ -65,7 +68,19 @@ const Chat = () => {
     if (!socket || !user?._id) return;
 
     socket.emit("addNewUser", user._id);
-  }, [socket, user?._id]);
+
+    return () => {
+      setChatList([]);
+      setCurrentChatMessageList([]);
+      resetCurrentChat();
+    };
+  }, [
+    resetCurrentChat,
+    setChatList,
+    setCurrentChatMessageList,
+    socket,
+    user?._id,
+  ]);
 
   useEffect(() => {
     if (!socket) return;
@@ -128,14 +143,12 @@ const Chat = () => {
   return (
     <Flex w="90%">
       <Box w="35%" bg="gray.800" color={"white"}>
-        <Box p={12}>
-          <Text fontSize={"2xl"}>Hello, {user?.userName} 😺</Text>
-        </Box>
+        <ChatProfile />
         <Divider borderColor="gray.600" />
         <PotentialChat />
         <Divider borderColor="gray.600" />
         {isLoaded &&
-          (chatList.contents.length > 0 ? (
+          (chatList?.contents.length > 0 ? (
             <ChatList chatList={chatList.contents} />
           ) : (
             <Flex

@@ -1,6 +1,8 @@
 export interface BaseUser {
   _id: string;
   userName: string;
+  nickname?: string;
+  avatar?: string;
 }
 
 export interface OnlineUser {
@@ -22,6 +24,7 @@ export type LoginUserRes = BaseUser & UserToken;
 
 export type RegisterUserReq = LoginUserReq & {
   passwordConfirm: string;
+  nickname?: string;
 };
 
 export type RegisterUserRes = BaseUser;

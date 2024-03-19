@@ -3,7 +3,6 @@ import Chat from "./pages/Chat";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import { Flex } from "@chakra-ui/react";
-import NavBar from "./components/common/NavBar";
 import { useRecoilValue } from "recoil";
 import { isLoggedInSelector } from "./state";
 import RequireAuth from "./components/auth/RequireAuth";
@@ -26,7 +25,6 @@ function App() {
   return (
     <>
       <Flex height={"100vh"} overflowY={"hidden"} bgColor={"gray.900"}>
-        {isLoggedIn ? <NavBar /> : <></>}
         <Routes>
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/login" element={<LoginRedirect />} />

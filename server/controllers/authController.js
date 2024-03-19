@@ -6,36 +6,44 @@ const validator = require("validator");
 const userModel = require("../models/userModel");
 
 const registerUser = async (req, res) => {
-  const { userName, password } = req.body;
+  const { userName, password, nickname } = req.body;
   try {
     if (!validator.matches(userName, "([a-z0-9]){4,30}")) {
-      return res.apiError(
-        "UserName must be 4 to 30 lowercase letters and numbers...",
-        400
-      );
+      return res.apiError(res.locals.messages.userNameFormat, 400);
+    }
+    if (
+      nickname &&
+      !validator.matches(
+        nickname,
+        "^(?!\\s)[a-zA-Z0-9가-힣\\s]{0,29}[a-zA-Z0-9가-힣]$"
+      )
+    ) {
+      return res.apiError(res.locals.messages.nickname, 400);
     }
     if (!userName || !password) {
-      return res.apiError("All fields are required...", 400);
+      return res.apiError(res.locals.messages.required, 400);
     }
     if (
       !validator.isStrongPassword(password, {
         minUppercase: 0,
       })
     ) {
-      return res.apiError("Password must be a strong passwords...", 400);
+      return res.apiError(res.locals.messages.passwordFormat, 400);
     }
-    let user = await userModel.findOne({ userName });
+    let user = await userModel.findOne({
+      userName: { $regex: new RegExp(userName, "i") },
+    });
     if (user) {
-      return res.apiError("User with the given userName already exist...", 400);
+      return res.apiError(res.locals.messages.userNameDuplicate, 400);
     }
 
-    user = new userModel({ userName, password });
+    user = new userModel({ userName, password, nickname });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
 
     return res.apiSuccess(
-      { _id: user._id, userName },
+      { _id: user._id, userName, nickname },
       "User registered successfully.",
       201
     );
@@ -51,12 +59,12 @@ const loginUser = async (req, res) => {
   try {
     let user = await userModel.findOne({ userName });
     if (!user) {
-      return res.apiError("Invalid email or password...", 400);
+      return res.apiError(res.locals.messages.notExist, 400);
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return res.apiError("Invalid email or password...", 400);
+      return res.apiError(res.locals.messages.notExist, 400);
     }
 
     const accessToken = jwtUtils.generateAccessToken(user._id);
@@ -65,6 +73,8 @@ const loginUser = async (req, res) => {
     return res.apiSuccess({
       _id: user._id,
       userName,
+      nickname: user.nickname,
+      avatar: user.avatar,
       accessToken,
       refreshToken,
     });

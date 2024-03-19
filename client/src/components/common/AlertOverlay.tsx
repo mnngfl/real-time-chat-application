@@ -38,7 +38,7 @@ const AlertOverlay = () => {
             >
               Close
             </Button>
-            {hasButtonAction() && (
+            {hasButtonAction(alertDialog.action) && (
               <Button
                 colorScheme="teal"
                 ml={3}

@@ -10,6 +10,17 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     password: { type: String, require: true, minlength: 4, maxlength: 1024 },
+    nickname: {
+      type: String,
+      require: false,
+      maxlength: 30,
+      unique: false,
+    },
+    avatar: {
+      type: String,
+      require: false,
+      unique: false,
+    },
   },
   {
     timestamps: true,
