@@ -74,6 +74,7 @@ const loginUser = async (req, res) => {
       _id: user._id,
       userName,
       nickname: user.nickname,
+      avatar: user.avatar,
       accessToken,
       refreshToken,
     });

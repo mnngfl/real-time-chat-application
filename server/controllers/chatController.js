@@ -125,6 +125,7 @@ const findUserChats = async (req, res) => {
                 _id: "$$user._id",
                 userName: "$$user.userName",
                 nickname: "$$user.nickname",
+                avatar: "$$user.avatar",
               },
             },
           },

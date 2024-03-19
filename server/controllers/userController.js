@@ -8,7 +8,7 @@ const getProfile = async (req, res) => {
   try {
     const user = await userModel
       .findById(userId)
-      .select(["_id", "userName", "nickname"]);
+      .select(["_id", "userName", "nickname", "avatar"]);
     return res.apiSuccess(user);
   } catch (error) {
     console.error(error);
@@ -68,9 +68,26 @@ const updateNickname = async (req, res) => {
   }
 };
 
+const updateAvatar = async (req, res) => {
+  const userId = getUserIdFromRequest(req);
+  const { avatar } = req.params;
+
+  try {
+    const updatedUser = await userModel.updateOne(
+      { _id: userId },
+      { $set: { avatar: avatar } }
+    );
+    return res.apiSuccess(updatedUser);
+  } catch (error) {
+    console.error(error);
+    return res.apiError(error);
+  }
+};
+
 module.exports = {
   getProfile,
   getOtherUsers,
   validateNickname,
   updateNickname,
+  updateAvatar,
 };
