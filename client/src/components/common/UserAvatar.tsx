@@ -10,7 +10,7 @@ const UserAvatar = ({
   children?: React.ReactNode;
 }) => {
   const avatarPath = avatar
-    ? new URL("../../assets/" + avatar, import.meta.url).href
+    ? new URL("/static/" + avatar, import.meta.url).href
     : undefined;
 
   return (
