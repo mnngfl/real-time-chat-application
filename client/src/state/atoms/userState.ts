@@ -7,6 +7,7 @@ export const userState = atom<LoginUserRes>({
     _id: "",
     userName: "",
     nickname: "",
+    avatar: "",
   },
   effects: [
     ({ setSelf, onSet }) => {

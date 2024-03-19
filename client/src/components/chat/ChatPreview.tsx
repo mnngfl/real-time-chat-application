@@ -1,5 +1,4 @@
 import {
-  Avatar,
   AvatarBadge,
   Flex,
   HStack,
@@ -20,6 +19,7 @@ import { useEffect, useMemo, useState } from "react";
 import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
 import useFetchChats from "../../hooks/useFetchChats";
+import UserAvatar from "../common/UserAvatar";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   const { fetchChats } = useFetchChats();
@@ -31,6 +31,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
     _id: "",
     userName: "",
     nickname: "",
+    avatar: "",
   });
 
   const isOnlineUser = useMemo(() => {
@@ -56,6 +57,7 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       userId: chatUser._id,
       userName: chatUser.userName,
       nickname: chatUser?.nickname,
+      avatar: chatUser?.avatar,
     });
 
     if (!socket) return;
@@ -77,9 +79,9 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       onClick={() => onChangeChat(chat.chatId)}
     >
       <HStack>
-        <Avatar src="#">
+        <UserAvatar avatar={chatUser.avatar}>
           {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
-        </Avatar>
+        </UserAvatar>
       </HStack>
       <Flex justifyContent={"space-between"} w={"100%"}>
         <VStack alignItems={"start"} ml={4}>

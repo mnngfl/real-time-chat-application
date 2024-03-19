@@ -38,3 +38,7 @@ export const updateUserName = async (
 ): Promise<CommonQueryRes> => {
   return await instance.put(`/users/update-name/${nickname}`);
 };
+
+export const updateAvatar = async (avatar: string): Promise<CommonQueryRes> => {
+  return await instance.put(`/users/update-avatar/${avatar}`);
+};

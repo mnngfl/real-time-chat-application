@@ -1,10 +1,17 @@
-import { Avatar, Box, Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { BaseMessage } from "../../types/chats";
 import { useRecoilValue } from "recoil";
 import { userIdSelector } from "../../state";
 import { format } from "date-fns";
+import UserAvatar from "../common/UserAvatar";
 
-const ChatBubble = ({ message }: { message: BaseMessage }) => {
+const ChatBubble = ({
+  message,
+  otherUser,
+}: {
+  message: BaseMessage;
+  otherUser: { nickname?: string; avatar?: string };
+}) => {
   const parser = new DOMParser();
   const parsedHTML = parser.parseFromString(message.text, "text/html");
   const textContent = parsedHTML.body.textContent;
@@ -39,9 +46,10 @@ const ChatBubble = ({ message }: { message: BaseMessage }) => {
         </HStack>
       ) : (
         <>
-          <Avatar size={"xs"} />
+          <UserAvatar avatar={otherUser.avatar} size={"xs"} />
           <Box ml={3} mr={"35%"} mb={3}>
-            <Text fontWeight={600}>{message.sendUser.userName}</Text>
+            {/* <Text fontWeight={600}>{message.sendUser.userName}</Text> */}
+            <Text fontWeight={600}>{otherUser.nickname || "Anonymous"}</Text>
             <HStack mb={3} alignItems={"flex-end"}>
               <Box
                 flex={1}

@@ -135,12 +135,12 @@ const EditProfileModal = ({
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Edit Profile</ModalHeader>
+        <ModalHeader>Edit user info</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <VStack>
             <FormControl isInvalid={hasError}>
-              <FormLabel>Nickname</FormLabel>
+              <FormLabel>New Nickname</FormLabel>
               <InputGroup alignItems={"center"}>
                 <Input
                   type="text"

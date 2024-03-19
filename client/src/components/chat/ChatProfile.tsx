@@ -1,12 +1,14 @@
-import { Avatar, Box, Flex, Icon, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Circle, Flex, Icon, Text, Tooltip } from "@chakra-ui/react";
 import { useRecoilState, useRecoilValue, useResetRecoilState } from "recoil";
 import { socketState, userState } from "../../state";
-import { EditIcon } from "@chakra-ui/icons";
+import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import useAlertDialog from "../../hooks/useAlertDialog";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import EditProfileModal from "../common/EditProfileModal";
+import EditProfileModal from "./EditProfileModal";
 import { getProfile } from "../../services/users";
+import EditAvatarModal from "./EditAvatarModal";
+import UserAvatar from "../common/UserAvatar";
 
 const ChatProfile = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -15,18 +17,30 @@ const ChatProfile = () => {
   const socket = useRecoilValue(socketState);
   const navigate = useNavigate();
 
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   const handleEdit = () => {
-    setShowEditModal(true);
+    setShowProfileModal(true);
   };
 
-  const handleEditSuccess = async () => {
+  const handleProfileSuccess = async () => {
     try {
       const res = await getProfile();
-      setUser((prev) => {
-        return { ...prev, nickname: res.nickname };
-      });
+      setUser((prev) => ({ ...prev, nickname: res.nickname }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAvatar = () => {
+    setShowAvatarModal(true);
+  };
+
+  const handleAvatarSuccess = async () => {
+    try {
+      const res = await getProfile();
+      setUser((prev) => ({ ...prev, avatar: res.avatar }));
     } catch (error) {
       console.log(error);
     }
@@ -49,7 +63,24 @@ const ChatProfile = () => {
   return (
     <>
       <Flex alignItems={"center"} p={12}>
-        <Avatar />
+        <>
+          <UserAvatar avatar={user.avatar} />
+          <Tooltip label="Edit Avatar">
+            <Circle
+              bg={"blue.500"}
+              size={"1.5em"}
+              position={"relative"}
+              left={"-1em"}
+              top={"1.15em"}
+              borderColor={"gray.800"}
+              borderWidth={3}
+              _hover={{ cursor: "pointer" }}
+              onClick={() => handleAvatar()}
+            >
+              <AddIcon boxSize={"0.65em"} />
+            </Circle>
+          </Tooltip>
+        </>
         <Box ml={4} flex={1}>
           <Text fontSize={"xl"} fontWeight={"semibold"}>
             {user?.nickname || "Anonymous"}
@@ -57,7 +88,7 @@ const ChatProfile = () => {
           <Text fontSize={"sm"}>({user?.userName})</Text>
         </Box>
         <Flex alignItems={"center"}>
-          <Tooltip label="Edit">
+          <Tooltip label="Edit Profile">
             <EditIcon
               boxSize={4}
               ml={3}
@@ -99,9 +130,14 @@ const ChatProfile = () => {
         </Flex>
       </Flex>
       <EditProfileModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSuccess={() => handleEditSuccess()}
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        onSuccess={() => handleProfileSuccess()}
+      />
+      <EditAvatarModal
+        isOpen={showAvatarModal}
+        onClose={() => setShowAvatarModal(false)}
+        onSuccess={() => handleAvatarSuccess()}
       />
     </>
   );

@@ -2,6 +2,7 @@ export interface BaseUser {
   _id: string;
   userName: string;
   nickname?: string;
+  avatar?: string;
 }
 
 export interface OnlineUser {

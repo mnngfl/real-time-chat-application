@@ -20,6 +20,7 @@ export interface CurrentChat {
   userId: string;
   userName: string;
   nickname?: string;
+  avatar?: string;
 }
 
 export type ChatReq = {
