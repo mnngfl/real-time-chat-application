@@ -23,7 +23,6 @@ import {
   socketState,
   userState,
 } from "../state";
-import PotentialChat from "../components/chat/PotentialChat";
 import { OnlineUser } from "../types/users";
 import useFetchChats from "../hooks/useFetchChats";
 import { PreviewChat } from "../types/chats";
@@ -145,14 +144,12 @@ const Chat = () => {
       <Box w="35%" bg="gray.800" color={"white"}>
         <ChatProfile />
         <Divider borderColor="gray.600" />
-        <PotentialChat />
-        <Divider borderColor="gray.600" />
         {isLoaded &&
           (chatList?.contents.length > 0 ? (
             <ChatList chatList={chatList.contents} />
           ) : (
             <Flex
-              h={"calc(100vh - 30%)"}
+              h={"calc(100vh - 19%)"}
               alignItems={"center"}
               justifyContent={"center"}
             >

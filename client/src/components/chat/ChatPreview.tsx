@@ -86,7 +86,9 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
       <Flex justifyContent={"space-between"} w={"100%"}>
         <VStack alignItems={"start"} ml={4}>
           <HStack alignItems={"baseline"}>
-            <Text fontWeight={"bold"}>{chatUser.nickname || "Anonymous"}</Text>
+            <Text fontWeight={"bold"} noOfLines={1} wordBreak={"break-all"}>
+              {chatUser.nickname || "Anonymous"}
+            </Text>
             <Text fontSize={"small"}>({chatUser.userName})</Text>
           </HStack>
           {chat.latestMessage?.length > 0 ? (
