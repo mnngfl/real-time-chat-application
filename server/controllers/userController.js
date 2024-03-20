@@ -24,7 +24,7 @@ const getOtherUsers = async (req, res) => {
       .find({
         _id: { $nin: [userId] },
       })
-      .select(["_id", "userName"]);
+      .select(["_id", "userName", "nickname", "avatar"]);
     return res.apiSuccess(users);
   } catch (error) {
     console.error(error);
