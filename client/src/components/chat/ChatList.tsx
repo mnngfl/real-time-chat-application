@@ -6,7 +6,7 @@ const ChatList = ({ chatList }: { chatList: Array<PreviewChat> }) => {
   return (
     <Box
       overflowY={"auto"}
-      h={"calc(100vh - 30%)"}
+      h={"calc(100vh - 19%)"}
       style={{ scrollbarWidth: "none" }}
     >
       {chatList.map((chat) => {

@@ -38,7 +38,6 @@ const ChatBubble = ({
             bgColor={"gray.700"}
             borderRadius={8}
             borderTopRightRadius={0}
-            display={"inline-block"}
             whiteSpace={"pre-wrap"}
           >
             {textContent}
@@ -48,22 +47,19 @@ const ChatBubble = ({
         <>
           <UserAvatar avatar={otherUser.avatar} size={"xs"} />
           <Box ml={3} mr={"35%"} mb={3}>
-            {/* <Text fontWeight={600}>{message.sendUser.userName}</Text> */}
             <Text fontWeight={600}>{otherUser.nickname || "Anonymous"}</Text>
             <HStack mb={3} alignItems={"flex-end"}>
               <Box
-                flex={1}
                 w="auto"
                 p={2}
                 bgColor={"gray.700"}
                 borderRadius={8}
                 borderTopLeftRadius={0}
-                display={"inline-block"}
                 whiteSpace={"pre-wrap"}
               >
                 {textContent}
               </Box>
-              <Text fontSize={"small"}>
+              <Text fontSize={"small"} whiteSpace={"nowrap"}>
                 {format(message.createdAt, "HH:mm aa")}
               </Text>
             </HStack>

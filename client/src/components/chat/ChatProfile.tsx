@@ -9,6 +9,10 @@ import EditProfileModal from "./EditProfileModal";
 import { getProfile } from "../../services/users";
 import EditAvatarModal from "./EditAvatarModal";
 import UserAvatar from "../common/UserAvatar";
+import UserSearchIcon from "@/assets/ico_user_search.svg?react";
+import LogoutIcon from "@/assets/ico_exit.svg?react";
+import SearchUserModal from "./SearchUserModal";
+import useFetchChats from "@/hooks/useFetchChats";
 
 const ChatProfile = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -16,8 +20,10 @@ const ChatProfile = () => {
   const { openAlert, closeAlert } = useAlertDialog();
   const socket = useRecoilValue(socketState);
   const navigate = useNavigate();
+  const { fetchChats } = useFetchChats();
 
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   const handleEdit = () => {
@@ -41,6 +47,18 @@ const ChatProfile = () => {
     try {
       const res = await getProfile();
       setUser((prev) => ({ ...prev, avatar: res.avatar }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSearchModal = () => {
+    setShowSearchModal(true);
+  };
+
+  const handleCreateChatSuccess = async () => {
+    try {
+      await fetchChats();
     } catch (error) {
       console.log(error);
     }
@@ -82,7 +100,12 @@ const ChatProfile = () => {
           </Tooltip>
         </>
         <Box ml={4} flex={1}>
-          <Text fontSize={"xl"} fontWeight={"semibold"}>
+          <Text
+            fontSize={"xl"}
+            fontWeight={"semibold"}
+            noOfLines={1}
+            wordBreak={"break-all"}
+          >
             {user?.nickname || "Anonymous"}
           </Text>
           <Text fontSize={"sm"}>({user?.userName})</Text>
@@ -96,6 +119,17 @@ const ChatProfile = () => {
               _hover={{ cursor: "pointer" }}
             />
           </Tooltip>
+          <Tooltip label="Find Users">
+            <Icon
+              viewBox="0 0 24 24 "
+              boxSize={5}
+              ml={6}
+              onClick={() => handleSearchModal()}
+              _hover={{ cursor: "pointer" }}
+            >
+              <UserSearchIcon />
+            </Icon>
+          </Tooltip>
           <Tooltip label="Logout">
             <Icon
               viewBox="0 0 24 24 "
@@ -104,27 +138,7 @@ const ChatProfile = () => {
               onClick={() => handleLogout()}
               _hover={{ cursor: "pointer" }}
             >
-              {/* <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> */}
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
-                  stroke="#ffffff"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5"
-                  stroke="#ffffff"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <LogoutIcon />
             </Icon>
           </Tooltip>
         </Flex>
@@ -133,6 +147,11 @@ const ChatProfile = () => {
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
         onSuccess={() => handleProfileSuccess()}
+      />
+      <SearchUserModal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        onSuccess={() => handleCreateChatSuccess()}
       />
       <EditAvatarModal
         isOpen={showAvatarModal}
