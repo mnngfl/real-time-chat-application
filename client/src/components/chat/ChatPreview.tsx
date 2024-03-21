@@ -71,8 +71,8 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   return (
     <Flex
       color={"white"}
-      paddingX={12}
-      paddingY={6}
+      paddingX={8}
+      paddingY={4}
       alignItems={"center"}
       bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
       _hover={{ bgColor: "gray.600", cursor: "pointer" }}
@@ -84,13 +84,13 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
         </UserAvatar>
       </HStack>
       <Flex justifyContent={"space-between"} w={"100%"}>
-        <VStack alignItems={"start"} ml={4}>
-          <HStack alignItems={"baseline"}>
-            <Text fontWeight={"bold"} noOfLines={1} wordBreak={"break-all"}>
-              {chatUser.nickname || "Anonymous"}
-            </Text>
-            <Text fontSize={"small"}>({chatUser.userName})</Text>
-          </HStack>
+        <Flex alignItems={"start"} ml={6} flexDirection={"column"}>
+          <Text fontWeight={"bold"} noOfLines={1} wordBreak={"break-all"}>
+            {chatUser.nickname || "Anonymous"}
+          </Text>
+          <Text fontSize={"small"} mb={1}>
+            ({chatUser.userName})
+          </Text>
           {chat.latestMessage?.length > 0 ? (
             <Text fontSize={"small"} lineHeight="tight" noOfLines={1}>
               {chat.latestMessage}
@@ -106,11 +106,11 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
               There are no messages yet.
             </Text>
           )}
-        </VStack>
+        </Flex>
         <VStack alignItems={"end"} ml={4}>
           <Text fontSize={"small"} whiteSpace={"nowrap"}>
             {chat.latestMessageAt &&
-              format(chat.latestMessageAt, "yyyy-MM-dd HH:mm")}
+              format(chat.latestMessageAt, "yy-MM-dd HH:mm")}
           </Text>
           {unreadCount && (
             <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
