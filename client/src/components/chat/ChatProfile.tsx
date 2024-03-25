@@ -13,6 +13,7 @@ import UserSearchIcon from "@/assets/ico_user_search.svg?react";
 import LogoutIcon from "@/assets/ico_exit.svg?react";
 import SearchUserModal from "./SearchUserModal";
 import useFetchChats from "@/hooks/useFetchChats";
+import useResponsive from "@/hooks/useResponsive";
 
 const ChatProfile = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -21,6 +22,7 @@ const ChatProfile = () => {
   const socket = useRecoilValue(socketState);
   const navigate = useNavigate();
   const { fetchChats } = useFetchChats();
+  const { isPc } = useResponsive();
 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -80,78 +82,98 @@ const ChatProfile = () => {
 
   return (
     <>
-      <Flex alignItems={"center"} p={8}>
-        <>
-          <UserAvatar avatar={user.avatar} />
-          <Tooltip hasArrow label="Edit Avatar" bg="gray.200" color="black">
-            <Circle
-              bg={"blue.500"}
-              size={"1.5em"}
-              position={"relative"}
-              left={"-1em"}
-              top={"1.15em"}
-              borderColor={"gray.800"}
-              borderWidth={3}
-              _hover={{ cursor: "pointer" }}
-              onClick={() => handleAvatar()}
-            >
-              <AddIcon boxSize={"0.65em"} />
-            </Circle>
-          </Tooltip>
-        </>
-        <Box ml={0} flex={1}>
-          <Tooltip label={user?.nickname || "Anonymous"}>
-            <Text
-              fontSize={"xl"}
-              fontWeight={"semibold"}
-              noOfLines={1}
-              wordBreak={"break-all"}
-            >
-              {user?.nickname || "Anonymous"}
-            </Text>
-          </Tooltip>
-          <Flex justifyContent={"space-between"}>
-            <Text fontSize={"sm"}>({user?.userName})</Text>
-            <Flex alignItems={"center"}>
-              <Tooltip
-                hasArrow
-                label="Edit Profile"
-                bg="gray.200"
-                color="black"
+      {isPc ? (
+        <Flex alignItems={"center"} p={8}>
+          <>
+            <UserAvatar avatar={user.avatar} />
+            <Tooltip hasArrow label="Edit Avatar" bg="gray.200" color="black">
+              <Circle
+                bg={"blue.500"}
+                size={"1.5em"}
+                position={"relative"}
+                left={"-1em"}
+                top={"1.15em"}
+                borderColor={"gray.800"}
+                borderWidth={3}
+                _hover={{ cursor: "pointer" }}
+                onClick={() => handleAvatar()}
               >
-                <EditIcon
-                  boxSize={4}
-                  ml={2}
-                  onClick={() => handleEdit()}
-                  _hover={{ cursor: "pointer" }}
-                />
-              </Tooltip>
-              <Tooltip hasArrow label="Find Users" bg="gray.200" color="black">
-                <Icon
-                  viewBox="0 0 24 24 "
-                  boxSize={5}
-                  ml={4}
-                  onClick={() => handleSearchModal()}
-                  _hover={{ cursor: "pointer" }}
+                <AddIcon boxSize={"0.65em"} />
+              </Circle>
+            </Tooltip>
+          </>
+          <Box ml={0} flex={1}>
+            <Tooltip label={user?.nickname || "Anonymous"}>
+              <Text
+                fontSize={"xl"}
+                fontWeight={"semibold"}
+                noOfLines={1}
+                wordBreak={"break-all"}
+              >
+                {user?.nickname || "Anonymous"}
+              </Text>
+            </Tooltip>
+            <Flex justifyContent={"space-between"}>
+              <Text fontSize={"sm"}>({user?.userName})</Text>
+              <Flex alignItems={"center"}>
+                <Tooltip
+                  hasArrow
+                  label="Edit Profile"
+                  bg="gray.200"
+                  color="black"
                 >
-                  <UserSearchIcon />
-                </Icon>
-              </Tooltip>
-              <Tooltip hasArrow label="Logout" bg="gray.200" color="black">
-                <Icon
-                  viewBox="0 0 24 24 "
-                  boxSize={5}
-                  ml={4}
-                  onClick={() => handleLogout()}
-                  _hover={{ cursor: "pointer" }}
+                  <EditIcon
+                    boxSize={4}
+                    ml={2}
+                    onClick={() => handleEdit()}
+                    _hover={{ cursor: "pointer" }}
+                  />
+                </Tooltip>
+                <Tooltip
+                  hasArrow
+                  label="Find Users"
+                  bg="gray.200"
+                  color="black"
                 >
-                  <LogoutIcon />
-                </Icon>
-              </Tooltip>
+                  <Icon
+                    viewBox="0 0 24 24 "
+                    boxSize={5}
+                    ml={4}
+                    onClick={() => handleSearchModal()}
+                    _hover={{ cursor: "pointer" }}
+                  >
+                    <UserSearchIcon />
+                  </Icon>
+                </Tooltip>
+                <Tooltip hasArrow label="Logout" bg="gray.200" color="black">
+                  <Icon
+                    viewBox="0 0 24 24 "
+                    boxSize={5}
+                    ml={4}
+                    onClick={() => handleLogout()}
+                    _hover={{ cursor: "pointer" }}
+                  >
+                    <LogoutIcon />
+                  </Icon>
+                </Tooltip>
+              </Flex>
             </Flex>
+          </Box>
+        </Flex>
+      ) : (
+        <Box py={8}>
+          <Flex
+            flexDir={"column"}
+            cursor={"pointer"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            onClick={() => setShowSearchModal(true)}
+          >
+            <EditIcon boxSize={6} mb={1} />
+            <Text fontSize={"small"}>New Chat</Text>
           </Flex>
         </Box>
-      </Flex>
+      )}
       <EditProfileModal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}

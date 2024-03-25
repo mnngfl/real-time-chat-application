@@ -20,8 +20,10 @@ import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
 import useFetchChats from "../../hooks/useFetchChats";
 import UserAvatar from "../common/UserAvatar";
+import useResponsive from "@/hooks/useResponsive";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
+  const { isPc } = useResponsive();
   const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
@@ -83,58 +85,60 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
           {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
         </UserAvatar>
       </HStack>
-      <Flex justifyContent={"space-between"} w={"100%"}>
-        <Flex alignItems={"start"} ml={6} flexDirection={"column"}>
-          <Text fontWeight={"bold"} noOfLines={1} wordBreak={"break-all"}>
-            {chatUser.nickname || "Anonymous"}
-          </Text>
-          <Text fontSize={"small"} mb={1}>
-            ({chatUser.userName})
-          </Text>
-          {chat.latestMessage?.length > 0 ? (
-            <Text fontSize={"small"} lineHeight="tight" noOfLines={1}>
-              {chat.latestMessage}
+      {isPc && (
+        <Flex justifyContent={"space-between"} w={"100%"}>
+          <Flex alignItems={"start"} ml={6} flexDirection={"column"}>
+            <Text fontWeight={"bold"} noOfLines={1} wordBreak={"break-all"}>
+              {chatUser.nickname || "Anonymous"}
             </Text>
-          ) : (
-            <Text
-              fontSize={"small"}
-              color={"gray.400"}
-              fontStyle={"italic"}
-              lineHeight="tight"
-              noOfLines={1}
-            >
-              There are no messages yet.
+            <Text fontSize={"small"} mb={1}>
+              ({chatUser.userName})
             </Text>
-          )}
+            {chat.latestMessage?.length > 0 ? (
+              <Text fontSize={"small"} lineHeight="tight" noOfLines={1}>
+                {chat.latestMessage}
+              </Text>
+            ) : (
+              <Text
+                fontSize={"small"}
+                color={"gray.400"}
+                fontStyle={"italic"}
+                lineHeight="tight"
+                noOfLines={1}
+              >
+                There are no messages yet.
+              </Text>
+            )}
+          </Flex>
+          <VStack alignItems={"end"} ml={4}>
+            <Text fontSize={"small"} whiteSpace={"nowrap"}>
+              {chat.latestMessageAt &&
+                format(chat.latestMessageAt, "yy-MM-dd HH:mm")}
+            </Text>
+            {unreadCount && (
+              <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
+                <svg>
+                  <path
+                    fill="currentColor"
+                    d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+                  />
+                  <text
+                    x="50%"
+                    y="51%"
+                    alignmentBaseline="middle"
+                    textAnchor="middle"
+                    fill="white"
+                    fontSize={80}
+                    fontWeight={600}
+                  >
+                    {unreadCount}
+                  </text>
+                </svg>
+              </Icon>
+            )}
+          </VStack>
         </Flex>
-        <VStack alignItems={"end"} ml={4}>
-          <Text fontSize={"small"} whiteSpace={"nowrap"}>
-            {chat.latestMessageAt &&
-              format(chat.latestMessageAt, "yy-MM-dd HH:mm")}
-          </Text>
-          {unreadCount && (
-            <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
-              <svg>
-                <path
-                  fill="currentColor"
-                  d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
-                />
-                <text
-                  x="50%"
-                  y="51%"
-                  alignmentBaseline="middle"
-                  textAnchor="middle"
-                  fill="white"
-                  fontSize={80}
-                  fontWeight={600}
-                >
-                  {unreadCount}
-                </text>
-              </svg>
-            </Icon>
-          )}
-        </VStack>
-      </Flex>
+      )}
     </Flex>
   );
 };
