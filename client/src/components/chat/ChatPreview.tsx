@@ -20,8 +20,10 @@ import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
 import useFetchChats from "../../hooks/useFetchChats";
 import UserAvatar from "../common/UserAvatar";
+import useResponsive from "@/hooks/useResponsive";
 
 const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
+  const { isPc } = useResponsive();
   const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);
   const [currentChat, setCurrentChat] = useRecoilState(currentChatState);
@@ -71,8 +73,8 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
   return (
     <Flex
       color={"white"}
-      paddingX={12}
-      paddingY={6}
+      paddingX={8}
+      paddingY={4}
       alignItems={"center"}
       bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
       _hover={{ bgColor: "gray.600", cursor: "pointer" }}
@@ -83,58 +85,60 @@ const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
           {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
         </UserAvatar>
       </HStack>
-      <Flex justifyContent={"space-between"} w={"100%"}>
-        <VStack alignItems={"start"} ml={4}>
-          <HStack alignItems={"baseline"}>
+      {isPc && (
+        <Flex justifyContent={"space-between"} w={"100%"}>
+          <Flex alignItems={"start"} ml={6} flexDirection={"column"}>
             <Text fontWeight={"bold"} noOfLines={1} wordBreak={"break-all"}>
               {chatUser.nickname || "Anonymous"}
             </Text>
-            <Text fontSize={"small"}>({chatUser.userName})</Text>
-          </HStack>
-          {chat.latestMessage?.length > 0 ? (
-            <Text fontSize={"small"} lineHeight="tight" noOfLines={1}>
-              {chat.latestMessage}
+            <Text fontSize={"small"} mb={1}>
+              ({chatUser.userName})
             </Text>
-          ) : (
-            <Text
-              fontSize={"small"}
-              color={"gray.400"}
-              fontStyle={"italic"}
-              lineHeight="tight"
-              noOfLines={1}
-            >
-              There are no messages yet.
+            {chat.latestMessage?.length > 0 ? (
+              <Text fontSize={"small"} lineHeight="tight" noOfLines={1}>
+                {chat.latestMessage}
+              </Text>
+            ) : (
+              <Text
+                fontSize={"small"}
+                color={"gray.400"}
+                fontStyle={"italic"}
+                lineHeight="tight"
+                noOfLines={1}
+              >
+                There are no messages yet.
+              </Text>
+            )}
+          </Flex>
+          <VStack alignItems={"end"} ml={4}>
+            <Text fontSize={"small"} whiteSpace={"nowrap"}>
+              {chat.latestMessageAt &&
+                format(chat.latestMessageAt, "yy-MM-dd HH:mm")}
             </Text>
-          )}
-        </VStack>
-        <VStack alignItems={"end"} ml={4}>
-          <Text fontSize={"small"} whiteSpace={"nowrap"}>
-            {chat.latestMessageAt &&
-              format(chat.latestMessageAt, "yyyy-MM-dd HH:mm")}
-          </Text>
-          {unreadCount && (
-            <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
-              <svg>
-                <path
-                  fill="currentColor"
-                  d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
-                />
-                <text
-                  x="50%"
-                  y="51%"
-                  alignmentBaseline="middle"
-                  textAnchor="middle"
-                  fill="white"
-                  fontSize={80}
-                  fontWeight={600}
-                >
-                  {unreadCount}
-                </text>
-              </svg>
-            </Icon>
-          )}
-        </VStack>
-      </Flex>
+            {unreadCount && (
+              <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
+                <svg>
+                  <path
+                    fill="currentColor"
+                    d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+                  />
+                  <text
+                    x="50%"
+                    y="51%"
+                    alignmentBaseline="middle"
+                    textAnchor="middle"
+                    fill="white"
+                    fontSize={80}
+                    fontWeight={600}
+                  >
+                    {unreadCount}
+                  </text>
+                </svg>
+              </Icon>
+            )}
+          </VStack>
+        </Flex>
+      )}
     </Flex>
   );
 };

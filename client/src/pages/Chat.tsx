@@ -140,8 +140,8 @@ const Chat = () => {
   ]);
 
   return (
-    <Flex w="90%">
-      <Box w="35%" bg="gray.800" color={"white"}>
+    <Flex w="100%">
+      <Box w={{ base: "8em", lg: "25em" }} bg="gray.800" color={"white"}>
         <ChatProfile />
         <Divider borderColor="gray.600" />
         {isLoaded &&
@@ -149,7 +149,7 @@ const Chat = () => {
             <ChatList chatList={chatList.contents} />
           ) : (
             <Flex
-              h={"calc(100vh - 19%)"}
+              h={"calc(100vh - 12.5%)"}
               alignItems={"center"}
               justifyContent={"center"}
             >
@@ -174,7 +174,12 @@ const Chat = () => {
           </Flex>
         )}
       </Box>
-      <Box w="65%" bg="gray.900" p={12} color={"white"}>
+      <Box
+        w={{ base: "calc(100% - 8em)", lg: "calc(100% - 25em)" }}
+        bg="gray.900"
+        p={12}
+        color={"white"}
+      >
         <ChatRoom
           showNewButton={showNewButton}
           setShowNewButton={setShowNewButton}
