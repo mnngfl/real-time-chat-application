@@ -80,10 +80,10 @@ const ChatProfile = () => {
 
   return (
     <>
-      <Flex alignItems={"center"} p={12}>
+      <Flex alignItems={"center"} p={8}>
         <>
           <UserAvatar avatar={user.avatar} />
-          <Tooltip label="Edit Avatar">
+          <Tooltip hasArrow label="Edit Avatar" bg="gray.200" color="black">
             <Circle
               bg={"blue.500"}
               size={"1.5em"}
@@ -99,49 +99,58 @@ const ChatProfile = () => {
             </Circle>
           </Tooltip>
         </>
-        <Box ml={4} flex={1}>
-          <Text
-            fontSize={"xl"}
-            fontWeight={"semibold"}
-            noOfLines={1}
-            wordBreak={"break-all"}
-          >
-            {user?.nickname || "Anonymous"}
-          </Text>
-          <Text fontSize={"sm"}>({user?.userName})</Text>
+        <Box ml={0} flex={1}>
+          <Tooltip label={user?.nickname || "Anonymous"}>
+            <Text
+              fontSize={"xl"}
+              fontWeight={"semibold"}
+              noOfLines={1}
+              wordBreak={"break-all"}
+            >
+              {user?.nickname || "Anonymous"}
+            </Text>
+          </Tooltip>
+          <Flex justifyContent={"space-between"}>
+            <Text fontSize={"sm"}>({user?.userName})</Text>
+            <Flex alignItems={"center"}>
+              <Tooltip
+                hasArrow
+                label="Edit Profile"
+                bg="gray.200"
+                color="black"
+              >
+                <EditIcon
+                  boxSize={4}
+                  ml={2}
+                  onClick={() => handleEdit()}
+                  _hover={{ cursor: "pointer" }}
+                />
+              </Tooltip>
+              <Tooltip hasArrow label="Find Users" bg="gray.200" color="black">
+                <Icon
+                  viewBox="0 0 24 24 "
+                  boxSize={5}
+                  ml={4}
+                  onClick={() => handleSearchModal()}
+                  _hover={{ cursor: "pointer" }}
+                >
+                  <UserSearchIcon />
+                </Icon>
+              </Tooltip>
+              <Tooltip hasArrow label="Logout" bg="gray.200" color="black">
+                <Icon
+                  viewBox="0 0 24 24 "
+                  boxSize={5}
+                  ml={4}
+                  onClick={() => handleLogout()}
+                  _hover={{ cursor: "pointer" }}
+                >
+                  <LogoutIcon />
+                </Icon>
+              </Tooltip>
+            </Flex>
+          </Flex>
         </Box>
-        <Flex alignItems={"center"}>
-          <Tooltip label="Edit Profile">
-            <EditIcon
-              boxSize={4}
-              ml={3}
-              onClick={() => handleEdit()}
-              _hover={{ cursor: "pointer" }}
-            />
-          </Tooltip>
-          <Tooltip label="Find Users">
-            <Icon
-              viewBox="0 0 24 24 "
-              boxSize={5}
-              ml={6}
-              onClick={() => handleSearchModal()}
-              _hover={{ cursor: "pointer" }}
-            >
-              <UserSearchIcon />
-            </Icon>
-          </Tooltip>
-          <Tooltip label="Logout">
-            <Icon
-              viewBox="0 0 24 24 "
-              boxSize={5}
-              ml={6}
-              onClick={() => handleLogout()}
-              _hover={{ cursor: "pointer" }}
-            >
-              <LogoutIcon />
-            </Icon>
-          </Tooltip>
-        </Flex>
       </Flex>
       <EditProfileModal
         isOpen={showProfileModal}

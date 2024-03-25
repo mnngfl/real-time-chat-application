@@ -149,7 +149,7 @@ const EditProfileModal = ({
                   onChange={handleValue}
                   maxLength={30}
                 />
-                <Tooltip label="Undo">
+                <Tooltip hasArrow label="Undo" bg="gray.200" color="black">
                   <Icon
                     viewBox="0 0 24 24"
                     boxSize={6}
