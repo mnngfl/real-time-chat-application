@@ -1,13 +1,15 @@
 import { Avatar } from "@chakra-ui/react";
+import type { FC, PropsWithChildren } from "react";
 
-const UserAvatar = ({
+interface UserAvatarProps {
+  avatar?: string;
+  size?: string;
+}
+
+const UserAvatar: FC<PropsWithChildren<UserAvatarProps>> = ({
   avatar,
   size = "md",
   children,
-}: {
-  avatar?: string;
-  size?: string;
-  children?: React.ReactNode;
 }) => {
   const avatarPath = avatar
     ? new URL("/static/" + avatar, import.meta.url).href
