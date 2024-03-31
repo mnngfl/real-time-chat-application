@@ -18,20 +18,23 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
-import { nicknameSelector } from "../../state";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { nicknameSelector } from "@/state";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ChangeEvent, FC } from "react";
 import { debounce } from "lodash";
-import { checkDuplicateUserName, updateUserName } from "../../services/users";
+import { checkDuplicateUserName, updateUserName } from "@/services/users";
 import UndoIcon from "@/assets/ico_undo.svg?react";
 
-const EditProfileModal = ({
-  isOpen,
-  onClose,
-  onSuccess,
-}: {
+export type EditProfileModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+};
+
+const EditProfileModal: FC<EditProfileModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
 }) => {
   const nickname = useRecoilValue(nicknameSelector);
 
@@ -107,7 +110,7 @@ const EditProfileModal = ({
     }
   }, [isOpen, nickname]);
 
-  const handleValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValue = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setIsChanged(true);
     setInputValue(value);

@@ -1,7 +1,7 @@
 import { getOtherUsers } from "@/services/users";
 import { chatListState, onlineUserListState, userIdSelector } from "@/state";
-import { PreviewChat } from "@/types/chats";
-import { BaseUser } from "@/types/users";
+import type { PreviewChat } from "@/types/chats";
+import type { BaseUser } from "@/types/users";
 import {
   AvatarBadge,
   Box,
@@ -21,19 +21,22 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import type { FC } from "react";
 import { useRecoilValue, useRecoilValueLoadable } from "recoil";
-import UserAvatar from "../common/UserAvatar";
+import { UserAvatar } from "@/components/common";
 import { createChat } from "@/services/chats";
-import useAlertDialog from "@/hooks/useAlertDialog";
+import { useAlertDialog } from "@/hooks";
 
-const SearchUserModal = ({
-  isOpen,
-  onClose,
-  onSuccess,
-}: {
+export type SearchUserModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+};
+
+const SearchUserModal: FC<SearchUserModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
 }) => {
   const userId = useRecoilValue(userIdSelector);
   const chatList = useRecoilValueLoadable(chatListState);

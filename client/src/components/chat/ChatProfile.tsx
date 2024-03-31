@@ -1,19 +1,19 @@
 import { Box, Circle, Flex, Icon, Text, Tooltip } from "@chakra-ui/react";
 import { useRecoilState, useRecoilValue, useResetRecoilState } from "recoil";
-import { socketState, userState } from "../../state";
+import { socketState, userState } from "@/state";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
-import useAlertDialog from "../../hooks/useAlertDialog";
+import { useAlertDialog, useFetchChats, useResponsive } from "@/hooks";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import EditProfileModal from "./EditProfileModal";
-import { getProfile } from "../../services/users";
-import EditAvatarModal from "./EditAvatarModal";
-import UserAvatar from "../common/UserAvatar";
+import {
+  EditProfileModal,
+  EditAvatarModal,
+  SearchUserModal,
+} from "@/components/chat";
+import { getProfile } from "@/services/users";
+import { UserAvatar } from "@/components/common";
 import UserSearchIcon from "@/assets/ico_user_search.svg?react";
 import LogoutIcon from "@/assets/ico_exit.svg?react";
-import SearchUserModal from "./SearchUserModal";
-import useFetchChats from "@/hooks/useFetchChats";
-import useResponsive from "@/hooks/useResponsive";
 
 const ChatProfile = () => {
   const [user, setUser] = useRecoilState(userState);

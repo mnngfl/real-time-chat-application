@@ -13,11 +13,11 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
-import { LoginUserReq, LoginUserRes } from "../types/users";
-import { loginUser } from "../services/users";
+import type { LoginUserReq, LoginUserRes } from "@/types/users";
+import { loginUser } from "@/services/users";
 import validator from "validator";
-import { userState } from "../state";
-import useAlertDialog from "../hooks/useAlertDialog";
+import { userState } from "@/state";
+import { useAlertDialog } from "@/hooks";
 
 const Login = () => {
   const navigate = useNavigate();

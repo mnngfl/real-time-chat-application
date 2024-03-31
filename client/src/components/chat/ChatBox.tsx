@@ -7,20 +7,25 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import type { FC, RefObject } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   currentChatState,
   socketState,
   userIdSelector,
   userNameSelector,
-} from "../../state";
+} from "@/state";
 import ChatEmoji from "./ChatEmoji";
 import { EmojiClickData } from "emoji-picker-react";
-import useAlertDialog from "../../hooks/useAlertDialog";
+import { useAlertDialog } from "@/hooks";
 import SmileIcon from "@/assets/ico_smile.svg?react";
 import SendIcon from "@/assets/ico_send.svg?react";
 
-const ChatBox = ({ boxRef }: { boxRef: React.RefObject<HTMLDivElement> }) => {
+export type ChatBoxProps = {
+  boxRef: RefObject<HTMLDivElement>;
+};
+
+const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
   const { openAlert } = useAlertDialog();
   const [socket] = useRecoilState(socketState);
   const userId = useRecoilValue(userIdSelector);

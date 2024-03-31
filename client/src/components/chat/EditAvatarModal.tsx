@@ -16,8 +16,9 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useRecoilValue } from "recoil";
 import { avatarSelector } from "@/state";
 import { useEffect, useState } from "react";
+import type { FC } from "react";
 import { updateAvatar } from "@/services/users";
-import UserAvatar from "../common/UserAvatar";
+import { UserAvatar } from "@/components/common";
 
 const Avatars = [
   "",
@@ -29,15 +30,13 @@ const Avatars = [
   "panda.png",
 ];
 
-const AvatarItem = ({
-  avatar,
-  isSelected,
-  onSelect,
-}: {
+export type AvatarItemProps = {
   avatar: string;
   isSelected: boolean;
   onSelect: (src: string) => void;
-}) => {
+};
+
+const AvatarItem: FC<AvatarItemProps> = ({ avatar, isSelected, onSelect }) => {
   return (
     <Circle
       _hover={{ cursor: "pointer", brightness: "100%" }}

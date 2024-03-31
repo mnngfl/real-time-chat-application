@@ -1,8 +1,13 @@
 import { Box } from "@chakra-ui/react";
-import { PreviewChat } from "../../types/chats";
-import ChatPreview from "./ChatPreview";
+import type { PreviewChat } from "@/types/chats";
+import { ChatPreview } from "@/components/chat";
+import type { FC } from "react";
 
-const ChatList = ({ chatList }: { chatList: Array<PreviewChat> }) => {
+export type ChatListProps = {
+  chatList: Array<PreviewChat>;
+};
+
+const ChatList: FC<ChatListProps> = ({ chatList }) => {
   return (
     <Box overflowY={"auto"} h={"calc(100vh - 12.5%)"}>
       {chatList.map((chat) => {

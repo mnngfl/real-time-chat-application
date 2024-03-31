@@ -9,8 +9,8 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useRecoilValue } from "recoil";
-import { alertDialogState } from "../../state";
-import useAlertDialog from "../../hooks/useAlertDialog";
+import { alertDialogState } from "@/state";
+import { useAlertDialog } from "@/hooks";
 
 const AlertOverlay = () => {
   const alertDialog = useRecoilValue(alertDialogState);

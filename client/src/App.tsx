@@ -1,13 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Chat from "./pages/Chat";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
+import Chat from "@/pages/Chat";
+import Register from "@/pages/Register";
+import Login from "@/pages/Login";
 import { Flex } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
-import { isLoggedInSelector } from "./state";
-import RequireAuth from "./components/auth/RequireAuth";
-import AlertOverlay from "./components/common/AlertOverlay";
-import useSocket from "./hooks/useSocket";
+import { isLoggedInSelector } from "@/state";
+import { RequireAuth } from "@/components/auth";
+import { AlertOverlay } from "@/components/common";
+import { useSocket } from "@/hooks";
 
 function App() {
   useSocket();
