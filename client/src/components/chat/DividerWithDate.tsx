@@ -1,5 +1,5 @@
 import { AbsoluteCenter, Box, Divider } from "@chakra-ui/react";
-import { formatSameDay } from "../../utils/dateUtil";
+import { formatSameDay } from "@/utils/dateUtil";
 
 export type DividerWithDateProps = {
   date: Date;

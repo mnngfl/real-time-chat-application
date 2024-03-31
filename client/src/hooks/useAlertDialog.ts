@@ -1,5 +1,5 @@
 import { useSetRecoilState } from "recoil";
-import { AlertDialogStateAction, alertDialogState } from "../state";
+import { AlertDialogStateAction, alertDialogState } from "@/state";
 
 const useAlertDialog = () => {
   const setAlertDialog = useSetRecoilState(alertDialogState);

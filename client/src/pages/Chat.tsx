@@ -5,8 +5,6 @@ import {
   SkeletonCircle,
   SkeletonText,
 } from "@chakra-ui/react";
-import ChatList from "../components/chat/ChatList";
-import ChatRoom from "../components/chat/ChatRoom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   useRecoilStateLoadable,
@@ -22,11 +20,11 @@ import {
   onlineUserListState,
   socketState,
   userState,
-} from "../state";
-import { OnlineUser } from "../types/users";
-import useFetchChats from "../hooks/useFetchChats";
-import { PreviewChat } from "../types/chats";
-import ChatProfile from "../components/chat/ChatProfile";
+} from "@/state";
+import { useFetchChats } from "@/hooks";
+import type { OnlineUser } from "@/types/users";
+import type { PreviewChat } from "@/types/chats";
+import { ChatProfile, ChatList, ChatRoom } from "@/components/chat";
 
 const Chat = () => {
   const { fetchChats } = useFetchChats();

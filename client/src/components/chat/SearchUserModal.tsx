@@ -1,7 +1,7 @@
 import { getOtherUsers } from "@/services/users";
 import { chatListState, onlineUserListState, userIdSelector } from "@/state";
-import { PreviewChat } from "@/types/chats";
-import { BaseUser } from "@/types/users";
+import type { PreviewChat } from "@/types/chats";
+import type { BaseUser } from "@/types/users";
 import {
   AvatarBadge,
   Box,
@@ -23,9 +23,9 @@ import {
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { FC } from "react";
 import { useRecoilValue, useRecoilValueLoadable } from "recoil";
-import UserAvatar from "../common/UserAvatar";
+import { UserAvatar } from "@/components/common";
 import { createChat } from "@/services/chats";
-import useAlertDialog from "@/hooks/useAlertDialog";
+import { useAlertDialog } from "@/hooks";
 
 export type SearchUserModalProps = {
   isOpen: boolean;

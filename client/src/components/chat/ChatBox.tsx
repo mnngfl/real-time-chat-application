@@ -14,10 +14,10 @@ import {
   socketState,
   userIdSelector,
   userNameSelector,
-} from "../../state";
+} from "@/state";
 import ChatEmoji from "./ChatEmoji";
 import { EmojiClickData } from "emoji-picker-react";
-import useAlertDialog from "../../hooks/useAlertDialog";
+import { useAlertDialog } from "@/hooks";
 import SmileIcon from "@/assets/ico_smile.svg?react";
 import SendIcon from "@/assets/ico_send.svg?react";
 

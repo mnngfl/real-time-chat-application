@@ -11,8 +11,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import ChatBubble from "./ChatBubble";
-import DividerWithDate from "./DividerWithDate";
+import { ChatBubble, DividerWithDate, ChatBox } from "@/components/chat";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   Fragment,
@@ -24,20 +23,19 @@ import {
   useState,
 } from "react";
 import type { FC } from "react";
-import { findMessages } from "../../services/chats";
+import { findMessages } from "@/services/chats";
 import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
-import ChatBox from "./ChatBox";
 import {
   currentChatMessageListState,
   currentChatState,
   onlineUserListState,
   socketState,
   userIdSelector,
-} from "../../state";
+} from "@/state";
 import { parseISO, isSameDay } from "date-fns";
 import { throttle } from "lodash";
-import useFetchChats from "../../hooks/useFetchChats";
-import UserAvatar from "../common/UserAvatar";
+import { useFetchChats } from "@/hooks";
+import { UserAvatar } from "@/components/common";
 
 export type ChatRoomProps = {
   showNewButton: boolean;

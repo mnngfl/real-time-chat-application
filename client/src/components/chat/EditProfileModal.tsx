@@ -18,11 +18,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
-import { nicknameSelector } from "../../state";
+import { nicknameSelector } from "@/state";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FC } from "react";
 import { debounce } from "lodash";
-import { checkDuplicateUserName, updateUserName } from "../../services/users";
+import { checkDuplicateUserName, updateUserName } from "@/services/users";
 import UndoIcon from "@/assets/ico_undo.svg?react";
 
 export type EditProfileModalProps = {

@@ -13,10 +13,10 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import validator from "validator";
-import { RegisterUserReq, RegisterUserRes } from "../types/users";
-import { registerUser } from "../services/users";
+import type { RegisterUserReq, RegisterUserRes } from "@/types/users";
+import { registerUser } from "@/services/users";
 import { useNavigate } from "react-router-dom";
-import useAlertDialog from "../hooks/useAlertDialog";
+import { useAlertDialog } from "@/hooks";
 import { trim } from "lodash";
 
 const Register = () => {

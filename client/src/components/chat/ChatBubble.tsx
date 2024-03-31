@@ -1,9 +1,9 @@
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
-import { BaseMessage } from "../../types/chats";
+import type { BaseMessage } from "@/types/chats";
 import { useRecoilValue } from "recoil";
-import { userIdSelector } from "../../state";
+import { userIdSelector } from "@/state";
 import { format } from "date-fns";
-import UserAvatar from "../common/UserAvatar";
+import { UserAvatar } from "@/components/common";
 import type { FC } from "react";
 
 export type ChatBubbleProps = {

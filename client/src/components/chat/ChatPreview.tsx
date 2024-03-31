@@ -6,22 +6,21 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { BaseUser } from "../../types/users";
-import { PreviewChat } from "../../types/chats";
+import type { BaseUser } from "@/types/users";
+import type { PreviewChat } from "@/types/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   currentChatState,
   onlineUserListState,
   socketState,
   userIdSelector,
-} from "../../state";
+} from "@/state";
 import { useEffect, useMemo, useState } from "react";
 import type { FC } from "react";
-import { deleteNotifications } from "../../services/chats";
+import { deleteNotifications } from "@/services/chats";
 import { format } from "date-fns";
-import useFetchChats from "../../hooks/useFetchChats";
-import UserAvatar from "../common/UserAvatar";
-import useResponsive from "@/hooks/useResponsive";
+import { useFetchChats, useResponsive } from "@/hooks";
+import { UserAvatar } from "@/components/common";
 
 export type ChatPreviewProps = {
   chat: PreviewChat;

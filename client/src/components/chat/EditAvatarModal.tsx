@@ -18,7 +18,7 @@ import { avatarSelector } from "@/state";
 import { useEffect, useState } from "react";
 import type { FC } from "react";
 import { updateAvatar } from "@/services/users";
-import UserAvatar from "../common/UserAvatar";
+import { UserAvatar } from "@/components/common";
 
 const Avatars = [
   "",
