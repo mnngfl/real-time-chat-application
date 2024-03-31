@@ -23,6 +23,7 @@ import {
   useRef,
   useState,
 } from "react";
+import type { FC } from "react";
 import { findMessages } from "../../services/chats";
 import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import ChatBox from "./ChatBox";
@@ -38,13 +39,12 @@ import { throttle } from "lodash";
 import useFetchChats from "../../hooks/useFetchChats";
 import UserAvatar from "../common/UserAvatar";
 
-const ChatRoom = ({
-  showNewButton,
-  setShowNewButton,
-}: {
+export type ChatRoomProps = {
   showNewButton: boolean;
   setShowNewButton: (newState: boolean) => void;
-}) => {
+};
+
+const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
   const { fetchChats } = useFetchChats();
   const [socket] = useRecoilState(socketState);
   const userId = useRecoilValue(userIdSelector);

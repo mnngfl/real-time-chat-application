@@ -16,13 +16,18 @@ import {
   userIdSelector,
 } from "../../state";
 import { useEffect, useMemo, useState } from "react";
+import type { FC } from "react";
 import { deleteNotifications } from "../../services/chats";
 import { format } from "date-fns";
 import useFetchChats from "../../hooks/useFetchChats";
 import UserAvatar from "../common/UserAvatar";
 import useResponsive from "@/hooks/useResponsive";
 
-const ChatPreview = ({ chat }: { chat: PreviewChat }) => {
+export type ChatPreviewProps = {
+  chat: PreviewChat;
+};
+
+const ChatPreview: FC<ChatPreviewProps> = ({ chat }) => {
   const { isPc } = useResponsive();
   const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);

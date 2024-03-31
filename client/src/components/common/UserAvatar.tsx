@@ -1,10 +1,10 @@
 import { Avatar } from "@chakra-ui/react";
 import type { FC, PropsWithChildren } from "react";
 
-interface UserAvatarProps {
+export type UserAvatarProps = {
   avatar?: string;
   size?: string;
-}
+};
 
 const UserAvatar: FC<PropsWithChildren<UserAvatarProps>> = ({
   avatar,

@@ -3,14 +3,14 @@ import EmojiPicker, {
   SuggestionMode,
   Theme,
 } from "emoji-picker-react";
+import type { FC } from "react";
 
-const ChatEmoji = ({
-  open,
-  handler,
-}: {
+export type ChatEmojiProps = {
   open: boolean;
   handler: (emojiData: EmojiClickData) => void;
-}) => {
+};
+
+const ChatEmoji: FC<ChatEmojiProps> = ({ open, handler }) => {
   return (
     <EmojiPicker
       open={open}
