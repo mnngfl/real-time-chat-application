@@ -124,7 +124,6 @@ const EditProfileModal: FC<EditProfileModalProps> = ({
   };
 
   const handleReset = () => {
-    setIsChanged(false);
     setInputValue(nickname || "");
     handleDebouncedInput.cancel();
   };
