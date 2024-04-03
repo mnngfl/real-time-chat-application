@@ -1,23 +1,12 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Link,
-  Text,
-} from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, Link, Text } from "@chakra-ui/react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import type { LoginUserReq, LoginUserRes } from "@/types/users";
 import { loginUser } from "@/services/users";
-import validator from "validator";
 import { userState } from "@/state";
 import { useAlertDialog } from "@/hooks";
+import ValidatableInput, { ValidatableInputMethods } from "@/components/form/ValidatableInput";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,9 +19,16 @@ const Login = () => {
     userName: "",
     password: "",
   });
+  const [validFields, setValidFields] = useState({
+    userName: false,
+    password: false,
+  });
   const [errors, setErrors] = useState<Partial<LoginUserReq>>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitLoading, setIsSubmitLoding] = useState(false);
+  const userNameMethodsRef = useRef<ValidatableInputMethods>(null);
+  const passwordMethodsRef = useRef<ValidatableInputMethods>(null);
+  const hasError = useMemo(() => Object.values(errors).length > 0, [errors]);
+  const isValid = useMemo(() => Object.values(validFields).every((v) => v), [validFields]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,11 +37,7 @@ const Login = () => {
       [name]: value,
     }));
 
-    if (isSubmitted) {
-      let newErrors = { ...errors };
-      newErrors = validateField(newErrors, name, value);
-      setErrors(newErrors);
-    }
+    validateFields(name);
   };
 
   const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -57,14 +49,6 @@ const Login = () => {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitted(true);
-
-    const validationErrors = validateForm();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) {
-      return;
-    }
-
     try {
       setIsSubmitLoding(true);
       const res: LoginUserRes = await loginUser(formData);
@@ -77,39 +61,37 @@ const Login = () => {
     }
   };
 
-  const validateForm = () => {
-    let newErrors = { ...errors };
-    newErrors = validateField(newErrors, "userName", formData.userName);
-    newErrors = validateField(newErrors, "password", formData.password);
-    return newErrors;
-  };
+  const validateFields = (fieldName: string) => {
+    const newErrors = { ...errors };
 
-  const validateField = (
-    prevErrors: Partial<LoginUserReq>,
-    fieldName: string,
-    value: string
-  ) => {
-    const newErrors = { ...prevErrors };
     switch (fieldName) {
-      case "userName":
-        if (!validator.matches(value, "([a-z0-9]){4,30}")) {
-          newErrors.userName = "Enter 4 to 30 lowercase letters and numbers.";
-        } else {
+      case "userName": {
+        if (!userNameMethodsRef.current) return;
+        const [valid, valueOrErrorMessage] = userNameMethodsRef.current.validate();
+        if (valid) {
           delete newErrors.userName;
-        }
-        break;
-      case "password":
-        if (!validator.isStrongPassword(value, { minUppercase: 0 })) {
-          newErrors.password =
-            "At least 8 characters with 1 lowercase, 1 number, and 1 special character.";
+          setValidFields((prev) => ({ ...prev, userName: true }));
         } else {
-          delete newErrors.password;
+          newErrors.userName = valueOrErrorMessage;
+          setValidFields((prev) => ({ ...prev, userName: false }));
         }
         break;
-      default:
+      }
+      case "password": {
+        if (!passwordMethodsRef.current) return;
+        const [valid, valueOrErrorMessage] = passwordMethodsRef.current.validate();
+        if (valid) {
+          delete newErrors.password;
+          setValidFields((prev) => ({ ...prev, password: true }));
+        } else {
+          newErrors.password = valueOrErrorMessage;
+          setValidFields((prev) => ({ ...prev, password: false }));
+        }
         break;
+      }
     }
-    return newErrors;
+
+    setErrors(newErrors);
   };
 
   return (
@@ -121,31 +103,31 @@ const Login = () => {
           </Text>
           <FormControl my={4} isInvalid={!!errors?.userName}>
             <FormLabel>User name</FormLabel>
-            <Input
+            <ValidatableInput
               placeholder="Enter your username"
               name="userName"
               value={formData.userName}
               onChange={handleChange}
               onKeyUp={handleKeyUp}
+              fieldname="User name"
+              ref={userNameMethodsRef}
             />
-            {errors?.userName && (
-              <FormErrorMessage>{errors.userName}</FormErrorMessage>
-            )}
+            {errors?.userName && <FormErrorMessage>{errors.userName}</FormErrorMessage>}
           </FormControl>
 
           <FormControl mb={4} isInvalid={!!errors?.password}>
             <FormLabel>Password</FormLabel>
-            <Input
+            <ValidatableInput
               type="password"
               placeholder="Enter your password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               onKeyUp={handleKeyUp}
+              fieldname="Password"
+              ref={passwordMethodsRef}
             />
-            {errors?.password && (
-              <FormErrorMessage>{errors.password}</FormErrorMessage>
-            )}
+            {errors?.password && <FormErrorMessage>{errors.password}</FormErrorMessage>}
           </FormControl>
 
           <Button
@@ -154,6 +136,7 @@ const Login = () => {
             size={"lg"}
             my={4}
             w={"100%"}
+            isDisabled={!isValid || hasError}
             isLoading={isSubmitLoading}
             onClick={() => handleSubmit()}
           >

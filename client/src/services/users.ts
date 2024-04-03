@@ -1,17 +1,8 @@
 import instance from "../utils/api";
-import {
-  FindUserRes,
-  GetUsersRes,
-  LoginUserReq,
-  LoginUserRes,
-  RegisterUserReq,
-  RegisterUserRes,
-} from "../types/users";
+import { FindUserRes, GetUsersRes, LoginUserReq, LoginUserRes, RegisterUserReq, RegisterUserRes } from "../types/users";
 import { CommonQueryRes } from "../types/common";
 
-export const registerUser = async (
-  data: RegisterUserReq
-): Promise<RegisterUserRes> => {
+export const registerUser = async (data: RegisterUserReq): Promise<RegisterUserRes> => {
   return await instance.post("/auth/register", data);
 };
 
@@ -27,15 +18,11 @@ export const getOtherUsers = async (): Promise<Array<GetUsersRes>> => {
   return await instance.get("/users/others");
 };
 
-export const checkDuplicateUserName = async (
-  nickname: string
-): Promise<boolean> => {
+export const checkValidateNickname = async (nickname: string): Promise<boolean> => {
   return await instance.get(`/users/validate/${nickname}`);
 };
 
-export const updateUserName = async (
-  nickname: string
-): Promise<CommonQueryRes> => {
+export const updateUserName = async (nickname: string): Promise<CommonQueryRes> => {
   return await instance.put(`/users/update-name/${nickname}`);
 };
 

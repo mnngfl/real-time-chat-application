@@ -6,18 +6,16 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Input,
   Link,
   Text,
   useToast,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
-import validator from "validator";
+import React, { useMemo, useRef, useState } from "react";
 import type { RegisterUserReq, RegisterUserRes } from "@/types/users";
 import { registerUser } from "@/services/users";
 import { useNavigate } from "react-router-dom";
 import { useAlertDialog } from "@/hooks";
-import { trim } from "lodash";
+import ValidatableInput, { ValidatableInputMethods } from "@/components/form/ValidatableInput";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -30,9 +28,20 @@ const Register = () => {
     passwordConfirm: "",
     nickname: "",
   });
+  const [validFields, setValidFields] = useState({
+    userName: false,
+    password: false,
+    passwordConfirm: false,
+    nickname: true,
+  });
   const [errors, setErrors] = useState<Partial<RegisterUserReq>>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitLoading, setIsSubmitLoding] = useState(false);
+  const userNameMethodsRef = useRef<ValidatableInputMethods>(null);
+  const passwordMethodsRef = useRef<ValidatableInputMethods>(null);
+  const passwordConfirmMethodsRef = useRef<ValidatableInputMethods>(null);
+  const nicknameMethodsRef = useRef<ValidatableInputMethods>(null);
+  const hasError = useMemo(() => Object.values(errors).length > 0, [errors]);
+  const isValid = useMemo(() => Object.values(validFields).every((v) => v), [validFields]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,11 +50,7 @@ const Register = () => {
       [name]: value,
     }));
 
-    if (isSubmitted) {
-      let newErrors = { ...errors };
-      newErrors = validateField(newErrors, name, value);
-      setErrors(newErrors);
-    }
+    validateFields(name);
   };
 
   const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -59,21 +64,9 @@ const Register = () => {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitted(true);
-
-    const validationErrors = validateForm();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) {
-      return;
-    }
-
     try {
       setIsSubmitLoding(true);
-      const nicknameTrim = trim(formData.nickname);
-      const res: RegisterUserRes = await registerUser({
-        ...formData,
-        nickname: nicknameTrim.length > 0 ? nicknameTrim : undefined,
-      });
+      const res: RegisterUserRes = await registerUser(formData);
       toast({
         title: "Register Succeed",
         description: `Hello, ${res.userName}`,
@@ -89,73 +82,61 @@ const Register = () => {
     }
   };
 
-  const validateForm = () => {
-    let newErrors = { ...errors };
-    newErrors = validateField(newErrors, "userName", formData.userName);
-    newErrors = validateField(newErrors, "password", formData.password);
-    newErrors = validateField(
-      newErrors,
-      "passwordConfirm",
-      formData.passwordConfirm
-    );
-    if (formData.nickname && formData.nickname.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        nickname: trim(prev.nickname),
-      }));
-      newErrors = validateField(newErrors, "nickname", trim(formData.nickname));
-    }
-    return newErrors;
-  };
+  const validateFields = (fieldName: string) => {
+    const newErrors = { ...errors };
 
-  const validateField = (
-    prevErrors: Partial<RegisterUserReq>,
-    fieldName: string,
-    value: string
-  ) => {
-    const newErrors = { ...prevErrors };
     switch (fieldName) {
-      case "userName":
-        if (!validator.matches(value, "([a-z0-9]){4,30}")) {
-          newErrors.userName = "Enter 4 to 30 lowercase letters and numbers.";
-        } else {
+      case "userName": {
+        if (!userNameMethodsRef.current) return;
+        const [valid, valueOrErrorMessage] = userNameMethodsRef.current.validate();
+        if (valid) {
           delete newErrors.userName;
-        }
-        break;
-      case "password":
-        if (!validator.isStrongPassword(value, { minUppercase: 0 })) {
-          newErrors.password =
-            "At least 8 characters with 1 lowercase, 1 number, and 1 special character.";
+          setValidFields((prev) => ({ ...prev, userName: true }));
         } else {
-          delete newErrors.password;
-        }
-        break;
-      case "passwordConfirm":
-        if (value.length === 0) {
-          newErrors.passwordConfirm = "Enter a password confirm.";
-        } else if (!validator.equals(formData.password, value)) {
-          newErrors.passwordConfirm = "Passwords do not match.";
-        } else {
-          delete newErrors.passwordConfirm;
-        }
-        break;
-      case "nickname": {
-        if (
-          !validator.matches(
-            value,
-            "^(?!\\s)[a-zA-Z0-9ㄱ-힣\\s]{0,29}[a-zA-Z0-9ㄱ-힣]$"
-          )
-        ) {
-          newErrors.nickname = "Enter up to 30 letters and numbers.";
-        } else {
-          delete newErrors.nickname;
+          newErrors.userName = valueOrErrorMessage;
+          setValidFields((prev) => ({ ...prev, userName: false }));
         }
         break;
       }
-      default:
+      case "password": {
+        if (!passwordMethodsRef.current) return;
+        const [valid, valueOrErrorMessage] = passwordMethodsRef.current.validate();
+        if (valid) {
+          delete newErrors.password;
+          setValidFields((prev) => ({ ...prev, password: true }));
+        } else {
+          newErrors.password = valueOrErrorMessage;
+          setValidFields((prev) => ({ ...prev, password: false }));
+        }
         break;
+      }
+      case "passwordConfirm": {
+        if (!passwordConfirmMethodsRef.current) return;
+        const [valid, valueOrErrorMessage] = passwordConfirmMethodsRef.current.matchWith(formData.password);
+        if (valid) {
+          delete newErrors.passwordConfirm;
+          setValidFields((prev) => ({ ...prev, passwordConfirm: true }));
+        } else {
+          newErrors.passwordConfirm = valueOrErrorMessage;
+          setValidFields((prev) => ({ ...prev, passwordConfirm: false }));
+        }
+        break;
+      }
+      case "nickname": {
+        if (!nicknameMethodsRef.current) return;
+        const [valid, valueOrErrorMessage] = nicknameMethodsRef.current.validate();
+        if (valid) {
+          delete newErrors.nickname;
+          setValidFields((prev) => ({ ...prev, nickname: true }));
+        } else {
+          newErrors.nickname = valueOrErrorMessage;
+          setValidFields((prev) => ({ ...prev, nickname: false }));
+        }
+        break;
+      }
     }
-    return newErrors;
+
+    setErrors(newErrors);
   };
 
   return (
@@ -167,60 +148,60 @@ const Register = () => {
           </Text>
           <FormControl my={4} isInvalid={!!errors?.userName} isRequired>
             <FormLabel>User name</FormLabel>
-            <Input
+            <ValidatableInput
               placeholder="Enter 4 to 30 lowercase letters and numbers"
               name="userName"
               value={formData.userName}
               onChange={handleChange}
               onKeyUp={handleKeyUp}
+              ref={userNameMethodsRef}
+              fieldname="User name"
             />
-            {errors?.userName && (
-              <FormErrorMessage>{errors.userName}</FormErrorMessage>
-            )}
+            {errors?.userName && <FormErrorMessage>{errors.userName}</FormErrorMessage>}
           </FormControl>
 
           <FormControl mb={4} isInvalid={!!errors?.password} isRequired>
             <FormLabel>Password</FormLabel>
-            <Input
+            <ValidatableInput
               type="password"
               placeholder="Please enter a secure password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               onKeyUp={handleKeyUp}
+              ref={passwordMethodsRef}
+              fieldname="Password"
             />
-            {errors?.password && (
-              <FormErrorMessage>{errors.password}</FormErrorMessage>
-            )}
+            {errors?.password && <FormErrorMessage>{errors.password}</FormErrorMessage>}
           </FormControl>
 
           <FormControl mb={4} isInvalid={!!errors?.passwordConfirm} isRequired>
             <FormLabel>Password Confirm</FormLabel>
-            <Input
+            <ValidatableInput
               type="password"
               name="passwordConfirm"
               value={formData.passwordConfirm}
               onChange={handleChange}
               onKeyUp={handleKeyUp}
+              ref={passwordConfirmMethodsRef}
+              fieldname="Password Confirm"
             />
-            {errors?.passwordConfirm && (
-              <FormErrorMessage>{errors.passwordConfirm}</FormErrorMessage>
-            )}
+            {errors?.passwordConfirm && <FormErrorMessage>{errors.passwordConfirm}</FormErrorMessage>}
           </FormControl>
 
           <FormControl mb={4} isInvalid={!!errors?.nickname}>
             <FormLabel>Nickname</FormLabel>
-            <Input
+            <ValidatableInput
               type="text"
               placeholder="Please enter a nickname (optional)"
               name="nickname"
               value={formData.nickname}
               onChange={handleChange}
               onKeyUp={handleKeyUp}
+              ref={nicknameMethodsRef}
+              fieldname="Nickname"
             />
-            {errors?.nickname && (
-              <FormErrorMessage>{errors.nickname}</FormErrorMessage>
-            )}
+            {errors?.nickname && <FormErrorMessage>{errors.nickname}</FormErrorMessage>}
           </FormControl>
 
           <Button
@@ -228,6 +209,7 @@ const Register = () => {
             size={"lg"}
             my={4}
             w={"100%"}
+            isDisabled={!isValid || hasError}
             isLoading={isSubmitLoading}
             onClick={() => handleSubmit()}
           >
