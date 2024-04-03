@@ -36,6 +36,12 @@ export type AvatarItemProps = {
   onSelect: (src: string) => void;
 };
 
+export type EditAvatarModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+};
+
 const AvatarItem: FC<AvatarItemProps> = ({ avatar, isSelected, onSelect }) => {
   return (
     <Circle
@@ -52,14 +58,10 @@ const AvatarItem: FC<AvatarItemProps> = ({ avatar, isSelected, onSelect }) => {
   );
 };
 
-const EditAvatarModal = ({
+const EditAvatarModal: FC<EditAvatarModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
 }) => {
   const avatar = useRecoilValue(avatarSelector);
 

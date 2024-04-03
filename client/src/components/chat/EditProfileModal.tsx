@@ -22,7 +22,7 @@ import { nicknameSelector } from "@/state";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FC } from "react";
 import { debounce } from "lodash";
-import { checkDuplicateUserName, updateUserName } from "@/services/users";
+import { checkValidateNickname, updateUserName } from "@/services/users";
 import UndoIcon from "@/assets/ico_undo.svg?react";
 
 export type EditProfileModalProps = {
@@ -31,25 +31,16 @@ export type EditProfileModalProps = {
   onSuccess: () => void;
 };
 
-const EditProfileModal: FC<EditProfileModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-}) => {
+const EditProfileModal: FC<EditProfileModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const nickname = useRecoilValue(nicknameSelector);
 
   const [inputValue, setInputValue] = useState(nickname || "");
   const [debouncedInput, setDebouncedInput] = useState(nickname || "");
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [isChanged, setIsChanged] = useState(false);
-  const [message, setMessage] = useState(
-    "Enter 4 to 30 lowercase letters and numbers."
-  );
+  const [message, setMessage] = useState("Enter 4 to 30 lowercase letters and numbers.");
 
-  const hasError = useMemo(
-    () => isChanged && isAvailable === false,
-    [isAvailable, isChanged]
-  );
+  const hasError = useMemo(() => isChanged && isAvailable === false, [isAvailable, isChanged]);
 
   const checkDuplicated = useCallback(
     async (value: string) => {
@@ -72,7 +63,7 @@ const EditProfileModal: FC<EditProfileModalProps> = ({
       }
 
       try {
-        const isDuplicated = await checkDuplicateUserName(value);
+        const isDuplicated = await checkValidateNickname(value);
         setIsAvailable(!isDuplicated);
         setMessage("Available username.");
       } catch (error) {
@@ -124,19 +115,12 @@ const EditProfileModal: FC<EditProfileModalProps> = ({
   };
 
   const handleReset = () => {
-    setIsChanged(false);
     setInputValue(nickname || "");
     handleDebouncedInput.cancel();
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size={"sm"}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} size={"sm"} closeOnOverlayClick={false} closeOnEsc={false}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Edit user info</ModalHeader>
@@ -146,12 +130,7 @@ const EditProfileModal: FC<EditProfileModalProps> = ({
             <FormControl isInvalid={hasError}>
               <FormLabel>New Nickname</FormLabel>
               <InputGroup alignItems={"center"}>
-                <Input
-                  type="text"
-                  value={inputValue}
-                  onChange={handleValue}
-                  maxLength={30}
-                />
+                <Input type="text" value={inputValue} onChange={handleValue} maxLength={30} />
                 <Tooltip hasArrow label="Undo" bg="gray.200" color="black">
                   <Icon
                     viewBox="0 0 24 24"
@@ -164,11 +143,7 @@ const EditProfileModal: FC<EditProfileModalProps> = ({
                   </Icon>
                 </Tooltip>
               </InputGroup>
-              {hasError ? (
-                <FormErrorMessage>{message}</FormErrorMessage>
-              ) : (
-                <FormHelperText>{message}</FormHelperText>
-              )}
+              {hasError ? <FormErrorMessage>{message}</FormErrorMessage> : <FormHelperText>{message}</FormHelperText>}
             </FormControl>
           </VStack>
         </ModalBody>
@@ -176,11 +151,7 @@ const EditProfileModal: FC<EditProfileModalProps> = ({
           <Button mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            colorScheme="teal"
-            isDisabled={!isAvailable}
-            onClick={() => handleSave()}
-          >
+          <Button colorScheme="teal" isDisabled={!isAvailable} onClick={() => handleSave()}>
             Save
           </Button>
         </ModalFooter>
