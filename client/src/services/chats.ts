@@ -1,11 +1,4 @@
-import {
-  BaseMessage,
-  ChatReq,
-  ChatRes,
-  MessageReq,
-  MessageRes,
-  PreviewChat,
-} from "../types/chats";
+import type { BaseMessage, ChatReq, ChatRes, MessageReq, MessageRes, PreviewChat } from "../types/chats";
 import { CommonPagination } from "../types/common";
 import instance from "../utils/api";
 

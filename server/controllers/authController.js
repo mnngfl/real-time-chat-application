@@ -53,6 +53,23 @@ const registerUser = async (req, res) => {
   }
 };
 
+const checkAvailableUserName = async (req, res) => {
+  const { userName } = req.params;
+  try {
+    let user = await userModel.findOne({
+      userName: { $regex: new RegExp(userName, "i") },
+    });
+    if (user) {
+      return res.apiSuccess(true);
+    } else {
+      return res.apiSuccess(false);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.apiError(error);
+  }
+};
+
 const loginUser = async (req, res) => {
   const { userName, password } = req.body;
 
@@ -96,4 +113,9 @@ const refreshToken = (req, res) => {
   });
 };
 
-module.exports = { registerUser, loginUser, refreshToken };
+module.exports = {
+  registerUser,
+  checkAvailableUserName,
+  loginUser,
+  refreshToken,
+};
