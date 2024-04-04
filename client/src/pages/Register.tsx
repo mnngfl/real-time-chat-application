@@ -6,22 +6,29 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  InputGroup,
+  InputRightElement,
   Link,
+  Spinner,
   Text,
   useToast,
 } from "@chakra-ui/react";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RegisterUserReq, RegisterUserRes } from "@/types/users";
-import { registerUser } from "@/services/users";
+import { checkUserNameDuplicate, registerUser } from "@/services/users";
 import { useNavigate } from "react-router-dom";
 import { useAlertDialog } from "@/hooks";
 import ValidatableInput, { ValidatableInputMethods } from "@/components/form/ValidatableInput";
+import { debounce } from "lodash";
+import { DUPLICATED_USER_NAME } from "@/utils/validation";
 
 const Register = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { openAlert } = useAlertDialog();
 
+  const [debouncedUserName, setDebouncedUserName] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
   const [formData, setFormData] = useState<RegisterUserReq>({
     userName: "",
     password: "",
@@ -42,6 +49,44 @@ const Register = () => {
   const nicknameMethodsRef = useRef<ValidatableInputMethods>(null);
   const hasError = useMemo(() => Object.values(errors).length > 0, [errors]);
   const isValid = useMemo(() => Object.values(validFields).every((v) => v), [validFields]);
+
+  const handleDebouncedInput = debounce(() => {
+    setDebouncedUserName(formData.userName);
+  }, 400);
+
+  useEffect(() => {
+    if (formData.userName && !errors?.userName) {
+      handleDebouncedInput();
+    }
+
+    return () => {
+      handleDebouncedInput.cancel();
+    };
+  }, [errors?.userName, formData.userName, handleDebouncedInput]);
+
+  const checkDuplicated = useCallback(async () => {
+    try {
+      const isDuplicated = await checkUserNameDuplicate(debouncedUserName);
+      if (isDuplicated) {
+        setErrors((prev) => ({ ...prev, userName: DUPLICATED_USER_NAME }));
+      } else {
+        setErrors((prev) => {
+          delete prev.userName;
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsValidating(false);
+    }
+  }, [debouncedUserName]);
+
+  useEffect(() => {
+    if (debouncedUserName) {
+      checkDuplicated();
+    }
+  }, [checkDuplicated, debouncedUserName]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -92,6 +137,7 @@ const Register = () => {
         if (valid) {
           delete newErrors.userName;
           setValidFields((prev) => ({ ...prev, userName: true }));
+          setIsValidating(true);
         } else {
           newErrors.userName = valueOrErrorMessage;
           setValidFields((prev) => ({ ...prev, userName: false }));
@@ -148,15 +194,18 @@ const Register = () => {
           </Text>
           <FormControl my={4} isInvalid={!!errors?.userName} isRequired>
             <FormLabel>User name</FormLabel>
-            <ValidatableInput
-              placeholder="Enter 4 to 30 lowercase letters and numbers"
-              name="userName"
-              value={formData.userName}
-              onChange={handleChange}
-              onKeyUp={handleKeyUp}
-              ref={userNameMethodsRef}
-              fieldname="User name"
-            />
+            <InputGroup>
+              <ValidatableInput
+                placeholder="Enter 4 to 30 lowercase letters and numbers"
+                name="userName"
+                value={formData.userName}
+                onChange={handleChange}
+                onKeyUp={handleKeyUp}
+                ref={userNameMethodsRef}
+                fieldname="User name"
+              />
+              <InputRightElement>{isValidating && <Spinner size={"sm"} />}</InputRightElement>
+            </InputGroup>
             {errors?.userName && <FormErrorMessage>{errors.userName}</FormErrorMessage>}
           </FormControl>
 
@@ -209,7 +258,7 @@ const Register = () => {
             size={"lg"}
             my={4}
             w={"100%"}
-            isDisabled={!isValid || hasError}
+            isDisabled={!isValid || hasError || isValidating}
             isLoading={isSubmitLoading}
             onClick={() => handleSubmit()}
           >

@@ -1,9 +1,20 @@
 import instance from "../utils/api";
-import { FindUserRes, GetUsersRes, LoginUserReq, LoginUserRes, RegisterUserReq, RegisterUserRes } from "../types/users";
+import type {
+  FindUserRes,
+  GetUsersRes,
+  LoginUserReq,
+  LoginUserRes,
+  RegisterUserReq,
+  RegisterUserRes,
+} from "../types/users";
 import { CommonQueryRes } from "../types/common";
 
 export const registerUser = async (data: RegisterUserReq): Promise<RegisterUserRes> => {
   return await instance.post("/auth/register", data);
+};
+
+export const checkUserNameDuplicate = async (userName: string): Promise<boolean> => {
+  return await instance.get(`/auth/check-id/${userName}`);
 };
 
 export const loginUser = async (data: LoginUserReq): Promise<LoginUserRes> => {
