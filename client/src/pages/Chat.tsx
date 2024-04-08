@@ -1,17 +1,6 @@
-import {
-  Box,
-  Divider,
-  Flex,
-  SkeletonCircle,
-  SkeletonText,
-} from "@chakra-ui/react";
+import { Box, Divider, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  useRecoilStateLoadable,
-  useRecoilValue,
-  useResetRecoilState,
-  useSetRecoilState,
-} from "recoil";
+import { useRecoilStateLoadable, useRecoilValue, useResetRecoilState, useSetRecoilState } from "recoil";
 import {
   chatListState,
   currentChatIdSelector,
@@ -25,6 +14,7 @@ import { useFetchChats } from "@/hooks";
 import type { OnlineUser } from "@/types/users";
 import type { PreviewChat } from "@/types/chats";
 import { ChatProfile, ChatList, ChatRoom } from "@/components/chat";
+import SearchChat from "@/components/chat/SearchChat";
 
 const Chat = () => {
   const { fetchChats } = useFetchChats();
@@ -34,14 +24,9 @@ const Chat = () => {
   const resetCurrentChat = useResetRecoilState(currentChatState);
   const [chatList, setChatList] = useRecoilStateLoadable(chatListState);
   const setOnlineUserList = useSetRecoilState(onlineUserListState);
-  const setCurrentChatMessageList = useSetRecoilState(
-    currentChatMessageListState
-  );
+  const setCurrentChatMessageList = useSetRecoilState(currentChatMessageListState);
   const [showNewButton, setShowNewButton] = useState(false);
-  const isLoaded = useMemo(
-    () => chatList.state === "hasValue",
-    [chatList.state]
-  );
+  const isLoaded = useMemo(() => chatList.state === "hasValue", [chatList.state]);
 
   const handleFetchChats = useCallback(async () => {
     if (!socket || !fetchChats) return;
@@ -71,13 +56,7 @@ const Chat = () => {
       setCurrentChatMessageList([]);
       resetCurrentChat();
     };
-  }, [
-    resetCurrentChat,
-    setChatList,
-    setCurrentChatMessageList,
-    socket,
-    user?._id,
-  ]);
+  }, [resetCurrentChat, setChatList, setCurrentChatMessageList, socket, user?._id]);
 
   useEffect(() => {
     if (!socket) return;
@@ -97,11 +76,9 @@ const Chat = () => {
     socket.on("getMessage", (message) => {
       if (message.chatId !== currentChatId) return;
 
-      const updateChatIndex = chatList.contents.findIndex(
-        (chat: PreviewChat) => {
-          return chat.chatId === message.chatId;
-        }
-      );
+      const updateChatIndex = chatList.contents.findIndex((chat: PreviewChat) => {
+        return chat.chatId === message.chatId;
+      });
       setChatList((prevList) => {
         return prevList.map((prevChat, index) => {
           if (index === updateChatIndex) {
@@ -128,60 +105,31 @@ const Chat = () => {
     return () => {
       socket.off("getMessage");
     };
-  }, [
-    chatList,
-    currentChatId,
-    setChatList,
-    setCurrentChatMessageList,
-    socket,
-    user?._id,
-  ]);
+  }, [chatList, currentChatId, setChatList, setCurrentChatMessageList, socket, user?._id]);
 
   return (
     <Flex w="100%">
       <Box w={{ base: "8em", lg: "25em" }} bg="gray.800" color={"white"}>
         <ChatProfile />
         <Divider borderColor="gray.600" />
+        <SearchChat />
         {isLoaded &&
           (chatList?.contents.length > 0 ? (
             <ChatList chatList={chatList.contents} />
           ) : (
-            <Flex
-              h={"calc(100vh - 12.5%)"}
-              alignItems={"center"}
-              justifyContent={"center"}
-            >
+            <Flex h={"calc(100vh - 21%)"} alignItems={"center"} justifyContent={"center"}>
               No chats started
             </Flex>
           ))}
         {!isLoaded && (
-          <Flex
-            paddingX={12}
-            paddingY={6}
-            alignItems={"center"}
-            justifyContent={"space-between"}
-            bgColor={"gray.800"}
-          >
+          <Flex paddingX={12} paddingY={6} alignItems={"center"} justifyContent={"space-between"} bgColor={"gray.800"}>
             <SkeletonCircle size="12" />
-            <SkeletonText
-              noOfLines={2}
-              spacing={4}
-              skeletonHeight={"2"}
-              width={"80%"}
-            />
+            <SkeletonText noOfLines={2} spacing={4} skeletonHeight={"2"} width={"80%"} />
           </Flex>
         )}
       </Box>
-      <Box
-        w={{ base: "calc(100% - 8em)", lg: "calc(100% - 25em)" }}
-        bg="gray.900"
-        p={12}
-        color={"white"}
-      >
-        <ChatRoom
-          showNewButton={showNewButton}
-          setShowNewButton={setShowNewButton}
-        />
+      <Box w={{ base: "calc(100% - 8em)", lg: "calc(100% - 25em)" }} bg="gray.900" p={12} color={"white"}>
+        <ChatRoom showNewButton={showNewButton} setShowNewButton={setShowNewButton} />
       </Box>
     </Flex>
   );

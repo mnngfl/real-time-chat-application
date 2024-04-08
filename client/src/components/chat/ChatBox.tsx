@@ -1,20 +1,8 @@
-import {
-  Flex,
-  Icon,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
-  Textarea,
-} from "@chakra-ui/react";
-import { useState } from "react";
+import { Flex, Icon, InputGroup, InputLeftElement, InputRightElement, Textarea } from "@chakra-ui/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FC, RefObject } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import {
-  currentChatState,
-  socketState,
-  userIdSelector,
-  userNameSelector,
-} from "@/state";
+import { currentChatState, socketState, userIdSelector, userNameSelector } from "@/state";
 import ChatEmoji from "./ChatEmoji";
 import { EmojiClickData } from "emoji-picker-react";
 import { useAlertDialog } from "@/hooks";
@@ -33,6 +21,22 @@ const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
   const currentChat = useRecoilValue(currentChatState);
   const [inputText, setInputText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
+  const emojiRef = useRef<HTMLDivElement>(null);
+
+  const handleClickEmojiOutside = useCallback((e: MouseEvent) => {
+    if (!emojiRef.current?.contains(e.target as Node)) {
+      setTimeout(() => {
+        setShowPicker(false);
+      }, 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("mousedown", handleClickEmojiOutside);
+    return () => {
+      window.removeEventListener("mousedown", handleClickEmojiOutside);
+    };
+  }, [handleClickEmojiOutside]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
@@ -101,7 +105,7 @@ const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
             <SmileIcon />
           </Icon>
         </InputLeftElement>
-        <ChatEmoji open={showPicker} handler={handleEmoji} />
+        <ChatEmoji open={showPicker} handler={handleEmoji} ref={emojiRef} />
         <Textarea
           paddingX={10}
           placeholder="Type something...&#10;Press Shift + Enter to line break / Press Enter to send message"
@@ -116,10 +120,7 @@ const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
           style={{ scrollbarWidth: "none" }}
           maxLength={2000}
         />
-        <InputRightElement
-          _hover={{ cursor: "pointer" }}
-          onClick={() => handleSubmit()}
-        >
+        <InputRightElement _hover={{ cursor: "pointer" }} onClick={() => handleSubmit()}>
           <Icon viewBox="0 0 24 24" boxSize={6} color="gray.300">
             <SendIcon />
           </Icon>

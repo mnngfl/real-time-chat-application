@@ -26,17 +26,12 @@ const createChat = async (req, res) => {
   }
 };
 
-const findUserChats = async (req, res) => {
+const searchUserChats = async (req, res) => {
   const userId = getUserIdFromRequest(req);
+  const queryValue = req.query.search;
+
   try {
-    const chats = await chatModel.aggregate([
-      {
-        $match: {
-          members: {
-            $in: [new mongoose.Types.ObjectId(userId)],
-          },
-        },
-      },
+    let pipeline = [
       {
         $lookup: {
           from: "users",
@@ -53,6 +48,13 @@ const findUserChats = async (req, res) => {
             },
           ],
           as: "joinedUsers",
+        },
+      },
+      {
+        $match: {
+          members: {
+            $in: [new mongoose.Types.ObjectId(userId)],
+          },
         },
       },
       {
@@ -134,7 +136,37 @@ const findUserChats = async (req, res) => {
           notifications: 1,
         },
       },
-    ]);
+    ];
+
+    if (queryValue?.length > 0) {
+      pipeline[1].$match = {
+        $and: [
+          {
+            members: {
+              $in: [new mongoose.Types.ObjectId(userId)],
+            },
+          },
+          {
+            $or: [
+              {
+                "joinedUsers.nickname": {
+                  $regex: `.*${queryValue}.*`,
+                  $options: "i",
+                },
+              },
+              {
+                "joinedUsers.userName": {
+                  $regex: `.*${queryValue}.*`,
+                  $options: "i",
+                },
+              },
+            ],
+          },
+        ],
+      };
+    }
+
+    const chats = await chatModel.aggregate(pipeline);
     res.apiSuccess(chats);
   } catch (error) {
     console.error(error);
@@ -157,4 +189,4 @@ const deleteNotifications = async (req, res) => {
   }
 };
 
-module.exports = { createChat, findUserChats, deleteNotifications };
+module.exports = { createChat, searchUserChats, deleteNotifications };

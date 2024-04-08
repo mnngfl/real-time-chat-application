@@ -1,31 +1,29 @@
-import EmojiPicker, {
-  EmojiClickData,
-  SuggestionMode,
-  Theme,
-} from "emoji-picker-react";
-import type { FC } from "react";
+import EmojiPicker, { EmojiClickData, SuggestionMode, Theme } from "emoji-picker-react";
+import { forwardRef, type HTMLAttributes } from "react";
 
-export type ChatEmojiProps = {
+export type ChatEmojiProps = HTMLAttributes<HTMLDivElement> & {
   open: boolean;
   handler: (emojiData: EmojiClickData) => void;
 };
 
-const ChatEmoji: FC<ChatEmojiProps> = ({ open, handler }) => {
+const ChatEmoji = forwardRef<HTMLDivElement, ChatEmojiProps>((props, ref) => {
   return (
-    <EmojiPicker
-      open={open}
-      lazyLoadEmojis={true}
-      suggestedEmojisMode={SuggestionMode.RECENT}
-      skinTonesDisabled={true}
-      searchDisabled={true}
-      theme={Theme.DARK}
-      onEmojiClick={(emojiData) => handler(emojiData)}
-      style={{
-        position: "absolute",
-        bottom: "4.5em",
-      }}
-    />
+    <div ref={ref}>
+      <EmojiPicker
+        open={props.open}
+        lazyLoadEmojis={true}
+        suggestedEmojisMode={SuggestionMode.RECENT}
+        skinTonesDisabled={true}
+        searchDisabled={true}
+        theme={Theme.DARK}
+        onEmojiClick={(emojiData) => props.handler(emojiData)}
+        style={{
+          position: "absolute",
+          bottom: "4.5em",
+        }}
+      />
+    </div>
   );
-};
+});
 
 export default ChatEmoji;
