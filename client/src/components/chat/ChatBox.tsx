@@ -37,7 +37,6 @@ const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
       window.removeEventListener("mousedown", handleClickEmojiOutside);
     };
   }, [handleClickEmojiOutside]);
-  console.log(showPicker);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;

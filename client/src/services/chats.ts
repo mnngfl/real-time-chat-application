@@ -6,8 +6,8 @@ export const createChat = async (data: ChatReq): Promise<ChatRes> => {
   return await instance.post("/chats", data);
 };
 
-export const findUserChats = async (): Promise<Array<PreviewChat>> => {
-  return await instance.get(`/chats`);
+export const searchUserChats = async (search?: string): Promise<Array<PreviewChat>> => {
+  return await instance.get(search ? `/chats?search=${search}` : "/chats");
 };
 
 export const deleteNotifications = async (chatId: string): Promise<number> => {

@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { LoginUserRes, OnlineUser } from "../../types/users";
+import type { LoginUserRes, OnlineUser } from "@/types/users";
 
 export const userState = atom<LoginUserRes>({
   key: "userState",
@@ -17,9 +17,7 @@ export const userState = atom<LoginUserRes>({
       }
 
       onSet((newValue, _, isReset) => {
-        isReset
-          ? localStorage.removeItem("user")
-          : localStorage.setItem("user", JSON.stringify(newValue));
+        isReset ? localStorage.removeItem("user") : localStorage.setItem("user", JSON.stringify(newValue));
       });
     },
   ],
