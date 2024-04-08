@@ -9,7 +9,7 @@ export type ChatListProps = {
 
 const ChatList: FC<ChatListProps> = ({ chatList }) => {
   return (
-    <Box overflowY={"auto"} h={"calc(100vh - 12.5%)"}>
+    <Box overflowY={"auto"} h={"calc(100vh - 21%)"}>
       {chatList.map((chat) => {
         return <ChatPreview key={chat.chatId} chat={chat} />;
       })}
