@@ -145,7 +145,7 @@ const Register = () => {
 
       setErrors(newErrors);
     },
-    [errors, password, userName]
+    [errors, password]
   );
 
   const changed = useCallback(
