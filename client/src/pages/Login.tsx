@@ -1,47 +1,34 @@
 import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, Link, Text } from "@chakra-ui/react";
-import { useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
-import type { LoginUserReq, LoginUserRes } from "@/types/users";
 import { loginUser } from "@/services/users";
 import { userState } from "@/state";
 import { useAlertDialog } from "@/hooks";
 import ValidatableInput, { ValidatableInputMethods } from "@/components/form/ValidatableInput";
 
+type LoginFormType = Record<"userName" | "password", string>;
+const initialState = { userName: "", password: "" };
+
 const Login = () => {
   const navigate = useNavigate();
-  // const location = useLocation();
-  // const from = location.state?.from?.pathname || "/";
   const setUser = useSetRecoilState(userState);
   const { openAlert } = useAlertDialog();
 
-  const [formData, setFormData] = useState<LoginUserReq>({
-    userName: "",
-    password: "",
-  });
+  const [{ userName, password }, setForm] = useState<LoginFormType>(initialState);
   const [validFields, setValidFields] = useState({
     userName: false,
     password: false,
   });
-  const [errors, setErrors] = useState<Partial<LoginUserReq>>({});
+  const [errors, setErrors] = useState<Partial<LoginFormType>>({});
   const [isSubmitLoading, setIsSubmitLoding] = useState(false);
   const userNameMethodsRef = useRef<ValidatableInputMethods>(null);
   const passwordMethodsRef = useRef<ValidatableInputMethods>(null);
   const hasError = useMemo(() => Object.values(errors).length > 0, [errors]);
   const isValid = useMemo(() => Object.values(validFields).every((v) => v), [validFields]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-
-    validateFields(name);
-  };
-
   const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!formData.userName || !formData.password) return;
+    if (!userName || !password) return;
 
     if (e.key === "Enter") {
       await handleSubmit();
@@ -51,7 +38,10 @@ const Login = () => {
   const handleSubmit = async () => {
     try {
       setIsSubmitLoding(true);
-      const res: LoginUserRes = await loginUser(formData);
+      const res = await loginUser({
+        userName,
+        password,
+      });
       setUser(res);
       navigate("/");
     } catch (error) {
@@ -61,38 +51,49 @@ const Login = () => {
     }
   };
 
-  const validateFields = (fieldName: string) => {
-    const newErrors = { ...errors };
+  const validateFields = useCallback(
+    (fieldName: string) => {
+      const newErrors = { ...errors };
 
-    switch (fieldName) {
-      case "userName": {
-        if (!userNameMethodsRef.current) return;
-        const [valid, valueOrErrorMessage] = userNameMethodsRef.current.validate();
-        if (valid) {
-          delete newErrors.userName;
-          setValidFields((prev) => ({ ...prev, userName: true }));
-        } else {
-          newErrors.userName = valueOrErrorMessage;
-          setValidFields((prev) => ({ ...prev, userName: false }));
+      switch (fieldName) {
+        case "userName": {
+          if (!userNameMethodsRef.current) return;
+          const [valid, valueOrErrorMessage] = userNameMethodsRef.current.validate();
+          if (valid) {
+            delete newErrors.userName;
+            setValidFields((prev) => ({ ...prev, userName: true }));
+          } else {
+            newErrors.userName = valueOrErrorMessage;
+            setValidFields((prev) => ({ ...prev, userName: false }));
+          }
+          break;
         }
-        break;
-      }
-      case "password": {
-        if (!passwordMethodsRef.current) return;
-        const [valid, valueOrErrorMessage] = passwordMethodsRef.current.validate();
-        if (valid) {
-          delete newErrors.password;
-          setValidFields((prev) => ({ ...prev, password: true }));
-        } else {
-          newErrors.password = valueOrErrorMessage;
-          setValidFields((prev) => ({ ...prev, password: false }));
+        case "password": {
+          if (!passwordMethodsRef.current) return;
+          const [valid, valueOrErrorMessage] = passwordMethodsRef.current.validate();
+          if (valid) {
+            delete newErrors.password;
+            setValidFields((prev) => ({ ...prev, password: true }));
+          } else {
+            newErrors.password = valueOrErrorMessage;
+            setValidFields((prev) => ({ ...prev, password: false }));
+          }
+          break;
         }
-        break;
       }
-    }
 
-    setErrors(newErrors);
-  };
+      setErrors(newErrors);
+    },
+    [errors]
+  );
+
+  const changed = useCallback(
+    (key: string) => (e: ChangeEvent<HTMLInputElement>) => {
+      setForm((prevState) => ({ ...prevState, [key]: e.target.value }));
+      validateFields(e.target.name);
+    },
+    [validateFields]
+  );
 
   return (
     <Container maxW={"container.sm"}>
@@ -106,8 +107,8 @@ const Login = () => {
             <ValidatableInput
               placeholder="Enter your username"
               name="userName"
-              value={formData.userName}
-              onChange={handleChange}
+              value={userName}
+              onChange={changed("userName")}
               onKeyUp={handleKeyUp}
               fieldname="User name"
               ref={userNameMethodsRef}
@@ -121,8 +122,8 @@ const Login = () => {
               type="password"
               placeholder="Enter your password"
               name="password"
-              value={formData.password}
-              onChange={handleChange}
+              value={password}
+              onChange={changed("password")}
               onKeyUp={handleKeyUp}
               fieldname="Password"
               ref={passwordMethodsRef}
