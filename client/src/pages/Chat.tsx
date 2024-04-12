@@ -1,5 +1,5 @@
 import { Box, Divider, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilStateLoadable, useRecoilValue, useResetRecoilState, useSetRecoilState } from "recoil";
 import {
   chatListState,
@@ -10,14 +10,12 @@ import {
   socketState,
   userState,
 } from "@/state";
-import { useFetchChats } from "@/hooks";
 import type { OnlineUser } from "@/types/users";
 import type { PreviewChat } from "@/types/chats";
 import { ChatProfile, ChatList, ChatRoom } from "@/components/chat";
 import SearchChat from "@/components/chat/SearchChat";
 
 const Chat = () => {
-  const { fetchChats } = useFetchChats();
   const socket = useRecoilValue(socketState);
   const user = useRecoilValue(userState);
   const currentChatId = useRecoilValue(currentChatIdSelector);
@@ -26,25 +24,7 @@ const Chat = () => {
   const setOnlineUserList = useSetRecoilState(onlineUserListState);
   const setCurrentChatMessageList = useSetRecoilState(currentChatMessageListState);
   const [showNewButton, setShowNewButton] = useState(false);
-  const isLoaded = useMemo(() => chatList.state === "hasValue", [chatList.state]);
-
-  const handleFetchChats = useCallback(async () => {
-    if (!socket || !fetchChats) return;
-
-    try {
-      const res = await fetchChats();
-      if (res) {
-        const rooms = res.map((v) => v.chatId);
-        socket.emit("enterRoom", rooms);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [fetchChats, socket]);
-
-  useEffect(() => {
-    handleFetchChats();
-  }, [handleFetchChats]);
+  const isLoaded = useMemo(() => chatList?.state === "hasValue", [chatList?.state]);
 
   useEffect(() => {
     if (!socket || !user?._id) return;
@@ -74,7 +54,7 @@ const Chat = () => {
     if (!socket) return;
 
     socket.on("getMessage", (message) => {
-      if (message.chatId !== currentChatId) return;
+      if (message.chatId !== currentChatId || !isLoaded) return;
 
       const updateChatIndex = chatList.contents.findIndex((chat: PreviewChat) => {
         return chat.chatId === message.chatId;
@@ -105,7 +85,7 @@ const Chat = () => {
     return () => {
       socket.off("getMessage");
     };
-  }, [chatList, currentChatId, setChatList, setCurrentChatMessageList, socket, user?._id]);
+  }, [chatList, currentChatId, isLoaded, setChatList, setCurrentChatMessageList, socket, user?._id]);
 
   return (
     <Flex w="100%">
@@ -114,7 +94,7 @@ const Chat = () => {
         <Divider borderColor="gray.600" />
         <SearchChat />
         {isLoaded &&
-          (chatList?.contents.length > 0 ? (
+          (chatList.contents.length > 0 ? (
             <ChatList chatList={chatList.contents} />
           ) : (
             <Flex h={"calc(100vh - 21%)"} alignItems={"center"} justifyContent={"center"}>
