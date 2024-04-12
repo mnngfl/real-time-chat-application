@@ -1,7 +1,9 @@
 import { Flex } from "@chakra-ui/react";
-import { AlertOverlay } from "@/components/common";
 import { useSocket } from "@/hooks";
 import RoutesSetup from "@/routes/RoutesSetup";
+import { lazy } from "react";
+
+const AlertOverlay = lazy(() => import("@/components/common/AlertOverlay"));
 
 function App() {
   useSocket();
