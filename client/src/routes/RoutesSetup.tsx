@@ -1,20 +1,35 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Register from "@/pages/Register";
-import Login from "@/pages/Login";
-import Chat from "@/pages/Chat";
 import { RequireAuth } from "@/components/auth";
 import { useRecoilValue } from "recoil";
 import { isLoggedInSelector } from "@/state";
+import { lazy, Suspense } from "react";
+import ComponentLoading from "@/components/common/ComponentLoading";
+
+const Register = lazy(() => import("@/pages/Register"));
+const Login = lazy(() => import("@/pages/Login"));
+const Chat = lazy(() => import("@/pages/Chat"));
 
 export default function RoutesSetup() {
   const isLoggedIn = useRecoilValue(isLoggedInSelector);
 
   const LoginRedirect = () => {
-    return isLoggedIn ? <Navigate to="/" /> : <Login />;
+    return isLoggedIn ? (
+      <Navigate to="/" />
+    ) : (
+      <Suspense fallback={<ComponentLoading />}>
+        <Login />
+      </Suspense>
+    );
   };
 
   const RegisterRedirect = () => {
-    return isLoggedIn ? <Navigate to="/" /> : <Register />;
+    return isLoggedIn ? (
+      <Navigate to="/" />
+    ) : (
+      <Suspense fallback={<ComponentLoading />}>
+        <Register />
+      </Suspense>
+    );
   };
 
   return (
@@ -25,7 +40,9 @@ export default function RoutesSetup() {
         path="/"
         element={
           <RequireAuth>
-            <Chat />
+            <Suspense fallback={<ComponentLoading />}>
+              <Chat />
+            </Suspense>
           </RequireAuth>
         }
       />
