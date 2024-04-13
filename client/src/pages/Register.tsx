@@ -1,3 +1,4 @@
+import { Link as ReactRouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -8,7 +9,7 @@ import {
   FormLabel,
   InputGroup,
   InputRightElement,
-  Link,
+  Link as ChakraLink,
   Spinner,
   Text,
   useToast,
@@ -275,9 +276,9 @@ const Register = () => {
 
           <Text color={"gray.600"}>
             Already have an account?{" "}
-            <Link color="teal.500" href="/login" fontWeight={500}>
+            <ChakraLink as={ReactRouterLink} color="teal.500" to="/login" fontWeight={500}>
               Sign In
-            </Link>
+            </ChakraLink>
           </Text>
         </Box>
       </Flex>
