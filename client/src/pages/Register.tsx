@@ -1,3 +1,4 @@
+import { Link as ReactRouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -8,7 +9,7 @@ import {
   FormLabel,
   InputGroup,
   InputRightElement,
-  Link,
+  Link as ChakraLink,
   Spinner,
   Text,
   useToast,
@@ -18,7 +19,7 @@ import { checkUserNameDuplicate, registerUser } from "@/services/users";
 import { useNavigate } from "react-router-dom";
 import { useAlertDialog } from "@/hooks";
 import ValidatableInput, { ValidatableInputMethods } from "@/components/form/ValidatableInput";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import { DUPLICATED_USER_NAME } from "@/utils/validation";
 import { CheckIcon } from "@chakra-ui/icons";
 
@@ -275,9 +276,9 @@ const Register = () => {
 
           <Text color={"gray.600"}>
             Already have an account?{" "}
-            <Link color="teal.500" href="/login" fontWeight={500}>
+            <ChakraLink as={ReactRouterLink} color="teal.500" to="/login" fontWeight={500}>
               Sign In
-            </Link>
+            </ChakraLink>
           </Text>
         </Box>
       </Flex>

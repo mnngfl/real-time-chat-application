@@ -1,4 +1,15 @@
-import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, Link, Text } from "@chakra-ui/react";
+import { Link as ReactRouterLink } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Link as ChakraLink,
+  Text,
+} from "@chakra-ui/react";
 import { type ChangeEvent, useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
@@ -146,9 +157,9 @@ const Login = () => {
 
           <Text color={"gray.600"}>
             Not a member yet?{" "}
-            <Link color="teal.500" href="/register" fontWeight={500}>
+            <ChakraLink as={ReactRouterLink} color="teal.500" to="/register" fontWeight={500}>
               Register
-            </Link>
+            </ChakraLink>
           </Text>
         </Box>
       </Flex>

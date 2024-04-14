@@ -1,8 +1,8 @@
 import { atom } from "recoil";
-import { Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
-export const socketState = atom<Socket | null>({
+export const socketState = atom<Socket>({
   key: "socketState",
-  default: null,
+  default: io(import.meta.env.VITE_SOCKET_URL),
   dangerouslyAllowMutability: true,
 });

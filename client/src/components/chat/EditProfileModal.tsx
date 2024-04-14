@@ -21,7 +21,7 @@ import { useRecoilValue } from "recoil";
 import { nicknameSelector } from "@/state";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FC } from "react";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import { checkValidateNickname, updateUserName } from "@/services/users";
 import UndoIcon from "@/assets/ico_undo.svg?react";
 

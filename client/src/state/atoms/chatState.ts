@@ -1,6 +1,7 @@
 import { atom, selector } from "recoil";
 import { BaseMessage, CurrentChat, PreviewChat } from "@/types/chats";
 import { searchUserChats } from "@/services/chats";
+import { socketState } from "./socketState";
 
 export const chatListState = atom<Array<PreviewChat>>({
   key: "chatState",
@@ -11,6 +12,17 @@ export const chatListState = atom<Array<PreviewChat>>({
       return res;
     },
   }),
+  effects: [
+    ({ onSet, getPromise }) => {
+      getPromise(socketState).then((socket) => {
+        if (!socket) return;
+        onSet((newValue) => {
+          const rooms = newValue.map((v) => v.chatId);
+          socket.emit("enterRoom", rooms);
+        });
+      });
+    },
+  ],
 });
 
 export const currentChatState = atom<CurrentChat>({

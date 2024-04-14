@@ -5,11 +5,7 @@ import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import { useAlertDialog, useFetchChats, useResponsive } from "@/hooks";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import {
-  EditProfileModal,
-  EditAvatarModal,
-  SearchUserModal,
-} from "@/components/chat";
+import { EditProfileModal, EditAvatarModal, SearchUserModal } from "@/components/chat";
 import { getProfile } from "@/services/users";
 import { UserAvatar } from "@/components/common";
 import UserSearchIcon from "@/assets/ico_user_search.svg?react";
@@ -104,37 +100,17 @@ const ChatProfile = () => {
           </>
           <Box ml={0} flex={1}>
             <Tooltip label={user?.nickname || "Anonymous"}>
-              <Text
-                fontSize={"xl"}
-                fontWeight={"semibold"}
-                noOfLines={1}
-                wordBreak={"break-all"}
-              >
+              <Text fontSize={"xl"} fontWeight={"semibold"} noOfLines={1} wordBreak={"break-all"}>
                 {user?.nickname || "Anonymous"}
               </Text>
             </Tooltip>
             <Flex justifyContent={"space-between"}>
               <Text fontSize={"sm"}>({user?.userName})</Text>
               <Flex alignItems={"center"}>
-                <Tooltip
-                  hasArrow
-                  label="Edit Profile"
-                  bg="gray.200"
-                  color="black"
-                >
-                  <EditIcon
-                    boxSize={4}
-                    ml={2}
-                    onClick={() => handleEdit()}
-                    _hover={{ cursor: "pointer" }}
-                  />
+                <Tooltip hasArrow label="Edit Profile" bg="gray.200" color="black">
+                  <EditIcon boxSize={4} ml={2} onClick={() => handleEdit()} _hover={{ cursor: "pointer" }} />
                 </Tooltip>
-                <Tooltip
-                  hasArrow
-                  label="Find Users"
-                  bg="gray.200"
-                  color="black"
-                >
+                <Tooltip hasArrow label="Find Users" bg="gray.200" color="black">
                   <Icon
                     viewBox="0 0 24 24 "
                     boxSize={5}
