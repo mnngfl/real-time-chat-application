@@ -1,7 +1,7 @@
 import { Box, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import { useFetchChats } from "@/hooks";
 
 const SearchChat = () => {

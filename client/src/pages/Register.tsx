@@ -19,7 +19,7 @@ import { checkUserNameDuplicate, registerUser } from "@/services/users";
 import { useNavigate } from "react-router-dom";
 import { useAlertDialog } from "@/hooks";
 import ValidatableInput, { ValidatableInputMethods } from "@/components/form/ValidatableInput";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import { DUPLICATED_USER_NAME } from "@/utils/validation";
 import { CheckIcon } from "@chakra-ui/icons";
 

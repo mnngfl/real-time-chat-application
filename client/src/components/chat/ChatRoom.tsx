@@ -1,27 +1,7 @@
-import {
-  AvatarBadge,
-  Box,
-  Button,
-  Center,
-  Circle,
-  Divider,
-  Flex,
-  Icon,
-  Spinner,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { AvatarBadge, Box, Button, Center, Circle, Divider, Flex, Icon, Spinner, Text, VStack } from "@chakra-ui/react";
 import { ChatBubble, DividerWithDate, ChatBox } from "@/components/chat";
 import { useRecoilState, useRecoilValue } from "recoil";
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { FC } from "react";
 import { findMessages } from "@/services/chats";
 import { ArrowUpIcon, InfoOutlineIcon } from "@chakra-ui/icons";
@@ -33,7 +13,7 @@ import {
   userIdSelector,
 } from "@/state";
 import { parseISO, isSameDay } from "date-fns";
-import { throttle } from "lodash";
+import throttle from "lodash/throttle";
 import { useFetchChats } from "@/hooks";
 import { UserAvatar } from "@/components/common";
 
@@ -47,9 +27,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
   const [socket] = useRecoilState(socketState);
   const userId = useRecoilValue(userIdSelector);
   const currentChat = useRecoilValue(currentChatState);
-  const [messageList, setMessageList] = useRecoilState(
-    currentChatMessageListState
-  );
+  const [messageList, setMessageList] = useRecoilState(currentChatMessageListState);
   const onlineUserList = useRecoilValue(onlineUserListState);
   const boxRef = useRef<HTMLDivElement>(null);
   const [currPage, setCurrPage] = useState(1);
@@ -73,9 +51,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
           setViewCount(res.data.length);
           setHasNextPage(res.pageInfo.hasMorePages);
           setMessageList((prev) => {
-            const newMessages = res.data.filter(
-              (v) => !prev.some((message) => message._id === v._id)
-            );
+            const newMessages = res.data.filter((v) => !prev.some((message) => message._id === v._id));
             return [...newMessages, ...prev];
           });
         }
@@ -95,9 +71,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
       const res = await findMessages(currentChat._id);
       if (res) {
         setMessageList((prev) => {
-          const newMessages = res.data.filter(
-            (v) => !prev.some((message) => message._id === v._id)
-          );
+          const newMessages = res.data.filter((v) => !prev.some((message) => message._id === v._id));
           return [...prev, ...newMessages];
         });
         setShowNewButton(true);
@@ -148,12 +122,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
   const handleScroll = throttle(() => {
     const boxEl = boxRef.current;
 
-    if (
-      boxEl &&
-      showNewButton &&
-      Math.round(boxEl.scrollTop) >=
-        Math.round(boxEl.scrollHeight - boxEl.offsetHeight)
-    ) {
+    if (boxEl && showNewButton && Math.round(boxEl.scrollTop) >= Math.round(boxEl.scrollHeight - boxEl.offsetHeight)) {
       setShowNewButton(false);
     }
   }, 300);
@@ -203,9 +172,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
 
   const renderDivider = (currDate: Date, prevDate: Date | null) => {
     if (prevDate === null || !isSameDay(currDate, prevDate)) {
-      return (
-        <DividerWithDate date={currDate} bgColor={"gray.900"}></DividerWithDate>
-      );
+      return <DividerWithDate date={currDate} bgColor={"gray.900"}></DividerWithDate>;
     }
   };
 
@@ -225,13 +192,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
         </Center>
       </Flex>
       <Divider />
-      <Box
-        h={"85%"}
-        overflowY={"auto"}
-        paddingY={4}
-        bgColor={"gray.900"}
-        ref={boxRef}
-      >
+      <Box h={"85%"} overflowY={"auto"} paddingY={4} bgColor={"gray.900"} ref={boxRef}>
         {hasNextPage && (
           <Circle
             size="2.5rem"
@@ -247,8 +208,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
         )}
         {messageList.map((message, index, arr) => {
           const currDate = parseISO(message.createdAt);
-          const prevDate =
-            index > 0 ? parseISO(arr[index - 1].createdAt) : null;
+          const prevDate = index > 0 ? parseISO(arr[index - 1].createdAt) : null;
 
           return (
             <Fragment key={message._id || message.chatId + message.createdAt}>
