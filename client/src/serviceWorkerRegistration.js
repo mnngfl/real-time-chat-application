@@ -5,18 +5,12 @@ export const register = () => {
         scope: "/",
       })
       .then((registration) => {
-        if (registration.installing) {
-          console.log("Service worker installing");
-        } else if (registration.waiting) {
-          console.log("Service worker installed");
-        } else if (registration.active) {
-          console.log("Service worker active");
-        }
+        console.log("Service worker registration succeeded: ", registration);
       })
       .catch((error) => {
         console.error("Service worker registration failed: ", error);
       });
   } else {
-    console.log("Service workers are not available.");
+    console.log("Service workers are not supported.");
   }
 };

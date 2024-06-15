@@ -4,7 +4,18 @@ const addResourcesToCache = async (resources) => {
 };
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(addResourcesToCache(["/index.html", "/assets/index.css"]));
+  event.waitUntil(
+    addResourcesToCache([
+      "/index.html",
+      "/assets/index.css",
+      "/static/bear.png",
+      "/static/chicken.png",
+      "/static/dog.png",
+      "/static/giraffe.png",
+      "/static/meerkat.png",
+      "/static/panda.png",
+    ])
+  );
 });
 
 self.addEventListener("fetch", (event) => {

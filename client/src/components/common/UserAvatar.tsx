@@ -6,21 +6,11 @@ export type UserAvatarProps = {
   size?: string;
 };
 
-const UserAvatar: FC<PropsWithChildren<UserAvatarProps>> = ({
-  avatar,
-  size = "md",
-  children,
-}) => {
-  const avatarPath = avatar
-    ? new URL("/static/" + avatar, import.meta.url).href
-    : undefined;
+const UserAvatar: FC<PropsWithChildren<UserAvatarProps>> = ({ avatar, size = "md", children }) => {
+  const avatarPath = avatar ? `/static/${avatar}` : undefined;
 
   return (
-    <Avatar
-      src={avatarPath}
-      size={size}
-      {...(avatarPath === undefined && { bgColor: "gray.400" })}
-    >
+    <Avatar src={avatarPath} size={size} {...(avatarPath === undefined && { bgColor: "gray.400" })}>
       {children}
     </Avatar>
   );
