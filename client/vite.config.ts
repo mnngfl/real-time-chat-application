@@ -15,6 +15,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`,
         manualChunks(id: string) {
           if (id.includes("socket.io-client") || id.includes("axios")) {
             return "@networking-vendor";
