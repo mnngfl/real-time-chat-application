@@ -11,7 +11,7 @@ const useFetchChats = () => {
       if (!setChatList) return;
 
       try {
-        const res = await searchUserChats(search);
+        const { data: res } = await searchUserChats(search);
         if (res) {
           setChatList(res);
         }

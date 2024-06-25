@@ -16,6 +16,8 @@ import { parseISO, isSameDay } from "date-fns";
 import throttle from "lodash/throttle";
 import { useFetchChats } from "@/hooks";
 import { UserAvatar } from "@/components/common";
+import type { BaseMessage } from "@/types/chats";
+import useErrorToast from "@/hooks/useErrorToast";
 
 export type ChatRoomProps = {
   showNewButton: boolean;
@@ -35,6 +37,8 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
   const [viewCount, setViewCount] = useState(0);
   const [isScrollCreated, setScrollCreated] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<any>(null);
+  useErrorToast(errorMessage);
 
   const isOnlineUser = useMemo(() => {
     return onlineUserList.some((user) => user.userId === currentChat.userId);
@@ -45,18 +49,19 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
       if (!currentChat._id) return;
       setIsLoading(true);
       setViewCount(0);
+
       try {
         const res = await findMessages(currentChat._id, page);
-        if (res) {
-          setViewCount(res.data.length);
-          setHasNextPage(res.pageInfo.hasMorePages);
-          setMessageList((prev) => {
-            const newMessages = res.data.filter((v) => !prev.some((message) => message._id === v._id));
-            return [...newMessages, ...prev];
-          });
-        }
+        const { data: messages, pagination } = res;
+
+        setViewCount(messages.length);
+        setHasNextPage(pagination!.hasMorePages);
+        setMessageList((prev) => {
+          const newMessages = messages.filter((v: BaseMessage) => !prev.some((message) => message._id === v._id));
+          return [...newMessages, ...prev];
+        });
       } catch (error) {
-        console.log(error);
+        setErrorMessage(error);
       } finally {
         setIsLoading(false);
       }
@@ -69,13 +74,12 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
 
     try {
       const res = await findMessages(currentChat._id);
-      if (res) {
-        setMessageList((prev) => {
-          const newMessages = res.data.filter((v) => !prev.some((message) => message._id === v._id));
-          return [...prev, ...newMessages];
-        });
-        setShowNewButton(true);
-      }
+      const messages = res.data;
+      setMessageList((prev) => {
+        const newMessages = messages.filter((v: BaseMessage) => !prev.some((message) => message._id === v._id));
+        return [...prev, ...newMessages];
+      });
+      setShowNewButton(true);
     } catch (error) {
       console.log(error);
     }

@@ -1,26 +1,22 @@
-import { CommonTimestamp } from "./common";
-import { BaseUser } from "./users";
+import { type Timestamp } from "./common";
+import { type BaseUser } from "./users";
 
-export interface BaseChat extends CommonTimestamp {
+export interface BaseChat extends Timestamp {
   _id: string;
-  members: Array<string>;
+  members: string[];
 }
 
-export interface PreviewChat extends CommonTimestamp {
+export interface PreviewChat extends Timestamp {
   chatId: string;
-  joinedUsers: Array<BaseUser> | [];
+  joinedUsers: BaseUser[];
   latestMessage: string;
   latestMessageAt: string;
   unreadCount: number;
-  notifications: Array<BaseNotification> | [];
+  notifications: BaseNotification[];
 }
 
-export interface CurrentChat {
-  _id: string;
+export interface CurrentChat extends BaseUser {
   userId: string;
-  userName: string;
-  nickname?: string;
-  avatar?: string;
 }
 
 export type ChatReq = {
@@ -29,7 +25,7 @@ export type ChatReq = {
 
 export type ChatRes = BaseChat;
 
-export interface BaseMessage extends CommonTimestamp {
+export interface BaseMessage extends Timestamp {
   _id: string;
   chatId: string;
   sendUser: BaseUser;
@@ -37,19 +33,7 @@ export interface BaseMessage extends CommonTimestamp {
   text: string;
 }
 
-export interface MessageReq {
-  chatId: string;
-  text: string;
-}
-
-export interface MessageRes extends CommonTimestamp {
-  _id: string;
-  chatId: string;
-  senderId: string;
-  text: string;
-}
-
 export interface BaseNotification {
-  _id: Array<string>;
+  _id: string[];
   unreadCount: number;
 }

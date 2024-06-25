@@ -49,7 +49,7 @@ const Login = () => {
   const handleSubmit = async () => {
     try {
       setIsSubmitLoding(true);
-      const res = await loginUser({
+      const { data: res } = await loginUser({
         userName,
         password,
       });

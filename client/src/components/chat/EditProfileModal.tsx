@@ -63,7 +63,7 @@ const EditProfileModal: FC<EditProfileModalProps> = ({ isOpen, onClose, onSucces
       }
 
       try {
-        const isDuplicated = await checkValidateNickname(value);
+        const { data: isDuplicated } = await checkValidateNickname(value);
         setIsAvailable(!isDuplicated);
         setMessage("Available username.");
       } catch (error) {

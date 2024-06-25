@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosError, type AxiosResponse } from "axios";
 
 const baseUrl = `${import.meta.env.VITE_SERVER_URL}/api`;
 
@@ -29,42 +29,52 @@ instance.interceptors.request.use(
 );
 
 instance.interceptors.response.use(
-  (response) => {
-    const { data, pageInfo } = response.data;
-    return pageInfo ? { data, pageInfo } : data;
+  (response: AxiosResponse) => {
+    return response.data;
   },
-  async (error) => {
-    const existToken = JSON.parse(localStorage.getItem("user")!);
+  async (error: AxiosError<any>) => {
+    const existToken = JSON.parse(localStorage.getItem("user") || "{}");
 
-    if (error.response.status === 401 && existToken.accessToken) {
-      if (isCalled) return;
-      isCalled = true;
+    if (error.response) {
+      console.log("API Error: ", error.response.status, error.message);
 
-      try {
-        const res = await axios.post(baseUrl + "/auth/refresh-token", {
-          refreshToken: existToken.refreshToken,
-        });
-        isCalled = false;
-        const newToken = res?.data?.accessToken;
+      if (error.response.status === 401 && existToken.accessToken) {
+        if (isCalled) return;
+        isCalled = true;
 
-        if (newToken) {
-          instance.defaults.headers.common["Authorization"] = newToken;
-          existToken.accessToken = newToken;
-          localStorage.setItem("user", JSON.stringify(existToken));
+        try {
+          const res = await axios.post(baseUrl + "/auth/refresh-token", {
+            refreshToken: existToken.refreshToken,
+          });
+          isCalled = false;
+          const newToken = res?.data?.accessToken;
+
+          if (newToken) {
+            instance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+            existToken.accessToken = newToken;
+            localStorage.setItem("user", JSON.stringify(existToken));
+          }
+
+          if (error.config) {
+            error.config.headers["Authorization"] = `Bearer ${newToken}`;
+            return instance(error.config);
+          }
+        } catch (error) {
+          console.error("Failed to refresh access token: ", error);
+          localStorage.removeItem("user");
+          throw error;
         }
-
-        const originRequest = error.config;
-        originRequest.headers["Authorization"] = newToken;
-        return instance(originRequest);
-      } catch (error) {
-        console.error("Failed to refresh access token: ", error);
-
-        localStorage.removeItem("user");
-
-        throw error;
       }
+
+      if (error.response.data.message) {
+        return Promise.reject(error.response.data.message);
+      }
+    } else if (error.request) {
+      console.log("No response received: ", error.request);
+    } else {
+      console.log("Error setting up request: ", error.message);
     }
-    return Promise.reject(error.response.data.message);
+    return Promise.reject(error);
   }
 );
 

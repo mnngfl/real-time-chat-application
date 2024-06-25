@@ -65,7 +65,7 @@ const Register = () => {
 
   const checkDuplicated = useCallback(async () => {
     try {
-      const isDuplicated = await checkUserNameDuplicate(debouncedUserName);
+      const { data: isDuplicated } = await checkUserNameDuplicate(debouncedUserName);
       if (isDuplicated) {
         setErrors((prev) => ({ ...prev, userName: DUPLICATED_USER_NAME }));
       } else {
@@ -170,7 +170,7 @@ const Register = () => {
   const handleSubmit = async () => {
     try {
       setIsSubmitLoding(true);
-      const res = await registerUser({
+      const { data: res } = await registerUser({
         userName,
         password,
         passwordConfirm,

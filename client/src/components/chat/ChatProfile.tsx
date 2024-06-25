@@ -30,7 +30,7 @@ const ChatProfile = () => {
 
   const handleProfileSuccess = async () => {
     try {
-      const res = await getProfile();
+      const { data: res } = await getProfile();
       setUser((prev) => ({ ...prev, nickname: res.nickname }));
     } catch (error) {
       console.log(error);
@@ -43,7 +43,7 @@ const ChatProfile = () => {
 
   const handleAvatarSuccess = async () => {
     try {
-      const res = await getProfile();
+      const { data: res } = await getProfile();
       setUser((prev) => ({ ...prev, avatar: res.avatar }));
     } catch (error) {
       console.log(error);
