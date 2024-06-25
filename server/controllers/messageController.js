@@ -122,7 +122,7 @@ const getMessages = async (req, res) => {
     const totalPage = Math.ceil(totalItems / limitNum);
     const hasMorePages = pageNum < totalPage;
 
-    const pageInfo = {
+    const pagination = {
       page: pageNum,
       limit: limitNum,
       totalItems,
@@ -130,7 +130,7 @@ const getMessages = async (req, res) => {
       hasMorePages,
     };
 
-    res.apiSuccessPagination(messages[0].data.reverse(), pageInfo);
+    res.apiSuccessPagination(messages[0].data.reverse(), pagination);
   } catch (error) {
     console.error(error);
     res.apiError(error);
