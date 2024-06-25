@@ -39,7 +39,7 @@ const Login = () => {
   const isValid = useMemo(() => Object.values(validFields).every((v) => v), [validFields]);
 
   const handleKeyUp = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!userName || !password) return;
+    if (!userName || !password || !isValid || hasError) return;
 
     if (e.key === "Enter") {
       await handleSubmit();
@@ -56,7 +56,7 @@ const Login = () => {
       setUser(res);
       navigate("/");
     } catch (error) {
-      openAlert("Login Failed", error as string);
+      openAlert("Login Failed", error);
     } finally {
       setIsSubmitLoding(false);
     }

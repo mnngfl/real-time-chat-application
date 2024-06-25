@@ -1,10 +1,14 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { searchUserChats } from "../services/chats";
 import { useSetRecoilState } from "recoil";
 import { chatListState } from "../state";
+import useErrorToast from "./useErrorToast";
 
 const useFetchChats = () => {
   const setChatList = useSetRecoilState(chatListState);
+  const [errorMessage, setErrorMessage] = useState<any>(null);
+
+  useErrorToast(errorMessage);
 
   const fetchChats = useCallback(
     async (search?: string) => {
@@ -17,7 +21,7 @@ const useFetchChats = () => {
         }
         return res;
       } catch (error) {
-        console.log(error);
+        setErrorMessage(error);
       }
     },
     [setChatList]

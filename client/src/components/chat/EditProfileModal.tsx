@@ -24,6 +24,7 @@ import type { ChangeEvent, FC } from "react";
 import debounce from "lodash/debounce";
 import { checkValidateNickname, updateUserName } from "@/services/users";
 import UndoIcon from "@/assets/ico_undo.svg?react";
+import { isAxiosError } from "axios";
 
 export type EditProfileModalProps = {
   isOpen: boolean;
@@ -67,9 +68,8 @@ const EditProfileModal: FC<EditProfileModalProps> = ({ isOpen, onClose, onSucces
         setIsAvailable(!isDuplicated);
         setMessage("Available username.");
       } catch (error) {
-        console.log(error);
         setIsAvailable(false);
-        setMessage(error as string);
+        setMessage(isAxiosError(error) ? error.message : (error as string));
       }
     },
     [nickname]

@@ -75,7 +75,7 @@ const updateAvatar = async (req, res) => {
   try {
     const updatedUser = await userModel.updateOne(
       { _id: userId },
-      { $set: { avatar: avatar } }
+      { $set: { avatar: avatar || "" } }
     );
     return res.apiSuccess(updatedUser);
   } catch (error) {

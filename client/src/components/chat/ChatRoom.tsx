@@ -81,7 +81,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
       });
       setShowNewButton(true);
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error);
     }
   }, [currentChat._id, setMessageList, setShowNewButton]);
 

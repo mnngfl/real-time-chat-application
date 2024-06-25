@@ -75,7 +75,7 @@ const Register = () => {
         });
       }
     } catch (error) {
-      console.log(error);
+      setErrors((prev) => ({ ...prev, userName: DUPLICATED_USER_NAME }));
     } finally {
       setIsValidating(false);
     }
@@ -158,7 +158,7 @@ const Register = () => {
   );
 
   const handleKeyUp = async (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!userName || !password || !passwordConfirm) {
+    if (!userName || !password || !passwordConfirm || !isValid || hasError) {
       return;
     }
 
@@ -185,7 +185,7 @@ const Register = () => {
       });
       navigate("/login");
     } catch (error) {
-      openAlert("Register Failed", error as string);
+      openAlert("Register Failed", error);
     } finally {
       setIsSubmitLoding(false);
     }

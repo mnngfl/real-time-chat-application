@@ -19,16 +19,9 @@ import { useEffect, useState } from "react";
 import type { FC } from "react";
 import { updateAvatar } from "@/services/users";
 import { UserAvatar } from "@/components/common";
+import useErrorToast from "@/hooks/useErrorToast";
 
-const Avatars = [
-  "",
-  "bear.png",
-  "chicken.png",
-  "dog.png",
-  "giraffe.png",
-  "meerkat.png",
-  "panda.png",
-];
+const Avatars = ["", "bear.png", "chicken.png", "dog.png", "giraffe.png", "meerkat.png", "panda.png"];
 
 export type AvatarItemProps = {
   avatar: string;
@@ -58,12 +51,10 @@ const AvatarItem: FC<AvatarItemProps> = ({ avatar, isSelected, onSelect }) => {
   );
 };
 
-const EditAvatarModal: FC<EditAvatarModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-}) => {
+const EditAvatarModal: FC<EditAvatarModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const avatar = useRecoilValue(avatarSelector);
+  const [errorMessage, setErrorMessage] = useState<any>(null);
+  useErrorToast(errorMessage);
 
   const [selectedAvatar, setSelectedAvatar] = useState(avatar || "");
 
@@ -76,9 +67,13 @@ const EditAvatarModal: FC<EditAvatarModalProps> = ({
       onClose();
       return;
     }
-    await updateAvatar(selectedAvatar);
-    onSuccess();
-    onClose();
+
+    await updateAvatar(selectedAvatar)
+      .then(() => {
+        onSuccess();
+        onClose();
+      })
+      .catch((error) => setErrorMessage(error));
   };
 
   useEffect(() => {
@@ -88,12 +83,7 @@ const EditAvatarModal: FC<EditAvatarModalProps> = ({
   }, [isOpen, avatar]);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} closeOnEsc={false}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Select your avatar</ModalHeader>
@@ -113,10 +103,7 @@ const EditAvatarModal: FC<EditAvatarModalProps> = ({
           </HStack>
           <Text mt={4} color={"gray.300"} fontSize={"0.8em"}>
             Animals icons created by Freepik - Flaticon
-            <Link
-              href={"https://www.flaticon.com/free-icons/animals"}
-              isExternal
-            >
+            <Link href={"https://www.flaticon.com/free-icons/animals"} isExternal>
               <ExternalLinkIcon mx="2px" />
             </Link>
           </Text>

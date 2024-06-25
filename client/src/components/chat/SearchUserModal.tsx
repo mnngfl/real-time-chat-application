@@ -26,6 +26,7 @@ import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { UserAvatar } from "@/components/common";
 import { createChat } from "@/services/chats";
 import { useAlertDialog } from "@/hooks";
+import useErrorToast from "@/hooks/useErrorToast";
 
 export type SearchUserModalProps = {
   isOpen: boolean;
@@ -40,6 +41,8 @@ const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess 
   const [users, setUsers] = useState<Array<BaseUser> | []>([]);
   const [userLoaded, setUserLoaded] = useState(false);
   const { openAlert } = useAlertDialog();
+  const [errorMessage, setErrorMessage] = useState<any>(null);
+  useErrorToast(errorMessage);
 
   const isLoaded = useMemo(() => chatList.state === "hasValue" && userLoaded === true, [chatList.state, userLoaded]);
 
@@ -56,7 +59,7 @@ const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess 
         setUsers(pUsers);
       }
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error);
     } finally {
       setUserLoaded(true);
     }
@@ -73,7 +76,7 @@ const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess 
       onSuccess();
       onClose();
     } catch (error) {
-      openAlert("Create chat Failed", error as string);
+      openAlert("Create chat Failed", error);
     }
   };
 

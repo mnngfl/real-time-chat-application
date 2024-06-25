@@ -1,20 +1,8 @@
-import {
-  AvatarBadge,
-  Flex,
-  HStack,
-  Icon,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { AvatarBadge, Flex, HStack, Icon, Text, VStack } from "@chakra-ui/react";
 import type { BaseUser } from "@/types/users";
 import type { PreviewChat } from "@/types/chats";
 import { useRecoilState, useRecoilValue } from "recoil";
-import {
-  currentChatState,
-  onlineUserListState,
-  socketState,
-  userIdSelector,
-} from "@/state";
+import { currentChatState, onlineUserListState, socketState, userIdSelector } from "@/state";
 import { useEffect, useMemo, useState } from "react";
 import type { FC } from "react";
 import { deleteNotifications } from "@/services/chats";
@@ -51,8 +39,7 @@ const ChatPreview: FC<ChatPreviewProps> = ({ chat }) => {
   }, [chat?.joinedUsers, userId]);
 
   const unreadCount = useMemo(() => {
-    return chat.notifications.find((noti) => noti._id[1] === userId)
-      ?.unreadCount;
+    return chat.notifications.find((noti) => noti._id[1] === userId)?.unreadCount;
   }, [chat.notifications, userId]);
 
   const onChangeChat = async (chatId: string) => {
@@ -103,29 +90,19 @@ const ChatPreview: FC<ChatPreviewProps> = ({ chat }) => {
                 {chat.latestMessage}
               </Text>
             ) : (
-              <Text
-                fontSize={"small"}
-                color={"gray.400"}
-                fontStyle={"italic"}
-                lineHeight="tight"
-                noOfLines={1}
-              >
+              <Text fontSize={"small"} color={"gray.400"} fontStyle={"italic"} lineHeight="tight" noOfLines={1}>
                 There are no messages yet.
               </Text>
             )}
           </Flex>
           <VStack alignItems={"end"} ml={4}>
             <Text fontSize={"small"} whiteSpace={"nowrap"}>
-              {chat.latestMessageAt &&
-                format(chat.latestMessageAt, "yy-MM-dd HH:mm")}
+              {chat.latestMessageAt && format(chat.latestMessageAt, "yy-MM-dd HH:mm")}
             </Text>
             {unreadCount && (
               <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
                 <svg>
-                  <path
-                    fill="currentColor"
-                    d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
-                  />
+                  <path fill="currentColor" d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0" />
                   <text
                     x="50%"
                     y="51%"

@@ -55,11 +55,7 @@ const ChatProfile = () => {
   };
 
   const handleCreateChatSuccess = async () => {
-    try {
-      await fetchChats();
-    } catch (error) {
-      console.log(error);
-    }
+    await fetchChats();
   };
 
   const handleLogout = () => {
