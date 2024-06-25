@@ -26,6 +26,7 @@ import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { UserAvatar } from "@/components/common";
 import { createChat } from "@/services/chats";
 import { useAlertDialog } from "@/hooks";
+import useErrorToast from "@/hooks/useErrorToast";
 
 export type SearchUserModalProps = {
   isOpen: boolean;
@@ -33,43 +34,32 @@ export type SearchUserModalProps = {
   onSuccess: () => void;
 };
 
-const SearchUserModal: FC<SearchUserModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-}) => {
+const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const userId = useRecoilValue(userIdSelector);
   const chatList = useRecoilValueLoadable(chatListState);
   const onlineUserList = useRecoilValue(onlineUserListState);
   const [users, setUsers] = useState<Array<BaseUser> | []>([]);
   const [userLoaded, setUserLoaded] = useState(false);
   const { openAlert } = useAlertDialog();
+  const [errorMessage, setErrorMessage] = useState<any>(null);
+  useErrorToast(errorMessage);
 
-  const isLoaded = useMemo(
-    () => chatList.state === "hasValue" && userLoaded === true,
-    [chatList.state, userLoaded]
-  );
+  const isLoaded = useMemo(() => chatList.state === "hasValue" && userLoaded === true, [chatList.state, userLoaded]);
 
   const isChatCreated = (user: BaseUser, chat: PreviewChat) =>
-    chat.joinedUsers[0]._id === user._id ||
-    chat.joinedUsers[1]._id === user._id;
+    chat.joinedUsers[0]._id === user._id || chat.joinedUsers[1]._id === user._id;
 
   const getPotentialUsers = useCallback(async () => {
     if (chatList.state !== "hasValue") return;
 
     try {
-      const res = await getOtherUsers();
+      const { data: res } = await getOtherUsers();
       if (res) {
-        const pUsers = res.filter(
-          (user) =>
-            !chatList?.contents.some((chat: PreviewChat) =>
-              isChatCreated(user, chat)
-            )
-        );
+        const pUsers = res.filter((user) => !chatList?.contents.some((chat: PreviewChat) => isChatCreated(user, chat)));
         setUsers(pUsers);
       }
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error);
     } finally {
       setUserLoaded(true);
     }
@@ -86,17 +76,12 @@ const SearchUserModal: FC<SearchUserModalProps> = ({
       onSuccess();
       onClose();
     } catch (error) {
-      openAlert("Create chat Failed", error as string);
+      openAlert("Create chat Failed", error);
     }
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} closeOnEsc={false}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Find Users</ModalHeader>
@@ -106,37 +91,23 @@ const SearchUserModal: FC<SearchUserModalProps> = ({
           <Box height={"26em"} overflowY={"auto"} mt={2}>
             {isLoaded ? (
               users.length === 0 ? (
-                <Center height={"100%"}>
-                  There's no user to start a chat with...
-                </Center>
+                <Center height={"100%"}>There's no user to start a chat with...</Center>
               ) : (
                 users.map((user, index) => {
-                  const isOnlineUser = onlineUserList.some(
-                    (onlineUser) => onlineUser.userId === user._id
-                  );
+                  const isOnlineUser = onlineUserList.some((onlineUser) => onlineUser.userId === user._id);
                   return (
                     <Fragment key={user._id}>
                       <HStack my={2} px={2}>
                         <UserAvatar avatar={user?.avatar}>
-                          {isOnlineUser && (
-                            <AvatarBadge bg={"green.500"} boxSize={"1.25em"} />
-                          )}
+                          {isOnlineUser && <AvatarBadge bg={"green.500"} boxSize={"1.25em"} />}
                         </UserAvatar>
                         <Box alignItems={"start"} width={"70%"}>
-                          <Text
-                            fontWeight={"semibold"}
-                            noOfLines={1}
-                            wordBreak={"break-all"}
-                          >
+                          <Text fontWeight={"semibold"} noOfLines={1} wordBreak={"break-all"}>
                             {user?.nickname || "Anonymous"}
                           </Text>
                           <Text fontSize={"small"}>({user.userName})</Text>
                         </Box>
-                        <Button
-                          colorScheme="teal"
-                          variant={"outline"}
-                          onClick={() => createNewChat(user._id)}
-                        >
+                        <Button colorScheme="teal" variant={"outline"} onClick={() => createNewChat(user._id)}>
                           Create Room
                         </Button>
                       </HStack>

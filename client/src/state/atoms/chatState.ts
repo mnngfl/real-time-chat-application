@@ -8,7 +8,7 @@ export const chatListState = atom<Array<PreviewChat>>({
   default: selector({
     key: "chatState/Default",
     get: async () => {
-      const res = await searchUserChats();
+      const { data: res } = await searchUserChats();
       return res;
     },
   }),

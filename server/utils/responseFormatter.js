@@ -4,12 +4,13 @@ const responseFormatter = (req, res, next) => {
       success: true,
       message,
       data,
+      status,
     });
   };
 
   res.apiSuccessPagination = (
     data,
-    pageInfo,
+    pagination,
     message = "Success",
     status = 200
   ) => {
@@ -17,7 +18,8 @@ const responseFormatter = (req, res, next) => {
       success: true,
       message,
       data,
-      pageInfo,
+      pagination,
+      status,
     });
   };
 
@@ -26,6 +28,7 @@ const responseFormatter = (req, res, next) => {
       success: false,
       message,
       data: null,
+      status,
     });
   };
 

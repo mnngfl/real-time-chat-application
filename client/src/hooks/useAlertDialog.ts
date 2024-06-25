@@ -1,18 +1,15 @@
 import { useSetRecoilState } from "recoil";
 import { AlertDialogStateAction, alertDialogState } from "@/state";
+import { isAxiosError } from "axios";
 
 const useAlertDialog = () => {
   const setAlertDialog = useSetRecoilState(alertDialogState);
 
-  const openAlert = (
-    title: string,
-    desc: string,
-    action?: Partial<AlertDialogStateAction>
-  ) => {
+  const openAlert = (title: string, desc: unknown, action?: Partial<AlertDialogStateAction>) => {
     setAlertDialog({
       isOpen: true,
       title,
-      desc,
+      desc: isAxiosError(desc) ? desc.message : (desc as string),
       action: action && hasButtonAction(action) ? action : {},
     });
   };

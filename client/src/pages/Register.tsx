@@ -65,7 +65,7 @@ const Register = () => {
 
   const checkDuplicated = useCallback(async () => {
     try {
-      const isDuplicated = await checkUserNameDuplicate(debouncedUserName);
+      const { data: isDuplicated } = await checkUserNameDuplicate(debouncedUserName);
       if (isDuplicated) {
         setErrors((prev) => ({ ...prev, userName: DUPLICATED_USER_NAME }));
       } else {
@@ -75,7 +75,7 @@ const Register = () => {
         });
       }
     } catch (error) {
-      console.log(error);
+      setErrors((prev) => ({ ...prev, userName: DUPLICATED_USER_NAME }));
     } finally {
       setIsValidating(false);
     }
@@ -158,7 +158,7 @@ const Register = () => {
   );
 
   const handleKeyUp = async (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!userName || !password || !passwordConfirm) {
+    if (!userName || !password || !passwordConfirm || !isValid || hasError) {
       return;
     }
 
@@ -170,7 +170,7 @@ const Register = () => {
   const handleSubmit = async () => {
     try {
       setIsSubmitLoding(true);
-      const res = await registerUser({
+      const { data: res } = await registerUser({
         userName,
         password,
         passwordConfirm,
@@ -185,7 +185,7 @@ const Register = () => {
       });
       navigate("/login");
     } catch (error) {
-      openAlert("Register Failed", error as string);
+      openAlert("Register Failed", error);
     } finally {
       setIsSubmitLoding(false);
     }
