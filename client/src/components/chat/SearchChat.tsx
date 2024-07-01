@@ -39,11 +39,11 @@ const SearchChat = () => {
     <Box p={4}>
       <InputGroup>
         <InputLeftElement>
-          <SearchIcon color={"gray.500"} />
+          <SearchIcon color={"on-secondary-container"} />
         </InputLeftElement>
         <Input
-          bgColor={"white"}
-          color={"gray.700"}
+          bgColor={"on-secondary"}
+          borderColor={"on-secondary-container"}
           placeholder="Search by nickname or username"
           value={inputVal}
           onChange={handleChange}

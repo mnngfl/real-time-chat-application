@@ -98,7 +98,7 @@ const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
           <Icon
             viewBox="0 0 24 24"
             boxSize={6}
-            color="gray.300"
+            color="on-secondary-container"
             _hover={{ cursor: "pointer" }}
             onClick={() => setShowPicker(!showPicker)}
           >
@@ -109,8 +109,7 @@ const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
         <Textarea
           paddingX={10}
           placeholder="Type something...&#10;Press Shift + Enter to line break / Press Enter to send message"
-          borderColor="gray.900"
-          focusBorderColor="gray.300"
+          borderColor="on-secondary-container"
           name="text"
           resize={"none"}
           rows={2}
@@ -121,7 +120,7 @@ const ChatBox: FC<ChatBoxProps> = ({ boxRef }) => {
           maxLength={2000}
         />
         <InputRightElement _hover={{ cursor: "pointer" }} onClick={() => handleSubmit()}>
-          <Icon viewBox="0 0 24 24" boxSize={6} color="gray.300">
+          <Icon viewBox="0 0 24 24" boxSize={6} color="on-secondary-container">
             <SendIcon />
           </Icon>
         </InputRightElement>

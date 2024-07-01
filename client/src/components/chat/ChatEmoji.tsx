@@ -1,3 +1,4 @@
+import { useColorMode } from "@chakra-ui/react";
 import EmojiPicker, { EmojiClickData, SuggestionMode, Theme } from "emoji-picker-react";
 import { forwardRef, type HTMLAttributes } from "react";
 
@@ -7,6 +8,8 @@ export type ChatEmojiProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 const ChatEmoji = forwardRef<HTMLDivElement, ChatEmojiProps>((props, ref) => {
+  const { colorMode } = useColorMode();
+
   return (
     <div ref={ref}>
       <EmojiPicker
@@ -15,7 +18,7 @@ const ChatEmoji = forwardRef<HTMLDivElement, ChatEmojiProps>((props, ref) => {
         suggestedEmojisMode={SuggestionMode.RECENT}
         skinTonesDisabled={true}
         searchDisabled={true}
-        theme={Theme.DARK}
+        theme={colorMode === "light" ? Theme.LIGHT : Theme.DARK}
         onEmojiClick={(emojiData) => props.handler(emojiData)}
         style={{
           position: "absolute",

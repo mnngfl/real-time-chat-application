@@ -14,6 +14,7 @@ import type { OnlineUser } from "@/types/users";
 import type { PreviewChat } from "@/types/chats";
 import { ChatProfile, ChatList, ChatRoom } from "@/components/chat";
 import SearchChat from "@/components/chat/SearchChat";
+import ToggleTheme from "@/components/common/ToggleTheme";
 
 const Chat = () => {
   const socket = useRecoilValue(socketState);
@@ -21,6 +22,7 @@ const Chat = () => {
   const currentChatId = useRecoilValue(currentChatIdSelector);
   const resetCurrentChat = useResetRecoilState(currentChatState);
   const [chatList, setChatList] = useRecoilStateLoadable(chatListState);
+  const resetChatList = useResetRecoilState(chatListState);
   const setOnlineUserList = useSetRecoilState(onlineUserListState);
   const setCurrentChatMessageList = useSetRecoilState(currentChatMessageListState);
   const [showNewButton, setShowNewButton] = useState(false);
@@ -32,11 +34,11 @@ const Chat = () => {
     socket.emit("addNewUser", user._id);
 
     return () => {
-      setChatList([]);
+      resetChatList();
       setCurrentChatMessageList([]);
       resetCurrentChat();
     };
-  }, [resetCurrentChat, setChatList, setCurrentChatMessageList, socket, user?._id]);
+  }, [resetCurrentChat, resetChatList, setCurrentChatMessageList, socket, user?._id]);
 
   useEffect(() => {
     if (!socket) return;
@@ -89,9 +91,9 @@ const Chat = () => {
 
   return (
     <Flex w="100%">
-      <Box w={{ base: "8em", lg: "25em" }} bg="gray.800" color={"white"}>
+      <Box w={{ base: "8em", lg: "25em" }} bg="on-secondary">
         <ChatProfile />
-        <Divider borderColor="gray.600" />
+        <Divider borderColor="outline" />
         <SearchChat />
         {isLoaded &&
           (chatList.contents.length > 0 ? (
@@ -102,13 +104,14 @@ const Chat = () => {
             </Flex>
           ))}
         {!isLoaded && (
-          <Flex paddingX={12} paddingY={6} alignItems={"center"} justifyContent={"space-between"} bgColor={"gray.800"}>
+          <Flex paddingX={12} paddingY={6} alignItems={"center"} justifyContent={"space-between"}>
             <SkeletonCircle size="12" />
             <SkeletonText noOfLines={2} spacing={4} skeletonHeight={"2"} width={"80%"} />
           </Flex>
         )}
       </Box>
-      <Box w={{ base: "calc(100% - 8em)", lg: "calc(100% - 25em)" }} bg="gray.900" p={12} color={"white"}>
+      <Box w={{ base: "calc(100% - 8em)", lg: "calc(100% - 25em)" }} bg="on-secondary" p={12}>
+        <ToggleTheme />
         <ChatRoom showNewButton={showNewButton} setShowNewButton={setShowNewButton} />
       </Box>
     </Flex>

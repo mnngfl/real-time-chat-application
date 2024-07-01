@@ -131,9 +131,10 @@ const EditProfileModal: FC<EditProfileModalProps> = ({ isOpen, onClose, onSucces
               <FormLabel>New Nickname</FormLabel>
               <InputGroup alignItems={"center"}>
                 <Input type="text" value={inputValue} onChange={handleValue} maxLength={30} />
-                <Tooltip hasArrow label="Undo" bg="gray.200" color="black">
+                <Tooltip hasArrow label="Undo" bg="surface-variant" color="on-surface-variant">
                   <Icon
                     viewBox="0 0 24 24"
+                    color="on-secondary-container"
                     boxSize={6}
                     ml={3}
                     onClick={() => handleReset()}
@@ -148,10 +149,10 @@ const EditProfileModal: FC<EditProfileModalProps> = ({ isOpen, onClose, onSucces
           </VStack>
         </ModalBody>
         <ModalFooter>
-          <Button mr={3} onClick={onClose}>
+          <Button colorScheme="gray" mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme="teal" isDisabled={!isAvailable} onClick={() => handleSave()}>
+          <Button isDisabled={!isAvailable} onClick={() => handleSave()}>
             Save
           </Button>
         </ModalFooter>

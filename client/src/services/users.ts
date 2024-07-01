@@ -18,7 +18,7 @@ export const checkUserNameDuplicate = async (userName: string): Promise<ApiRespo
 };
 
 export const loginUser = async (data: LoginUserReq): Promise<ApiResponse<LoginUserRes>> => {
-  return await instance.post("/auth/logins", data);
+  return await instance.post("/auth/login", data);
 };
 
 export const getProfile = async (): Promise<ApiResponse<FindUserRes>> => {

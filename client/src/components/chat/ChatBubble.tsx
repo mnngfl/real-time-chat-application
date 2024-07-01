@@ -24,11 +24,7 @@ const ChatBubble: FC<ChatBubbleProps> = ({ message, otherUser }) => {
   const isMyMessage = message.sendUser._id === userId;
 
   return (
-    <Flex
-      className="chat-bubble"
-      flexDir={"row"}
-      justifyContent={isMyMessage ? "flex-end" : "flex-start"}
-    >
+    <Flex className="chat-bubble" flexDir={"row"} justifyContent={isMyMessage ? "flex-end" : "flex-start"}>
       {isMyMessage ? (
         <HStack mr={3} ml={"35%"} mb={3} alignItems={"flex-end"}>
           <Text fontSize={"small"} textAlign={"right"}>
@@ -38,7 +34,8 @@ const ChatBubble: FC<ChatBubbleProps> = ({ message, otherUser }) => {
             flex={1}
             w="auto"
             p={2}
-            bgColor={"gray.700"}
+            bgColor={"on-primary-container"}
+            color={"on-primary"}
             borderRadius={8}
             borderTopRightRadius={0}
             whiteSpace={"pre-wrap"}
@@ -55,7 +52,7 @@ const ChatBubble: FC<ChatBubbleProps> = ({ message, otherUser }) => {
               <Box
                 w="auto"
                 p={2}
-                bgColor={"gray.700"}
+                bgColor={"surface-variant"}
                 borderRadius={8}
                 borderTopLeftRadius={0}
                 whiteSpace={"pre-wrap"}

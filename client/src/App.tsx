@@ -16,12 +16,12 @@ function App() {
           height={"100vh"}
           justifyContent={"center"}
           alignItems={"center"}
-          bgColor={"white"}
+          bgColor={"background"}
           opacity={0.8}
           position={"absolute"}
           zIndex={100}
         >
-          <Text color={"gray.800"} fontSize={"2xl"} textAlign={"center"} fontWeight={"bold"}>
+          <Text color={"on-primary-container"} fontSize={"2xl"} textAlign={"center"} fontWeight={"bold"}>
             No network connection.
             <br />
             Please check your connection status.
@@ -31,7 +31,7 @@ function App() {
       <Flex
         height={"100vh"}
         overflowY={"hidden"}
-        bgColor={"gray.900"}
+        bgColor={"background"}
         {...(isOnline === false && { pointerEvents: "none" })}
       >
         <RoutesSetup />

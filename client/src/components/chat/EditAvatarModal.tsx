@@ -40,9 +40,7 @@ const AvatarItem: FC<AvatarItemProps> = ({ avatar, isSelected, onSelect }) => {
     <Circle
       _hover={{ cursor: "pointer", brightness: "100%" }}
       onClick={() => onSelect(avatar)}
-      border={isSelected ? "0.15em solid" : "none"}
-      borderColor={"gray.300"}
-      borderRadius={"50%"}
+      size={50}
       filter={"auto"}
       brightness={isSelected ? "100%" : "50%"}
     >
@@ -101,7 +99,7 @@ const EditAvatarModal: FC<EditAvatarModalProps> = ({ isOpen, onClose, onSuccess 
               );
             })}
           </HStack>
-          <Text mt={4} color={"gray.300"} fontSize={"0.8em"}>
+          <Text mt={4} color={"outline"} fontSize={"0.8em"}>
             Animals icons created by Freepik - Flaticon
             <Link href={"https://www.flaticon.com/free-icons/animals"} isExternal>
               <ExternalLinkIcon mx="2px" />
@@ -109,12 +107,10 @@ const EditAvatarModal: FC<EditAvatarModalProps> = ({ isOpen, onClose, onSuccess 
           </Text>
         </ModalBody>
         <ModalFooter>
-          <Button mr={3} onClick={onClose}>
+          <Button colorScheme="gray" mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme="teal" onClick={() => handleSave()}>
-            Save
-          </Button>
+          <Button onClick={() => handleSave()}>Save</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
