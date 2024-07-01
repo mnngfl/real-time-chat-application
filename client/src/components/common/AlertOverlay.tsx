@@ -18,12 +18,7 @@ const AlertOverlay = () => {
   const cancelRef = useRef(null);
 
   return (
-    <AlertDialog
-      isOpen={alertDialog.isOpen}
-      onClose={closeAlert}
-      leastDestructiveRef={cancelRef}
-      isCentered
-    >
+    <AlertDialog isOpen={alertDialog.isOpen} onClose={closeAlert} leastDestructiveRef={cancelRef} isCentered>
       <AlertDialogOverlay>
         <AlertDialogContent>
           <AlertDialogHeader fontSize={"md"} fontWeight={"bold"}>
@@ -31,19 +26,11 @@ const AlertOverlay = () => {
           </AlertDialogHeader>
           <AlertDialogBody>{alertDialog.desc}</AlertDialogBody>
           <AlertDialogFooter>
-            <Button
-              colorScheme="gray"
-              onClick={closeAlert}
-              ref={cancelRef.current}
-            >
+            <Button colorScheme="gray" onClick={closeAlert} ref={cancelRef.current}>
               Close
             </Button>
             {hasButtonAction(alertDialog.action) && (
-              <Button
-                colorScheme="teal"
-                ml={3}
-                onClick={alertDialog.action.handler}
-              >
+              <Button ml={3} onClick={alertDialog.action.handler}>
                 {alertDialog.action.label}
               </Button>
             )}

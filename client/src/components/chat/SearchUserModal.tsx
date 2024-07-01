@@ -87,7 +87,7 @@ const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess 
         <ModalHeader>Find Users</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>Find friends to chat with! 👇</Text>
+          <Text>Find friends to chat with!</Text>
           <Box height={"26em"} overflowY={"auto"} mt={2}>
             {isLoaded ? (
               users.length === 0 ? (
@@ -99,7 +99,7 @@ const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess 
                     <Fragment key={user._id}>
                       <HStack my={2} px={2}>
                         <UserAvatar avatar={user?.avatar}>
-                          {isOnlineUser && <AvatarBadge bg={"green.500"} boxSize={"1.25em"} />}
+                          {isOnlineUser && <AvatarBadge bg={"green.400"} boxSize={"1.25em"} />}
                         </UserAvatar>
                         <Box alignItems={"start"} width={"70%"}>
                           <Text fontWeight={"semibold"} noOfLines={1} wordBreak={"break-all"}>
@@ -107,7 +107,7 @@ const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess 
                           </Text>
                           <Text fontSize={"small"}>({user.userName})</Text>
                         </Box>
-                        <Button colorScheme="teal" variant={"outline"} onClick={() => createNewChat(user._id)}>
+                        <Button variant={"outline"} onClick={() => createNewChat(user._id)}>
                           Create Room
                         </Button>
                       </HStack>
@@ -125,7 +125,9 @@ const SearchUserModal: FC<SearchUserModalProps> = ({ isOpen, onClose, onSuccess 
           </Box>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button colorScheme="gray" onClick={onClose}>
+            Cancel
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

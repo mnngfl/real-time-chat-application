@@ -78,24 +78,24 @@ const ChatProfile = () => {
         <Flex alignItems={"center"} p={8}>
           <>
             <UserAvatar avatar={user.avatar} />
-            <Tooltip hasArrow label="Edit Avatar" bg="gray.200" color="black">
+            <Tooltip hasArrow label="Edit Avatar" shadow={"none"} bg="surface-variant" color="on-surface-variant">
               <Circle
-                bg={"blue.500"}
+                bg={"primary"}
                 size={"1.5em"}
                 position={"relative"}
                 left={"-1em"}
                 top={"1.15em"}
-                borderColor={"gray.800"}
+                borderColor={"on-secondary"}
                 borderWidth={3}
                 _hover={{ cursor: "pointer" }}
                 onClick={() => handleAvatar()}
               >
-                <AddIcon boxSize={"0.65em"} />
+                <AddIcon boxSize={"0.65em"} color={"on-secondary"} />
               </Circle>
             </Tooltip>
           </>
           <Box ml={0} flex={1}>
-            <Tooltip label={user?.nickname || "Anonymous"}>
+            <Tooltip label={user?.nickname || "Anonymous"} placement={"bottom-start"}>
               <Text fontSize={"xl"} fontWeight={"semibold"} noOfLines={1} wordBreak={"break-all"}>
                 {user?.nickname || "Anonymous"}
               </Text>
@@ -103,12 +103,22 @@ const ChatProfile = () => {
             <Flex justifyContent={"space-between"}>
               <Text fontSize={"sm"}>({user?.userName})</Text>
               <Flex alignItems={"center"}>
-                <Tooltip hasArrow label="Edit Profile" bg="gray.200" color="black">
-                  <EditIcon boxSize={4} ml={2} onClick={() => handleEdit()} _hover={{ cursor: "pointer" }} />
-                </Tooltip>
-                <Tooltip hasArrow label="Find Users" bg="gray.200" color="black">
+                <Tooltip hasArrow label="Edit Profile" bg="surface-variant" color="on-surface-variant">
                   <Icon
-                    viewBox="0 0 24 24 "
+                    viewBox="0 0 24 24"
+                    color="on-secondary-container"
+                    boxSize={4}
+                    ml={2}
+                    onClick={() => handleEdit()}
+                    _hover={{ cursor: "pointer" }}
+                  >
+                    <EditIcon />
+                  </Icon>
+                </Tooltip>
+                <Tooltip hasArrow label="Find Users" bg="surface-variant" color="on-surface-variant">
+                  <Icon
+                    viewBox="0 0 24 24"
+                    color="on-secondary-container"
                     boxSize={5}
                     ml={4}
                     onClick={() => handleSearchModal()}
@@ -117,9 +127,10 @@ const ChatProfile = () => {
                     <UserSearchIcon />
                   </Icon>
                 </Tooltip>
-                <Tooltip hasArrow label="Logout" bg="gray.200" color="black">
+                <Tooltip hasArrow label="Logout" bg="surface-variant" color="on-surface-variant">
                   <Icon
-                    viewBox="0 0 24 24 "
+                    viewBox="0 0 24 24"
+                    color="on-secondary-container"
                     boxSize={5}
                     ml={4}
                     onClick={() => handleLogout()}

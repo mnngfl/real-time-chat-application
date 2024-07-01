@@ -107,9 +107,9 @@ const Login = () => {
   );
 
   return (
-    <Container maxW={"container.sm"}>
+    <Container maxW={"container.sm"} bg="background">
       <Flex justifyContent={"center"} alignItems={"center"} h={"100%"}>
-        <Box width={"32rem"} p={"4rem"} bg="gray.100" borderRadius={8}>
+        <Box width={"32rem"} p={"4rem"} bg="primary-container" borderRadius={8}>
           <Text fontSize={"3xl"} fontWeight={500}>
             Login
           </Text>
@@ -144,7 +144,6 @@ const Login = () => {
 
           <Button
             type="submit"
-            colorScheme="teal"
             size={"lg"}
             my={4}
             w={"100%"}
@@ -155,9 +154,9 @@ const Login = () => {
             Sign In
           </Button>
 
-          <Text color={"gray.600"}>
+          <Text>
             Not a member yet?{" "}
-            <ChakraLink as={ReactRouterLink} color="teal.500" to="/register" fontWeight={500}>
+            <ChakraLink as={ReactRouterLink} color="primary" to="/register" fontWeight={600}>
               Register
             </ChakraLink>
           </Text>

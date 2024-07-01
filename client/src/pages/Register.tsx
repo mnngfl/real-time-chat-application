@@ -194,7 +194,7 @@ const Register = () => {
   return (
     <Container maxW={"container.sm"}>
       <Flex justifyContent={"center"} alignItems={"center"} h={"100%"}>
-        <Box width={"32rem"} p={"4rem"} bg="gray.100" borderRadius={8}>
+        <Box width={"32rem"} p={"4rem"} bg="primary-container" borderRadius={8}>
           <Text fontSize={"3xl"} fontWeight={500}>
             Register
           </Text>
@@ -212,7 +212,7 @@ const Register = () => {
               />
               <InputRightElement>
                 {userName.length > 0 && isValidating && <Spinner size={"sm"} />}
-                {validFields.userName && !isValidating && !errors?.userName && <CheckIcon color={"green.600"} />}
+                {validFields.userName && !isValidating && !errors?.userName && <CheckIcon color={"green"} />}
               </InputRightElement>
             </InputGroup>
             {errors?.userName && <FormErrorMessage>{errors.userName}</FormErrorMessage>}
@@ -263,7 +263,6 @@ const Register = () => {
           </FormControl>
 
           <Button
-            colorScheme="teal"
             size={"lg"}
             my={4}
             w={"100%"}
@@ -274,9 +273,9 @@ const Register = () => {
             Sign Up
           </Button>
 
-          <Text color={"gray.600"}>
+          <Text>
             Already have an account?{" "}
-            <ChakraLink as={ReactRouterLink} color="teal.500" to="/login" fontWeight={500}>
+            <ChakraLink as={ReactRouterLink} color="primary" to="/login" fontWeight={500}>
               Sign In
             </ChakraLink>
           </Text>

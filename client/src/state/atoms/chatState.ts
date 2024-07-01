@@ -16,7 +16,10 @@ export const chatListState = atom<Array<PreviewChat>>({
     ({ onSet, getPromise }) => {
       getPromise(socketState).then((socket) => {
         if (!socket) return;
-        onSet((newValue) => {
+        onSet((newValue, _, isReset) => {
+          if (isReset) {
+            return;
+          }
           const rooms = newValue.map((v) => v.chatId);
           socket.emit("enterRoom", rooms);
         });

@@ -176,7 +176,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
 
   const renderDivider = (currDate: Date, prevDate: Date | null) => {
     if (prevDate === null || !isSameDay(currDate, prevDate)) {
-      return <DividerWithDate date={currDate} bgColor={"gray.900"}></DividerWithDate>;
+      return <DividerWithDate date={currDate} bgColor="on-secondary"></DividerWithDate>;
     }
   };
 
@@ -185,7 +185,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
       <Flex mb={4}>
         <Center>
           <UserAvatar avatar={currentChat.avatar}>
-            {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
+            {isOnlineUser && <AvatarBadge bg="green.400" boxSize="1.25em" />}
           </UserAvatar>
           <Box ml={4}>
             <Text fontWeight={"semibold"} fontSize={"xl"}>
@@ -196,12 +196,12 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
         </Center>
       </Flex>
       <Divider />
-      <Box h={"85%"} overflowY={"auto"} paddingY={4} bgColor={"gray.900"} ref={boxRef}>
+      <Box h={"85%"} overflowY={"auto"} paddingY={4} bgColor="on-secondary" ref={boxRef}>
         {hasNextPage && (
           <Circle
             size="2.5rem"
-            bg="gray.500"
-            color="white"
+            bg="primary-container"
+            color="on-primary-container"
             mb={4}
             marginX={"auto"}
             _hover={{ cursor: "pointer" }}
@@ -230,8 +230,8 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
         {isScrollCreated && showNewButton && (
           <Center position="absolute" bottom={"15%"} width={"50%"}>
             <Button
-              bgColor={"gray.100"}
-              color={"gray.900"}
+              bgColor="primary-container"
+              color="on-primary-container"
               size={"sm"}
               _hover={{ cursor: "pointer" }}
               onClick={() => showNewMessage()}
@@ -246,7 +246,7 @@ const ChatRoom: FC<ChatRoomProps> = ({ showNewButton, setShowNewButton }) => {
     </>
   ) : (
     <Flex h={"100%"} alignItems={"center"} justifyContent={"center"}>
-      <VStack color={"white"}>
+      <VStack color={"on-primary-container"}>
         <Icon boxSize={8}>
           <InfoOutlineIcon />
         </Icon>

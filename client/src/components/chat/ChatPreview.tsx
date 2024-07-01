@@ -63,17 +63,16 @@ const ChatPreview: FC<ChatPreviewProps> = ({ chat }) => {
 
   return (
     <Flex
-      color={"white"}
       paddingX={8}
       paddingY={4}
       alignItems={"center"}
-      bgColor={currentChat._id === chat.chatId ? "gray.700" : "gray.800"}
-      _hover={{ bgColor: "gray.600", cursor: "pointer" }}
+      bgColor={currentChat._id === chat.chatId ? "primary-container" : "on-secondary"}
+      _hover={{ bgColor: "inverse-primary", cursor: "pointer" }}
       onClick={() => onChangeChat(chat.chatId)}
     >
       <HStack>
         <UserAvatar avatar={chatUser.avatar}>
-          {isOnlineUser && <AvatarBadge bg="green.500" boxSize="1.25em" />}
+          {isOnlineUser && <AvatarBadge bg="green.400" boxSize="1.25em" borderColor={"on-secondary"} />}
         </UserAvatar>
       </HStack>
       {isPc && (
@@ -90,7 +89,7 @@ const ChatPreview: FC<ChatPreviewProps> = ({ chat }) => {
                 {chat.latestMessage}
               </Text>
             ) : (
-              <Text fontSize={"small"} color={"gray.400"} fontStyle={"italic"} lineHeight="tight" noOfLines={1}>
+              <Text fontSize={"small"} color={"outline"} fontStyle={"italic"} lineHeight="tight" noOfLines={1}>
                 There are no messages yet.
               </Text>
             )}
@@ -100,7 +99,7 @@ const ChatPreview: FC<ChatPreviewProps> = ({ chat }) => {
               {chat.latestMessageAt && format(chat.latestMessageAt, "yy-MM-dd HH:mm")}
             </Text>
             {unreadCount && (
-              <Icon viewBox="0 0 200 200" boxSize={8} color="red.500">
+              <Icon viewBox="0 0 200 200" boxSize={8} color="secondary">
                 <svg>
                   <path fill="currentColor" d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0" />
                   <text
